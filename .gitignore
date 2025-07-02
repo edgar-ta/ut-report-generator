@@ -1,0 +1,8 @@
+Include/
+Lib/
+Scripts/
+pyvenv.cfg
+share/
+etc/
+*.xlsx
+*.xls
