@@ -6,3 +6,4 @@ share/
 etc/
 *.xlsx
 *.xls
+.logistics-assets/
