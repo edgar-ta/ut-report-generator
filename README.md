@@ -8,9 +8,9 @@ de los alumnos que solicita la Secretaría Académica a los profesores tutores d
 Se trata de un proyecto desarrollado en conjunto por Edgar Trejo Avila y el profesor [Gregorio Rodríguez Miranda](https://github.com/GoyoRodMir).
 
 ## Tecnologías Utilizadas
----
 
 * **Flet** para el desarrollo de la UI
 * **Matplotlib** y **Seaborn** para la generación de gráficos
+* **python-pptx** para la generación automática de presentaciones
 
 ![Imagen de pie de página que muestra los logos de las instituciones con las que está asociada la UTSJR](readme-assets/footer.png)
