@@ -3,6 +3,20 @@
     "description": "Aplicación interna de la UTSJR cuyo propósito es automatizar la generación de reportes de actividades académicas.",
     "items": [
         {
+            "version": "1.0.3+1",
+            "shortVersion": 4,
+            "changes": [
+                {
+                    "type": "chore",
+                    "message": "Pequeño cambio en el texto del mensaje x2"
+                }
+            ],
+            "date": "2025-07-06",
+            "mandatory": true,
+            "url": "https://edgar-ta.github.io/ut-report-generator/1/1.0.3%2B1-windows",
+            "platform": "windows"
+        },
+        {
             "version": "1.0.2+1",
             "shortVersion": 3,
             "changes": [
@@ -12,7 +26,7 @@
                 }
             ],
             "date": "2025-07-06",
-            "mandatory": false,
+            "mandatory": true,
             "url": "https://edgar-ta.github.io/ut-report-generator/1/1.0.2%2B1-windows",
             "platform": "windows"
         },
