@@ -1,7 +1,7 @@
 name: ut_report_generator
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.1+1
+version: 1.0.2+1
 
 environment:
   sdk: ^3.7.2
