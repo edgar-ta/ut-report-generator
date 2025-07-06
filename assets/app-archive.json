@@ -1,0 +1,20 @@
+{
+    "appName": "UT Report Generator",
+    "description": "Aplicación interna de la UTSJR cuyo propósito es automatizar la generación de reportes de actividades académicas.",
+    "items": [
+        {
+            "version": "1.0.0+1",
+            "shortVersion": 1,
+            "changes": [
+                {
+                    "type": "chore",
+                    "message": "Initial commit"
+                }
+            ],
+            "date": "2025-07-06",
+            "mandatory": true,
+            "url": "https://www.github.com/edgar-ta/tree/2025-06-07--desktop-updater-integration/dist/1/1.0.0%2B1-windows",
+            "platform": "windows"
+        }
+    ]
+}
