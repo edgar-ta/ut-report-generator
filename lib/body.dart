@@ -17,7 +17,7 @@ class _BodyState extends State<Body> {
     super.initState();
     _desktopUpdaterController = DesktopUpdaterController(
       appArchiveUrl: Uri.parse(
-        "https://www.github.com/edgar-ta/ut-report-generator/tree/2025-06-07--desktop-updater-integration/docs/app-archive.json",
+        "https://edgar-ta.github.io/ut-report-generator/app-archive.json",
       ),
     );
   }
