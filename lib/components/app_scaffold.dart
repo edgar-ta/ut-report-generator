@@ -19,7 +19,7 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    var pages = [ProfilePage(), HomePage(), BugReportPage()];
+    var pages = [HomePage(), ProfilePage(), BugReportPage()];
 
     return MaterialApp(
       title: "UT Report Generator",
