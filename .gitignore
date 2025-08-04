@@ -1,5 +1,4 @@
 Include/
-Lib/
 Scripts/
 pyvenv.cfg
 share/
@@ -7,6 +6,7 @@ etc/
 *.xlsx
 *.xls
 .logistics-assets/
+venv/
 
 python-app/venv/
 

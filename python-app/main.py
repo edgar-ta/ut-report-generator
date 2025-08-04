@@ -5,9 +5,6 @@ import re
 import pandas as pd
 from process_file import process_file
 
-# Should get the port from an environment variable
-PORT = 55_001
-
 app = Flask(__name__)
 
 @app.route("/hello", methods=["POST", "GET"])
@@ -41,4 +38,4 @@ def upload():
             return f"Error processing file: {str(e)}", 500
 
 if __name__ == '__main__':
-    app.run(port=PORT)
+    app.run()

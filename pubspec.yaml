@@ -1,4 +1,4 @@
-name: flutter_application_1
+name: ut_report_generator
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0
@@ -7,13 +7,15 @@ environment:
   sdk: ^3.7.2
 
 dependencies:
+  file_picker: ^10.2.1
   flutter:
     sdk: flutter
+  http: ^1.4.0
 
 dev_dependencies:
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
