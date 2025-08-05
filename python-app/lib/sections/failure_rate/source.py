@@ -1,3 +1,4 @@
+from lib.descriptive_error import DescriptiveError
 from io import TextIOWrapper
 import pandas as pd
 import re
@@ -11,6 +12,21 @@ NAME_HEADER = "NOMBRE"
 
 LEFT_COLUMN_HEADERS = [ NUMBER_HEADER, EXPEDIENTE_HEADER, NAME_HEADER ]
 UNIT_TYPES = [  "Letra", "Número" ]
+
+def read_excel(filename: str) -> pd.DataFrame:
+    try:
+        data_frame = pd.read_excel(filename, header=[0, 1, 2, 3, 4])
+        return data_frame
+    except FileNotFoundError as error:
+        raise DescriptiveError(404, f"Couldn't get the data frame with the following path {filename}") from error
+
+def check_file_extension(filename: str) -> None:
+    extension = re.search(r"\.([^\.]+)$", filename)
+    if not extension:
+        raise DescriptiveError(400, "Invalid file path (it doesn't have an extension)")
+    extension = extension.group(1).lower()
+    if extension not in [ "xls", "xlsx", "csv" ]:
+        raise DescriptiveError(400, f"Unsupported file type ({extension})")
 
 def create_unit_name(index: int, type: Literal["Letra"] | Literal["Número"]) -> str:
     return f"U{index} - {type}"
@@ -53,7 +69,7 @@ def create_clean_index(subject_names: list[str], professor_names: list[str], uni
 
     return pd.MultiIndex.from_arrays(list(zip(*left_part)), names=["subject", "professor", "unit"])
 
-def graph_failure_rate(data_frame: pd.DataFrame, image_name: str):
+def get_clean_data_frame(data_frame: pd.DataFrame) -> pd.DataFrame:
     subject_names, professor_names, units_per_subject, max_units = get_grades_statistics(data_frame.columns)
 
     clean_index = create_clean_index(subject_names, professor_names, units_per_subject)
@@ -61,24 +77,15 @@ def graph_failure_rate(data_frame: pd.DataFrame, image_name: str):
 
     data_frame = data_frame.T
 
-    print(data_frame)
+    return data_frame
 
-    default_unit = 1
-
-    grades_df = data_frame.xs(create_unit_name(default_unit, "Número"), level="unit").map(lambda value: abs(value))
-
-    professors_without_uploads = grades_df[(grades_df == 0).all(axis=1)]
-
-    professors_with_uploads = grades_df[(grades_df != 0).any(axis=1)]
-
+def graph_failure_rate(grades: pd.DataFrame, image_name: str):
     grades_per_professor = pd.DataFrame({
-        "Estudiantes Reprobados": professors_with_uploads[professors_with_uploads < 7].count(axis=1),
-        "Calif. E": professors_with_uploads[professors_with_uploads >= 9.5].count(axis=1),
-        "Calif. A": professors_with_uploads[professors_with_uploads >= 8][9.5 > professors_with_uploads].count(axis=1),
-        "Calif. B": professors_with_uploads[professors_with_uploads >= 7][8 > professors_with_uploads].count(axis=1),
+        "Estudiantes Reprobados": grades[grades < 7].count(axis=1),
+        "Calif. E": grades[grades >= 9.5].count(axis=1),
+        "Calif. A": grades[grades >= 8][9.5 > grades].count(axis=1),
+        "Calif. B": grades[grades >= 7][8 > grades].count(axis=1),
     })
-
-    print(grades_per_professor)
 
     grades_per_professor.plot.bar()
     plt.savefig(image_name)
@@ -97,3 +104,4 @@ if __name__ == '__main__':
         graph_failure_rate(data_frame, None)
     except Exception as e:
         raise f"Error processing file: {str(e)}"
+

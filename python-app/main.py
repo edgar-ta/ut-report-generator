@@ -2,6 +2,8 @@ from flask import Flask, request
 import re
 import pandas as pd
 from failure_rate import graph_failure_rate
+from lib.sections.failure_rate.controller import FailureRate_Controller
+from lib.section_controller import SectionController
 import uuid
 import os
 import json
@@ -13,51 +15,43 @@ from lib.descriptive_error import DescriptiveError
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
-@app.route("/hello", methods=["POST", "GET"])
-def hello_world():
-    return "Hello world!"
-
-def get_data_frame(filename: str) -> pd.DataFrame:
-    try:
-        data_frame = pd.read_excel(filename, header=[0, 1, 2, 3, 4])
-        return data_frame
-    except FileNotFoundError as error:
-        raise DescriptiveError(404, f"Couldn't get the data frame with the following path {filename}") from error
-
-def check_file_extension(filename: str) -> None:
-    extension = re.search(r"\.([^\.]+)$", filename)
-    if not extension:
-        raise DescriptiveError(400, "Invalid file path (it doesn't have an extension)")
-    extension = extension.group(1).lower()
-    if extension not in [ "xls", "xlsx", "csv" ]:
-        raise DescriptiveError(400, f"Unsupported file type ({extension})")
+CURRENT_FILE_PATH = os.path.abspath(__file__)
+CURRENT_DIRECTORY_PATH = os.path.dirname(CURRENT_FILE_PATH)
+AVAILABLE_SECTION_TYPES: list[type[SectionController]] = [
+    FailureRate_Controller
+]
 
 def create_reports_directory() -> str:
-    file_path = os.path.abspath(__file__)
-    current_directory_path = os.path.dirname(file_path)
-    reports_directory = os.path.join(current_directory_path, "reports")
+    reports_directory = os.path.join(CURRENT_DIRECTORY_PATH, "reports")
 
     if not os.path.isdir(reports_directory):
         os.mkdir(reports_directory)
     return reports_directory
 
+def asset_dict(assets: list[tuple[str, str]]) -> list[dict[str, str]]:
+    return [ { "name": name, "path": path } for (name, path) in assets ]
+
+
+@app.route("/hello", methods=["POST", "GET"])
+def hello_world():
+    return "Hello world!"
+
 @app.route("/start_report", methods=["POST"])
-@error_message_decorator("Couldn't start the report", logger)
+# @error_message_decorator("Couldn't start the report", logger)
 def start_report():
-    filename = request.json["filename"]
+    data_file = request.json["data_file"]
 
-    check_file_extension(filename)
-    data_frame = get_data_frame(filename)
-
+    print("Started the report here")
     reports_directory = create_reports_directory()
-    directory_name = os.path.join(reports_directory, str(uuid.uuid4()))
+    current_report = os.path.join(reports_directory, str(uuid.uuid4()))
 
-    os.mkdir(directory_name)
-    os.mkdir(os.path.join(directory_name, "images"))
+    os.mkdir(current_report)
+    os.mkdir(os.path.join(current_report, "images"))
 
-    image_name = os.path.join(directory_name, "images", str(uuid.uuid4()) + ".png")
-    graph_failure_rate(data_frame, image_name)
     section_id = str(uuid.uuid4())
+
+    assets = FailureRate_Controller.render_assets(data_file, current_report, { "unit": 1 })
+    assets = asset_dict(assets)
 
     creation_date = pd.Timestamp.now().isoformat()
     report_name = "Mi reporte"
@@ -69,22 +63,59 @@ def start_report():
         "sections": [
             {
                 "id": section_id,
-                "type": "failure_rate",
-                "images": [ image_name ],
-                "data_file": filename
+                "type": FailureRate_Controller.type_id(),
+                "images": assets,
+                "data_file": data_file
             }
         ]
     }
 
-    with open(os.path.join(directory_name, "metadata.json"), "w") as json_file:
+    with open(os.path.join(current_report, "metadata.json"), "w") as json_file:
         json.dump(json_metadata, json_file, indent=4)
     
     return { 
-        "report_directory": directory_name, 
+        "report_directory": current_report,
         "report_name": report_name,
-        "image_path": image_name, 
+        "assets": assets, 
         "section_id": section_id,
     }, 200
+
+@app.route("/edit_section", methods=["POST"])
+# @error_message_decorator("Couldn't edit the report's section", logger)
+def edit_section():
+    current_report = request.json["report_directory"]
+    section_id = request.json["section_id"]
+    arguments = request.json["arguments"]
+
+    metadata_file = os.path.join(current_report, "metadata.json")
+    with open(metadata_file, "r") as file:
+        metadata = json.load(file)
+    
+    index, section = next(((index, section) for (index, section) in enumerate(metadata["sections"]) if section["id"] == section_id), (None, None))
+    if section is None:
+        raise DescriptiveError(404, f"Section not found in the report metadata. Possibly wrong id ({section_id})")
+    
+    section_type = section["type"]
+    controller = next((controller for controller in AVAILABLE_SECTION_TYPES if controller.type_id() == section_type), None)
+    if controller is None:
+        raise DescriptiveError(404, f"Section type '{section_type}' not found. Possibly wrong section type")
+    
+    controller.validate_asset_arguments(arguments)
+    assets = controller.render_assets(section["data_file"], current_report, arguments)
+    assets = asset_dict(assets)
+
+    for asset in section["images"]:
+        if os.path.exists(asset["path"]):
+            os.remove(asset["path"])
+    
+    section["images"] = assets
+    metadata["sections"][index] = section
+    metadata["last_edit"] = pd.Timestamp.now().isoformat()
+
+    with open(metadata_file, "w") as file:
+        json.dump(metadata, file, indent=4)
+    
+    return "Section edited successfully", 200
 
 if __name__ == '__main__':
     logging.basicConfig(filename='logs.log')

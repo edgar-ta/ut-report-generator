@@ -31,7 +31,7 @@ class _FailureSectionState extends State<FailureSection> {
               children: [
                 Expanded(
                   flex: 3,
-                  child: Image.file(File(widget.response.imagePath)),
+                  child: Image.file(File(widget.response.assets[0].path)),
                 ),
                 Expanded(
                   flex: 1,
