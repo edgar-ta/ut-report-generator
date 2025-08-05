@@ -1,41 +1,91 @@
-from contextlib import redirect_stdout
-from io import StringIO
 from flask import Flask, request
 import re
 import pandas as pd
-from process_file import process_file
+from failure_rate import graph_failure_rate
+import uuid
+import os
+import json
+import logging
+
+from lib.error_message_decorator import error_message_decorator
+from lib.descriptive_error import DescriptiveError
 
 app = Flask(__name__)
+logger = logging.getLogger(__name__)
 
 @app.route("/hello", methods=["POST", "GET"])
 def hello_world():
     return "Hello world!"
 
-@app.route("/upload", methods=["POST"])
-def upload():
-    with open("logs.txt", "a") as logs:
-        file_path = request.form["file_path"]
-        extension = re.search(r"\.([^\.]+)$", file_path)
-        if not extension:
-            return "Invalid file path", 400
-        extension = extension.group(1).lower()
-        if extension not in [ "xls", "xlsx", "csv" ]:
-            return "Unsupported file type", 400
+def get_data_frame(filename: str) -> pd.DataFrame:
+    try:
+        data_frame = pd.read_excel(filename, header=[0, 1, 2, 3, 4])
+        return data_frame
+    except FileNotFoundError as error:
+        raise DescriptiveError(404, f"Couldn't get the data frame with the following path {filename}") from error
 
-        print(f"{extension = }", file=logs)
+def check_file_extension(filename: str) -> None:
+    extension = re.search(r"\.([^\.]+)$", filename)
+    if not extension:
+        raise DescriptiveError(400, "Invalid file path (it doesn't have an extension)")
+    extension = extension.group(1).lower()
+    if extension not in [ "xls", "xlsx", "csv" ]:
+        raise DescriptiveError(400, f"Unsupported file type ({extension})")
 
-        data_frame = None
-        try:
-            data_frame = pd.read_excel(file_path, header=[0, 1, 2, 3, 4])
-            print(data_frame, file=logs)
-        except FileNotFoundError:
-            return "File not found", 404   
-        
-        try:
-            image_url = process_file(data_frame, logs)
-            return { "imageUrl": image_url }, 200
-        except Exception as e:
-            return f"Error processing file: {str(e)}", 500
+def create_reports_directory() -> str:
+    file_path = os.path.abspath(__file__)
+    current_directory_path = os.path.dirname(file_path)
+    reports_directory = os.path.join(current_directory_path, "reports")
+
+    if not os.path.isdir(reports_directory):
+        os.mkdir(reports_directory)
+    return reports_directory
+
+@app.route("/start_report", methods=["POST"])
+@error_message_decorator("Couldn't start the report", logger)
+def start_report():
+    filename = request.json["filename"]
+
+    check_file_extension(filename)
+    data_frame = get_data_frame(filename)
+
+    reports_directory = create_reports_directory()
+    directory_name = os.path.join(reports_directory, str(uuid.uuid4()))
+
+    os.mkdir(directory_name)
+    os.mkdir(os.path.join(directory_name, "images"))
+
+    image_name = os.path.join(directory_name, "images", str(uuid.uuid4()) + ".png")
+    graph_failure_rate(data_frame, image_name)
+    section_id = str(uuid.uuid4())
+
+    creation_date = pd.Timestamp.now().isoformat()
+    report_name = "Mi reporte"
+
+    json_metadata = {
+        "report_name": report_name,
+        "creation_date": creation_date,
+        "last_edit": creation_date,
+        "sections": [
+            {
+                "id": section_id,
+                "type": "failure_rate",
+                "images": [ image_name ],
+                "data_file": filename
+            }
+        ]
+    }
+
+    with open(os.path.join(directory_name, "metadata.json"), "w") as json_file:
+        json.dump(json_metadata, json_file, indent=4)
+    
+    return { 
+        "report_directory": directory_name, 
+        "report_name": report_name,
+        "image_path": image_name, 
+        "section_id": section_id,
+    }, 200
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='logs.log')
     app.run()

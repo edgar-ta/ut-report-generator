@@ -17,10 +17,12 @@ def create_unit_name(index: int, type: Literal["Letra"] | Literal["Número"]) ->
     return f"U{index} - {type}"
 
 def get_grades_statistics(index: pd.Index) -> tuple[list[str], list[str], list[int], int]:
-    subject_names = [ name for name in index.get_level_values(1) if not re.search(r"Unnamed", name) ]
-    professor_names = [ name for name in index.get_level_values(3) if not re.search(r"Unnamed", name) ]
+    subject_names = list({ name for name in index.get_level_values(1) if not re.search(r"Unnamed", name) })
+    professor_names = list({ name for name in index.get_level_values(3) if not re.search(r"Unnamed", name) })
+
     units_list = [ name for name in index.get_level_values(4) if re.match(r"U\d", name) ]
     units_per_subject = get_units_per_subject(units_list)
+
     max_units = max(units_per_subject)
 
     return (subject_names, professor_names, units_per_subject, max_units)
@@ -33,7 +35,7 @@ def get_units_per_subject(units_list: list[str]) -> list[int]:
         unit_index = int(re.search(r"(\d)", unit).group(1))
         if unit_index == current_index + 1:
             current_index += 1
-        else:
+        elif unit_index < current_index:
             units_per_subject.append(current_index)
             current_index = 1
     units_per_subject.append(current_index)
@@ -52,18 +54,19 @@ def create_clean_index(subject_names: list[str], professor_names: list[str], uni
 
     return pd.MultiIndex.from_arrays(list(zip(*left_part)), names=["subject", "professor", "unit"])
 
+def graph_failure_rate(data_frame: pd.DataFrame, image_name: str):
+    print(data_frame)
+    print(f"{data_frame.columns = }")
 
-def process_file(data_frame: pd.DataFrame, logs: TextIOWrapper):
     subject_names, professor_names, units_per_subject, max_units = get_grades_statistics(data_frame.columns)
+
     clean_index = create_clean_index(subject_names, professor_names, units_per_subject)
     data_frame.columns = clean_index
 
     data_frame = data_frame.T
     default_unit = 1
 
-    print(data_frame, file=logs)
     grades_df = data_frame.xs(create_unit_name(default_unit, "Número"), level="unit").map(lambda value: abs(value))
-    print(grades_df, file=logs)
 
     professors_without_uploads = grades_df[(grades_df == 0).all(axis=1)]
 
@@ -77,10 +80,7 @@ def process_file(data_frame: pd.DataFrame, logs: TextIOWrapper):
     })
 
     grades_per_professor.plot.bar()
-    plt.show()
-    file_name = time.strftime("%Y-%m-%d_%H-%M-%S.png")
-    plt.savefig(file_name)
-    return file_name
+    plt.savefig(image_name)
 
 if __name__ == '__main__':
     # Example usage
@@ -93,6 +93,6 @@ if __name__ == '__main__':
         raise "File not found"
      
     try:
-        process_file(data_frame, None)
+        graph_failure_rate(data_frame, None)
     except Exception as e:
         raise f"Error processing file: {str(e)}"
