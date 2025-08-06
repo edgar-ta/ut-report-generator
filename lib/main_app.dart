@@ -9,7 +9,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold();
+    return AppScaffold(verifyConnection: true);
     return ReportEditor(
       response: StartReport_Response(
         reportDirectory: "8fe5d3ef-804c-4be3-a88b-c16c3139de6d",

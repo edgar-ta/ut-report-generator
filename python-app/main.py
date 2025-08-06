@@ -34,7 +34,7 @@ def asset_dict(assets: list[tuple[str, str]]) -> list[dict[str, str]]:
 
 @app.route("/hello", methods=["POST", "GET"])
 def hello_world():
-    return "Hello world!"
+    return { "message": "Bienvenido, profesor" }, 200
 
 @app.route("/start_report", methods=["POST"])
 # @error_message_decorator("Couldn't start the report", logger)
