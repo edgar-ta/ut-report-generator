@@ -4,6 +4,7 @@ import pandas as pd
 from failure_rate import graph_failure_rate
 from lib.sections.failure_rate.controller import FailureRate_Controller
 from lib.section_controller import SectionController
+from lib.asset_dict import asset_dict
 import uuid
 import os
 import json
@@ -28,10 +29,6 @@ def create_reports_directory() -> str:
         os.mkdir(reports_directory)
     return reports_directory
 
-def asset_dict(assets: list[tuple[str, str]]) -> list[dict[str, str]]:
-    return [ { "name": name, "path": path } for (name, path) in assets ]
-
-
 @app.route("/hello", methods=["POST", "GET"])
 def hello_world():
     return { "message": "Bienvenido, profesor" }, 200
@@ -41,7 +38,6 @@ def hello_world():
 def start_report():
     data_file = request.json["data_file"]
 
-    print("Started the report here")
     reports_directory = create_reports_directory()
     current_report = os.path.join(reports_directory, str(uuid.uuid4()))
 
@@ -51,7 +47,8 @@ def start_report():
     section_id = str(uuid.uuid4())
 
     assets = FailureRate_Controller.render_assets(data_file, current_report, { "unit": 1 })
-    assets = asset_dict(assets)
+
+    default_arguments = { "unit": 1, "show_delayed_teachers": False }
 
     creation_date = pd.Timestamp.now().isoformat()
     report_name = "Mi reporte"
@@ -64,7 +61,8 @@ def start_report():
             {
                 "id": section_id,
                 "type": FailureRate_Controller.type_id(),
-                "images": assets,
+                "assets": assets,
+                "arguments": default_arguments,
                 "data_file": data_file
             }
         ]
@@ -78,6 +76,7 @@ def start_report():
         "report_name": report_name,
         "assets": assets, 
         "section_id": section_id,
+        "arguments": default_arguments
     }, 200
 
 @app.route("/edit_section", methods=["POST"])
@@ -101,14 +100,15 @@ def edit_section():
         raise DescriptiveError(404, f"Section type '{section_type}' not found. Possibly wrong section type")
     
     controller.validate_asset_arguments(arguments)
-    assets = controller.render_assets(section["data_file"], current_report, arguments)
-    assets = asset_dict(assets)
+    assets = controller.obtain_assets(section["data_file"], current_report, arguments)
 
-    for asset in section["images"]:
+    for asset in section["assets"]:
         if os.path.exists(asset["path"]):
             os.remove(asset["path"])
     
-    section["images"] = assets
+    section["assets"] = assets
+    section["arguments"] = { **section["arguments"], **arguments }
+
     metadata["sections"][index] = section
     metadata["last_edit"] = pd.Timestamp.now().isoformat()
 

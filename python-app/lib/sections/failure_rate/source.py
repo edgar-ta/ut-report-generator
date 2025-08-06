@@ -1,4 +1,5 @@
 from lib.descriptive_error import DescriptiveError
+from lib.unique_list import unique_list
 from io import TextIOWrapper
 import pandas as pd
 import re
@@ -32,8 +33,8 @@ def create_unit_name(index: int, type: Literal["Letra"] | Literal["Número"]) ->
     return f"U{index} - {type}"
 
 def get_grades_statistics(index: pd.Index) -> tuple[list[str], list[str], list[int], int]:
-    subject_names = list({ name for name in index.get_level_values(1) if not re.search(r"Unnamed", name) })
-    professor_names = list({ name for name in index.get_level_values(3) if not re.search(r"Unnamed", name) })
+    subject_names = unique_list( name for name in index.get_level_values(1) if not re.search(r"Unnamed", name) )
+    professor_names = unique_list( name for name in index.get_level_values(3) if not re.search(r"Unnamed", name) )
 
     units_list = [ name for name in index.get_level_values(4) if re.match(r"U\d", name) ]
     units_per_subject = get_units_per_subject(units_list)
@@ -82,9 +83,6 @@ def get_clean_data_frame(data_frame: pd.DataFrame) -> pd.DataFrame:
 def graph_failure_rate(grades: pd.DataFrame, image_name: str):
     grades_per_professor = pd.DataFrame({
         "Estudiantes Reprobados": grades[grades < 7].count(axis=1),
-        "Calif. E": grades[grades >= 9.5].count(axis=1),
-        "Calif. A": grades[grades >= 8][9.5 > grades].count(axis=1),
-        "Calif. B": grades[grades >= 7][8 > grades].count(axis=1),
     })
 
     grades_per_professor.plot.bar()

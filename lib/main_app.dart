@@ -9,7 +9,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(verifyConnection: true);
+    // return AppScaffold(verifyConnection: true);
     return ReportEditor(
       response: StartReport_Response(
         reportDirectory: "8fe5d3ef-804c-4be3-a88b-c16c3139de6d",
@@ -22,6 +22,7 @@ class MainApp extends StatelessWidget {
           ),
         ],
         sectionId: "cd6f1a07-455f-4c90-acf0-93bacd3d10df",
+        arguments: {"unit": "1", "show_delayed_teachers": "true"},
       ),
     );
   }

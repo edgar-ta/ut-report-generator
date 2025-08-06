@@ -7,20 +7,24 @@ Future<http.Response> startReport(String filename) {
 
 // ignore: camel_case_types
 class StartReport_Response {
-  List<({String name, String path})> assets;
   String reportDirectory;
   String reportName;
+  List<({String name, String path})> assets;
   String sectionId;
+  dynamic arguments;
 
   StartReport_Response({
-    required this.assets,
     required this.reportDirectory,
     required this.reportName,
+    required this.assets,
     required this.sectionId,
+    required this.arguments,
   });
 
   static StartReport_Response fromJson(Map<String, dynamic> json) {
     return StartReport_Response(
+      reportDirectory: json['report_directory'] as String,
+      reportName: json['report_name'] as String,
       assets:
           (json['assets'] as List<dynamic>)
               .map(
@@ -30,9 +34,8 @@ class StartReport_Response {
                 ),
               )
               .toList(),
-      reportDirectory: json['report_directory'] as String,
-      reportName: json['report_name'] as String,
       sectionId: json['section_id'] as String,
+      arguments: json['arguments'] as dynamic,
     );
   }
 }

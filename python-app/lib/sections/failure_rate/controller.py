@@ -1,9 +1,27 @@
 from lib.section_controller import SectionController
 from lib.descriptive_error import DescriptiveError
 from lib.sections.failure_rate.source import read_excel, check_file_extension, get_clean_data_frame, create_unit_name, graph_failure_rate
+from lib.asset_dict import asset_dict
+from pandas import DataFrame
 import re
 import os
 import uuid
+
+def delayed_teachers_legend(subjects_without_grades: DataFrame, unit: int) -> str:
+    # Get unique professor names from the multi-index
+    subjects = subjects_without_grades.index.get_level_values("subject").unique()
+    subjects = [str(p).title() for p in subjects]
+
+    if not subjects:
+        return f"Todos los profesores subieron calificaciones en la unidad {unit}"
+
+    if len(subjects) == 1:
+        return f"La materia de {subjects[0]} no subió calificaciones en la unidad {unit}"
+    elif len(subjects) == 2:
+        return f"Las materias de {subjects[0]} y {subjects[1]} no subieron calificaciones en la unidad {unit}"
+    else:
+        *rest, last = subjects
+        return f"Las materias de {', '.join(rest)}, y {last} no subieron calificaciones en la unidad {unit}"
 
 class FailureRate_Controller(SectionController):
     @staticmethod
@@ -18,9 +36,8 @@ class FailureRate_Controller(SectionController):
         if unit > 5:
             raise DescriptiveError(400, "No subject has more than 5 units")
 
-
     @staticmethod
-    def render_assets(data_file: str, report_directory: str, arguments: dict[str, str]) -> list[tuple[str, str]]:
+    def render_assets(data_file: str, report_directory: str, arguments: dict[str, str]) -> list[dict[str, str]]:
         check_file_extension(data_file)
         data_frame = read_excel(data_file)
         data_frame = get_clean_data_frame(data_frame)
@@ -28,14 +45,21 @@ class FailureRate_Controller(SectionController):
         unit = arguments["unit"]
         grades = data_frame.xs(create_unit_name(unit, "Número"), level="unit").map(lambda value: abs(value))
 
-        # subjects_without_grades = grades[(grades == 0).all(axis=1)]
+        subjects_without_grades = grades[(grades == 0).all(axis=1)]
         subjects_with_grades = grades[(grades != 0).any(axis=1)]
+
+        print(f"{grades = }")
+        print(data_frame)
+        print(subjects_without_grades)
 
         main_chart_path = os.path.join(report_directory, "images", str(uuid.uuid4()) + ".png")
         graph_failure_rate(subjects_with_grades, main_chart_path)
 
-        return [ ("main-chart", main_chart_path) ]
-    
+        return asset_dict([ 
+            ("main-chart", main_chart_path), 
+            ("delayed-teachers", delayed_teachers_legend(subjects_without_grades, unit)) 
+        ])
+
 
     @staticmethod
     def validate_slide_arguments(arguments, assets):
