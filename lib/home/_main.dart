@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/api/start_report.dart';
+import 'package:ut_report_generator/components/server_connection_loader/widget.dart';
 import 'package:ut_report_generator/home/file_picker_button.dart';
 import 'package:ut_report_generator/home/report-editor/_main.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  String? message;
+  HomePage({super.key, this.message});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -28,7 +30,10 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 16,
             children: [
-              Text("Bienvenido, profesor", style: TextStyle(fontSize: 32)),
+              Text(
+                widget.message ?? "Bienvenido, profesor",
+                style: TextStyle(fontSize: 32),
+              ),
               FilePickerButton(
                 onFileSelected: (filePath) async {
                   setState(() {

@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/api/verify_connection.dart';
 import 'package:ut_report_generator/bugs/_main.dart';
 import 'package:ut_report_generator/components/footer_component.dart';
 import 'package:ut_report_generator/components/header_component.dart';
+import 'package:ut_report_generator/components/server_connection_loader/widget.dart';
 import 'package:ut_report_generator/home/_main.dart';
 import 'package:ut_report_generator/main_app.dart';
 import 'package:ut_report_generator/profile/_main.dart';
 
 class AppScaffold extends StatefulWidget {
   Future<bool> Function(int)? allowNewDestination;
+  bool verifyConnection;
   Widget? child;
 
-  AppScaffold({super.key, this.allowNewDestination, this.child});
+  AppScaffold({
+    super.key,
+    this.allowNewDestination,
+    this.child,
+    this.verifyConnection = false,
+  });
 
   @override
   State<AppScaffold> createState() => _AppScaffoldState();
@@ -21,7 +29,19 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    var pages = [HomePage(), ProfilePage(), BugReportPage()];
+    Widget getWidgetToRender(VerifyConnection_Response? response) {
+      if (widget.child != null) {
+        return widget.child!;
+      }
+      switch (selectedIndex) {
+        case 0:
+          return HomePage(message: response?.message);
+        case 1:
+          return ProfilePage();
+        default:
+          return BugReportPage();
+      }
+    }
 
     return MaterialApp(
       title: "UT Report Generator",
@@ -80,7 +100,12 @@ class _AppScaffoldState extends State<AppScaffold> {
                         VerticalDivider(thickness: 1, width: 1),
                         Expanded(
                           child: Center(
-                            child: widget.child ?? pages[selectedIndex],
+                            child:
+                                widget.verifyConnection
+                                    ? ServerConnectionLoader(
+                                      builder: getWidgetToRender,
+                                    )
+                                    : getWidgetToRender(null),
                           ),
                         ),
                       ],

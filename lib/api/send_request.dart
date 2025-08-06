@@ -12,8 +12,10 @@ Future<http.Response> sendRequest({required String route, Object? body}) {
       )
       .then((response) {
         if (response.statusCode == 200) {
+          print("@send_request.dart");
           print("Request successful: ${response.body}");
         } else {
+          print("@send_request.dart");
           print("Request failed with status: ${response.statusCode}");
         }
         return response;
