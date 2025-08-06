@@ -30,6 +30,9 @@ class _HomePageState extends State<HomePage> {
                 isLoading = true;
               });
 
+              print("This is the file to use");
+              print(file.absolute.path);
+
               await startReport(file.absolute.path)
                   .then((response) {
                     setState(() {
@@ -50,6 +53,8 @@ class _HomePageState extends State<HomePage> {
                     );
                   })
                   .catchError((error) {
+                    print("Something went wrong with the request");
+                    print(error);
                     setState(() {
                       isLoading = false;
                       errorMessage = "Hubo un error al cargar el archivo";
