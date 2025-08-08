@@ -1,8 +1,14 @@
-from lib.section_controller import SectionController
+from lib.section_controller import SlideController
 from lib.descriptive_error import DescriptiveError
-from lib.sections.failure_rate.source import read_excel, check_file_extension, get_clean_data_frame, create_unit_name, graph_failure_rate
+from lib.sections.failure_rate.source import read_excel, get_clean_data_frame, create_unit_name, graph_failure_rate
 from lib.asset_dict import asset_dict
+from lib.get_asset import get_string_asset, get_image_asset
+
 from pandas import DataFrame
+from pptx import Presentation
+from pptx.util import Inches, Pt
+from pptx.enum.text import PP_ALIGN
+
 import re
 import os
 import uuid
@@ -23,22 +29,21 @@ def delayed_teachers_legend(subjects_without_grades: DataFrame, unit: int) -> st
         *rest, last = subjects
         return f"Las materias de {', '.join(rest)}, y {last} no subieron calificaciones en la unidad {unit}"
 
-class FailureRate_Controller(SectionController):
+class FailureRate_Controller(SlideController):
     @staticmethod
     def type_id() -> str:
         return "failure_rate"
 
 
     @staticmethod
-    def validate_asset_arguments(arguments):
-        unit = arguments["unit"]
-        
-        if unit > 5:
-            raise DescriptiveError(400, "No subject has more than 5 units")
+    def default_arguments() -> dict[str, any]:
+        return {
+            "unit": 1,
+            "show_delayed_teachers": True
+        }
 
     @staticmethod
-    def render_assets(data_file: str, report_directory: str, arguments: dict[str, str]) -> list[dict[str, str]]:
-        check_file_extension(data_file)
+    def build_assets(data_file: str, report_directory: str, arguments: dict[str, any]) -> list[dict[str, str]]:
         data_frame = read_excel(data_file)
         data_frame = get_clean_data_frame(data_frame)
 
@@ -48,33 +53,52 @@ class FailureRate_Controller(SectionController):
         subjects_without_grades = grades[(grades == 0).all(axis=1)]
         subjects_with_grades = grades[(grades != 0).any(axis=1)]
 
-        print(f"{grades = }")
-        print(data_frame)
-        print(subjects_without_grades)
-
         main_chart_path = os.path.join(report_directory, "images", str(uuid.uuid4()) + ".png")
         graph_failure_rate(subjects_with_grades, main_chart_path)
 
         return asset_dict([ 
-            ("main-chart", main_chart_path), 
-            ("delayed-teachers", delayed_teachers_legend(subjects_without_grades, unit)) 
+            ("main_chart", main_chart_path, "image"), 
+            ("delayed_teachers", delayed_teachers_legend(subjects_without_grades, unit), "text") 
         ])
 
 
     @staticmethod
-    def validate_slide_arguments(arguments, assets):
+    def validate_arguments(arguments: dict[str, any]) -> None:
+        # UNIT
+        unit = arguments["unit"]        
+        if unit > 5:
+            raise DescriptiveError(400, "No subject has more than 5 units")
+
+        # SHOW_DELAYED_TEACHERS
+        print(f'{arguments}')
         show_delayed_teachers = arguments["show_delayed_teachers"]
-        if show_delayed_teachers not in [ "true", "false" ]:
+        if not type(show_delayed_teachers) is bool:
             raise DescriptiveError(400, f"Invalid value for 'show_delayed_teachers'. Expected 'true' or 'false', found {show_delayed_teachers}")
-        
-        if not assets["main-chart"]:
-            raise DescriptiveError(500, "The main chart asset is required to render the slide")
-        
-        if not assets["table"]:
-            raise DescriptiveError(500, "The table asset is required to render the slide")
 
 
     @staticmethod
-    def render_slide(filename: str, assets: dict[str, str], arguments: dict[str, str]) -> None:
-        print("Without implementation yet")
-        return super().render_slide(assets)
+    def render_slide(presentation: Presentation, arguments: dict[str, any], assets: list[dict[str, str]]) -> None:
+        slide = presentation.slides.add_slide(presentation.slide_layouts[5])
+
+        main_chart_path = get_image_asset(assets, "main_chart")
+
+        left = Inches(1)
+        top = Inches(1)
+        width = Inches(8)
+        slide.shapes.add_picture(main_chart_path, left, top, width=width)
+
+        if arguments["show_delayed_teachers"]:
+            delayed_teachers_text = get_string_asset(assets, "delayed_teachers")
+
+            left = Inches(1)
+            top = Inches(6)
+            width = Inches(8)
+            height = Inches(1)
+            text_box = slide.shapes.add_textbox(left, top, width, height)
+            text_frame = text_box.text_frame
+            text_frame.text = delayed_teachers_text
+
+            for paragraph in text_frame.paragraphs:
+                paragraph.font.size = Pt(14)
+                paragraph.font.bold = True
+                paragraph.alignment = PP_ALIGN.CENTER

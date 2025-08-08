@@ -1,24 +1,35 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+import 'package:ut_report_generator/api/asset_type.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
-Future<http.Response> startReport(String filename) {
-  return sendRequest(route: "start_report", body: {"data_file": filename});
+Future<StartReport_Response> startReport(String filename) {
+  return sendRequest(
+    route: "start_report",
+    body: {"data_file": filename},
+    callback: StartReport_Response.fromJson,
+  );
 }
 
 // ignore: camel_case_types
 class StartReport_Response {
   String reportDirectory;
   String reportName;
-  List<({String name, String path})> assets;
-  String sectionId;
-  dynamic arguments;
+
+  // Properties of the first slide of the report
+  List<AssetType> assets;
+  String slideId;
+  Map<String, dynamic> arguments;
+  String preview;
 
   StartReport_Response({
     required this.reportDirectory,
     required this.reportName,
     required this.assets,
-    required this.sectionId,
+    required this.slideId,
     required this.arguments,
+    required this.preview,
   });
 
   static StartReport_Response fromJson(Map<String, dynamic> json) {
@@ -30,12 +41,14 @@ class StartReport_Response {
               .map(
                 (asset) => (
                   name: asset['name'] as String,
-                  path: asset['path'] as String,
+                  value: asset['value'] as String,
+                  type: asset["type"] as String,
                 ),
               )
               .toList(),
-      sectionId: json['section_id'] as String,
-      arguments: json['arguments'] as dynamic,
+      slideId: json['slide_id'] as String,
+      arguments: json['arguments'] as Map<String, dynamic>,
+      preview: json['preview'] as String,
     );
   }
 }

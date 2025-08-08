@@ -45,23 +45,19 @@ class _HomePageState extends State<HomePage> {
                         setState(() {
                           isLoading = false;
                         });
-                        var responseBody = jsonDecode(response.body);
-                        var responseData = StartReport_Response.fromJson(
-                          responseBody,
-                        );
 
                         if (!mounted) return;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder:
-                                (context) =>
-                                    ReportEditor(response: responseData),
+                                (context) => ReportEditor(response: response),
                           ),
                         );
                       })
                       .catchError((error) {
-                        print("Something went wrong with the request");
+                        print("@home/_main.dart");
+                        print("Something went wrong");
                         print(error);
                         setState(() {
                           isLoading = false;
