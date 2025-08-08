@@ -1,11 +1,11 @@
-import 'package:ut_report_generator/api/types/asset_type.dart';
+import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
-Future<EditSlide_Response> editSlide(
-  String reportDirectory,
-  String slideId,
-  dynamic arguments,
-) {
+Future<EditSlide_Response> editSlide({
+  required String reportDirectory,
+  required String slideId,
+  required dynamic arguments,
+}) {
   return sendRequest(
     route: "edit_slide",
     body: {
@@ -19,7 +19,7 @@ Future<EditSlide_Response> editSlide(
 
 // ignore: camel_case_types
 class EditSlide_Response {
-  List<AssetType> assets;
+  List<AssetClass> assets;
   String preview;
 
   EditSlide_Response({required this.assets, required this.preview});
@@ -28,7 +28,7 @@ class EditSlide_Response {
     return EditSlide_Response(
       assets:
           (json['assets'] as List<dynamic>)
-              .map((asset) => AssetType.fromJson(asset))
+              .map((asset) => AssetClass.fromJson(asset))
               .toList(),
       preview: json['preview'] as String,
     );

@@ -2,53 +2,36 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ut_report_generator/api/types/asset_type.dart';
+import 'package:http/http.dart';
+import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/change_slide_data.dart';
 import 'package:ut_report_generator/api/edit_slide.dart';
 import 'package:ut_report_generator/api/start_report.dart';
 import 'package:ut_report_generator/api/send_request.dart';
+import 'package:ut_report_generator/api/types/slide_class.dart';
 import 'package:ut_report_generator/components/input_component.dart';
+import 'package:ut_report_generator/home/report-editor/failure_section/failure_section_arguments.dart';
 import 'package:ut_report_generator/home/report-editor/failure_section/pick_file_button.dart';
 
-class FailureSectionArguments {
-  int unit;
-  bool showDelayedTeachers;
-
-  FailureSectionArguments({
-    required this.unit,
-    required this.showDelayedTeachers,
-  });
-
-  static FailureSectionArguments fromJson(Map<String, dynamic> map) {
-    return FailureSectionArguments(
-      unit: map['unit'] as int,
-      showDelayedTeachers: map['show_delayed_teachers'] as bool,
-    );
-  }
-
-  FailureSectionArguments copyWith({int? unit, bool? showDelayedTeachers}) {
-    return FailureSectionArguments(
-      unit: unit ?? this.unit,
-      showDelayedTeachers: showDelayedTeachers ?? this.showDelayedTeachers,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'unit': unit, 'show_delayed_teachers': showDelayedTeachers};
-  }
-}
-
 class FailureSection extends StatefulWidget {
-  final StartReport_Response response;
+  SlideClass initialData;
+  Future<void> Function(String slideId, Map<String, dynamic> arguments)
+  editSlide;
+  Future<void> Function(String slideId, String newFilePath) changeSlideData;
 
-  FailureSection({super.key, required this.response});
+  FailureSection({
+    super.key,
+    required this.initialData,
+    required this.editSlide,
+    required this.changeSlideData,
+  });
 
   @override
   State<FailureSection> createState() => _FailureSectionState();
 }
 
 class _FailureSectionState extends State<FailureSection> {
-  late StartReport_Response response;
+  late SlideClass slideData;
 
   String? selectedAsset;
   bool isLoading = false;
@@ -57,42 +40,32 @@ class _FailureSectionState extends State<FailureSection> {
   void initState() {
     super.initState();
 
-    response = widget.response;
-    selectedAsset = widget.response.preview; // Default to the preview image
-  }
-
-  FailureSectionArguments parseArguments(Map<String, dynamic> arguments) {
-    return FailureSectionArguments.fromJson(arguments);
+    slideData = widget.initialData;
+    selectedAsset = widget.initialData.preview; // Default to the preview image
   }
 
   void updateArguments(FailureSectionArguments arguments) async {
     setState(() {
-      response = StartReport_Response(
-        reportDirectory: response.reportDirectory,
-        reportName: response.reportName,
-        assets: response.assets,
-        slideId: response.slideId,
+      slideData = slideData.copyWith(
+        assets: slideData.assets,
         arguments: arguments.toJson(),
-        preview: response.preview,
+        preview: slideData.preview,
       );
       isLoading = true;
     });
 
     try {
       await editSlide(
-        response.reportDirectory,
-        response.slideId,
+        slideData.reportDirectory,
+        slideData.slideId,
         arguments.toJson(),
       ).then((result) {
         setState(() {
-          response = StartReport_Response(
-            reportDirectory: response.reportDirectory,
-            reportName: response.reportName,
-            assets: result.assets,
-            slideId: response.slideId,
-            arguments: response.arguments,
-            preview: result.preview,
-          );
+          // slideData = slideData.copyWith(
+          //   assets: result.assets,
+          //   arguments: slideData.arguments,
+          //   preview: result.preview,
+          // );
           selectedAsset =
               result.preview; // Update the selected asset to the new preview
         });
@@ -108,14 +81,16 @@ class _FailureSectionState extends State<FailureSection> {
 
   @override
   Widget build(BuildContext context) {
-    FailureSectionArguments arguments = parseArguments(response.arguments);
+    FailureSectionArguments arguments = FailureSectionArguments.fromJson(
+      slideData.arguments,
+    );
     var imageList =
-        response.assets.where((value) {
+        slideData.assets.where((value) {
           return value.type == "image";
         }).toList();
     imageList.insert(
       0,
-      AssetType(name: "Preview", value: response.preview, type: "image"),
+      AssetClass(name: "Preview", value: slideData.preview, type: "image"),
     );
 
     return Card(
@@ -179,8 +154,9 @@ class _FailureSectionState extends State<FailureSection> {
                                   try {
                                     await changeSlideData(
                                       newDataFile: filePath,
-                                      reportDirectory: response.reportDirectory,
-                                      slideId: response.slideId,
+                                      reportDirectory:
+                                          slideData.reportDirectory,
+                                      slideId: slideData.slideId,
                                     );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(

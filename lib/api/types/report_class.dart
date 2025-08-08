@@ -1,23 +1,23 @@
-import 'package:ut_report_generator/api/types/slide_type.dart';
+import 'package:ut_report_generator/api/types/slide_class.dart';
 
-class ReportType {
+class ReportClass {
   String reportName;
   String reportDirectory;
-  List<SlideType> slides;
+  List<SlideClass> slides;
 
-  ReportType({
+  ReportClass({
     required this.reportName,
     required this.reportDirectory,
     required this.slides,
   });
 
-  factory ReportType.fromJson(Map<String, dynamic> json) {
-    return ReportType(
+  factory ReportClass.fromJson(Map<String, dynamic> json) {
+    return ReportClass(
       reportName: json['report_name'] as String,
       reportDirectory: json['report_directory'] as String,
       slides:
           (json['slides'] as List)
-              .map((slide) => SlideType.fromJson(slide))
+              .map((slide) => SlideClass.fromJson(slide))
               .toList(),
     );
   }

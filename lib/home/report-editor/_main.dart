@@ -1,16 +1,52 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/api/change_slide_data.dart';
+import 'package:ut_report_generator/api/edit_slide.dart';
 import 'package:ut_report_generator/api/start_report.dart';
+import 'package:ut_report_generator/api/types/report_class.dart';
+import 'package:ut_report_generator/api/types/slide_class.dart';
+import 'package:ut_report_generator/api/types/slide_type.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/home/report-editor/_test.dart';
 import 'package:ut_report_generator/home/report-editor/failure_section/widget.dart';
 
-class ReportEditor extends StatefulWidget {
-  StartReport_Response response;
+Widget buildSlideEditor(SlideClass slide, String reportDirectory) {
+  switch (slide.type) {
+    case SlideType.failureRate:
+      return FailureSection(
+        initialData: slide,
+        editSlide: (slideId, arguments) async {
+          return editSlide(
+            reportDirectory: reportDirectory,
+            slideId: slideId,
+            arguments: arguments,
+          ).then((value) {
+            // Something will occur to me
+          });
+        },
+        changeSlideData: (slideId, newFilePath) async {
+          return changeSlideData(
+            newDataFile: newFilePath,
+            reportDirectory: reportDirectory,
+            slideId: slideId,
+          ).then((value) {
+            // Handle the response if needed
+          });
+        },
+      );
+    case SlideType.average:
+      return Center(child: Text("Tipo de diapositiva no soportado"));
+    default:
+      return Center(child: Text("Tipo de diapositiva no soportado"));
+  }
+}
 
-  ReportEditor({super.key, required this.response});
+class ReportEditor extends StatefulWidget {
+  ReportClass initialReport;
+
+  ReportEditor({super.key, required this.initialReport});
 
   @override
   State<ReportEditor> createState() => _ReportEditorState();
@@ -18,12 +54,14 @@ class ReportEditor extends StatefulWidget {
 
 class _ReportEditorState extends State<ReportEditor> {
   late TextEditingController reportNameController;
+  late ReportClass report;
 
   @override
   void initState() {
     super.initState();
+    report = widget.initialReport;
     reportNameController = TextEditingController(
-      text: widget.response.reportName,
+      text: widget.initialReport.reportName,
     );
   }
 
@@ -46,7 +84,7 @@ class _ReportEditorState extends State<ReportEditor> {
                     hint: "Ingrese el nombre del reporte",
                     controller: reportNameController,
                   ),
-                  FailureSection(response: widget.response),
+                  // FailureSection(initialData: widget.report.slides[0]),
                 ],
               ),
             ),
