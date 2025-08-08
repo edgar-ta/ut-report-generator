@@ -1,4 +1,4 @@
-import 'package:ut_report_generator/api/asset_type.dart';
+import 'package:ut_report_generator/api/types/asset_type.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
 Future<EditSlide_Response> editSlide(

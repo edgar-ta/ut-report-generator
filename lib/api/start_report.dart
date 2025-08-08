@@ -1,8 +1,9 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:ut_report_generator/api/asset_type.dart';
+import 'package:ut_report_generator/api/types/asset_type.dart';
 import 'package:ut_report_generator/api/send_request.dart';
+import 'package:ut_report_generator/api/types/report_type.dart';
 
 Future<StartReport_Response> startReport(String filename) {
   return sendRequest(
@@ -13,36 +14,4 @@ Future<StartReport_Response> startReport(String filename) {
 }
 
 // ignore: camel_case_types
-class StartReport_Response {
-  String reportDirectory;
-  String reportName;
-
-  // Properties of the first slide of the report
-  List<AssetType> assets;
-  String slideId;
-  Map<String, dynamic> arguments;
-  String preview;
-
-  StartReport_Response({
-    required this.reportDirectory,
-    required this.reportName,
-    required this.assets,
-    required this.slideId,
-    required this.arguments,
-    required this.preview,
-  });
-
-  static StartReport_Response fromJson(Map<String, dynamic> json) {
-    return StartReport_Response(
-      reportDirectory: json['report_directory'] as String,
-      reportName: json['report_name'] as String,
-      assets:
-          (json['assets'] as List<dynamic>)
-              .map((asset) => AssetType.fromJson(asset))
-              .toList(),
-      slideId: json['slide_id'] as String,
-      arguments: json['arguments'] as Map<String, dynamic>,
-      preview: json['preview'] as String,
-    );
-  }
-}
+typedef StartReport_Response = ReportType;

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ut_report_generator/api/asset_type.dart';
+import 'package:ut_report_generator/api/types/asset_type.dart';
 import 'package:ut_report_generator/api/change_slide_data.dart';
 import 'package:ut_report_generator/api/edit_slide.dart';
 import 'package:ut_report_generator/api/start_report.dart';
