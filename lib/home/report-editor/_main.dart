@@ -16,21 +16,27 @@ class ReportEditor extends StatefulWidget {
 }
 
 class _ReportEditorState extends State<ReportEditor> {
-  late TextEditingController reportNameController = TextEditingController(
-    text: widget.response.reportName,
-  );
+  late TextEditingController reportNameController;
+
+  @override
+  void initState() {
+    super.initState();
+    reportNameController = TextEditingController(
+      text: widget.response.reportName,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
       child: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 128.0,
-              vertical: 64,
-            ),
-            child: SingleChildScrollView(
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 128.0,
+                vertical: 64,
+              ),
               child: Column(
                 spacing: 32,
                 children: [

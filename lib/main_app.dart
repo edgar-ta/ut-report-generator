@@ -17,11 +17,15 @@ class MainApp extends StatelessWidget {
         assets: [
           (
             name: "main-chart",
-            path:
+            value:
                 r"D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\python-app\reports\8fe5d3ef-804c-4be3-a88b-c16c3139de6d\images\c5f52263-cd31-4429-93b8-c2f03ba33f22.png",
+            type: "image",
           ),
         ],
-        sectionId: "cd6f1a07-455f-4c90-acf0-93bacd3d10df",
+        slideId: "cd6f1a07-455f-4c90-acf0-93bacd3d10df",
+        arguments: {"unit": "1", "show_delayed_teachers": "true"},
+        preview:
+            "D:\\college\\cuatrimestre-6\\2025-06-16--estadias\\ut-report-generator\\python-app\\reports\\8fe5d3ef-804c-4be3-a88b-c16c3139de6d\\images\\cd6f1a07-455f-4c90-acf0-93bacd3d10df.png",
       ),
     );
   }

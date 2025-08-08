@@ -24,7 +24,7 @@ class ServerConnectionLoader extends StatefulWidget {
 class _ServerConnectionLoaderState extends State<ServerConnectionLoader> {
   bool _minTimeElapsed = false;
   bool _dataLoaded = false;
-  Response? _response;
+  VerifyConnection_Response? _response;
 
   @override
   void initState() {
@@ -38,17 +38,19 @@ class _ServerConnectionLoaderState extends State<ServerConnectionLoader> {
     });
   }
 
-  Future<Response> _loadData() async {
-    try {
-      final result = await verifyConnection();
-      _response = result;
-    } catch (e) {}
-
+  void _loadData() async {
+    await verifyConnection()
+        .then((result) {
+          _response = result;
+        })
+        .catchError((error) {
+          print("@server_connection_loader/widget.dart");
+          print("An error ocurred");
+          print(error);
+        });
     setState(() {
       _dataLoaded = true;
     });
-
-    return _response!;
   }
 
   @override
@@ -58,10 +60,7 @@ class _ServerConnectionLoaderState extends State<ServerConnectionLoader> {
     }
 
     if (_response != null) {
-      final parsed = VerifyConnection_Response.fromJson(
-        jsonDecode(_response!.body),
-      );
-      return widget.builder(parsed);
+      return widget.builder(_response!);
     }
 
     return ErrorPage(

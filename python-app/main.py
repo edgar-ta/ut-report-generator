@@ -1,23 +1,25 @@
-from flask import Flask, request
-import re
-import pandas as pd
-from failure_rate import graph_failure_rate
 from lib.sections.failure_rate.controller import FailureRate_Controller
-from lib.section_controller import SectionController
+from lib.section_controller import SlideController
+from lib.descriptive_error import DescriptiveError
+from lib.check_file_extension import check_file_extension
+
+from flask import Flask, request
+from pptx import Presentation as LibrePresentation
+from spire.presentation import Presentation as SpirePresentation
+
+import pandas as pd
 import uuid
 import os
 import json
 import logging
 
-from lib.error_message_decorator import error_message_decorator
-from lib.descriptive_error import DescriptiveError
 
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
 CURRENT_FILE_PATH = os.path.abspath(__file__)
 CURRENT_DIRECTORY_PATH = os.path.dirname(CURRENT_FILE_PATH)
-AVAILABLE_SECTION_TYPES: list[type[SectionController]] = [
+AVAILABLE_SLIDE_TYPES: list[type[SlideController]] = [
     FailureRate_Controller
 ]
 
@@ -28,9 +30,25 @@ def create_reports_directory() -> str:
         os.mkdir(reports_directory)
     return reports_directory
 
-def asset_dict(assets: list[tuple[str, str]]) -> list[dict[str, str]]:
-    return [ { "name": name, "path": path } for (name, path) in assets ]
+def render_preview(controller: type[SlideController], current_report: str, arguments: dict[str, str], assets: list[dict[str, str]]) -> str:
+    presentation = LibrePresentation()
+    controller.render_slide(presentation, arguments, assets)
+    pptx_preview_path = os.path.join(current_report, str(uuid.uuid4()) + ".pptx")
+    presentation.save(pptx_preview_path)
 
+    spire_presentation = SpirePresentation()
+    spire_presentation.LoadFromFile(pptx_preview_path)
+
+    png_preview_path = os.path.join(current_report, "images", str(uuid.uuid4()) + ".png")
+    image = spire_presentation.Slides[0].SaveAsImage()
+    image.Save(png_preview_path)
+    image.Dispose()
+
+    spire_presentation.Dispose()
+    os.remove(pptx_preview_path)
+        
+    return png_preview_path
+    
 
 @app.route("/hello", methods=["POST", "GET"])
 def hello_world():
@@ -40,18 +58,19 @@ def hello_world():
 # @error_message_decorator("Couldn't start the report", logger)
 def start_report():
     data_file = request.json["data_file"]
+    check_file_extension(data_file)
 
-    print("Started the report here")
     reports_directory = create_reports_directory()
     current_report = os.path.join(reports_directory, str(uuid.uuid4()))
 
     os.mkdir(current_report)
     os.mkdir(os.path.join(current_report, "images"))
 
-    section_id = str(uuid.uuid4())
+    slide_id = str(uuid.uuid4())
 
-    assets = FailureRate_Controller.render_assets(data_file, current_report, { "unit": 1 })
-    assets = asset_dict(assets)
+    default_arguments = FailureRate_Controller.default_arguments()
+    assets = FailureRate_Controller.build_assets(data_file, current_report, default_arguments)
+    preview = render_preview(FailureRate_Controller, current_report, default_arguments, assets)
 
     creation_date = pd.Timestamp.now().isoformat()
     report_name = "Mi reporte"
@@ -60,12 +79,14 @@ def start_report():
         "report_name": report_name,
         "creation_date": creation_date,
         "last_edit": creation_date,
-        "sections": [
+        "slides": [
             {
-                "id": section_id,
+                "id": slide_id,
                 "type": FailureRate_Controller.type_id(),
-                "images": assets,
-                "data_file": data_file
+                "assets": assets,
+                "arguments": default_arguments,
+                "data_file": data_file,
+                "preview": preview
             }
         ]
     }
@@ -77,45 +98,95 @@ def start_report():
         "report_directory": current_report,
         "report_name": report_name,
         "assets": assets, 
-        "section_id": section_id,
+        "slide_id": slide_id,
+        "arguments": default_arguments,
+        "preview": preview
     }, 200
 
-@app.route("/edit_section", methods=["POST"])
-# @error_message_decorator("Couldn't edit the report's section", logger)
-def edit_section():
+@app.route("/edit_slide", methods=["POST"])
+def edit_slide():
     current_report = request.json["report_directory"]
-    section_id = request.json["section_id"]
+    slide_id = request.json["slide_id"]
     arguments = request.json["arguments"]
 
     metadata_file = os.path.join(current_report, "metadata.json")
     with open(metadata_file, "r") as file:
         metadata = json.load(file)
     
-    index, section = next(((index, section) for (index, section) in enumerate(metadata["sections"]) if section["id"] == section_id), (None, None))
-    if section is None:
-        raise DescriptiveError(404, f"Section not found in the report metadata. Possibly wrong id ({section_id})")
+    index, slide = next(((index, slide) for (index, slide) in enumerate(metadata["slides"]) if slide["id"] == slide_id), (None, None))
+    if slide is None:
+        raise DescriptiveError(404, f"Slide not found in the report metadata. Possibly wrong id ({slide_id})")
     
-    section_type = section["type"]
-    controller = next((controller for controller in AVAILABLE_SECTION_TYPES if controller.type_id() == section_type), None)
+    slide_type = slide["type"]
+    controller = next((controller for controller in AVAILABLE_SLIDE_TYPES if controller.type_id() == slide_type), None)
     if controller is None:
-        raise DescriptiveError(404, f"Section type '{section_type}' not found. Possibly wrong section type")
+        raise DescriptiveError(404, f"Slide type '{slide_type}' not found. Possibly wrong section type")
     
-    controller.validate_asset_arguments(arguments)
-    assets = controller.render_assets(section["data_file"], current_report, arguments)
-    assets = asset_dict(assets)
+    controller.validate_arguments(arguments)
+    new_assets = controller.build_assets(slide["data_file"], current_report, arguments)
+    new_preview = render_preview(controller, current_report, arguments, new_assets)
 
-    for asset in section["images"]:
-        if os.path.exists(asset["path"]):
-            os.remove(asset["path"])
-    
-    section["images"] = assets
-    metadata["sections"][index] = section
+    for asset in slide["assets"]:
+        if asset["type"] == "image" and os.path.exists(asset["value"]):
+            os.remove(asset["value"])
+    if os.path.exists(slide["preview"]):
+        os.remove(slide["preview"])
+
+    slide["preview"] = new_preview
+    slide["assets"] = new_assets
+    slide["arguments"] = { **slide["arguments"], **arguments }
+
+    metadata["slides"][index] = slide
     metadata["last_edit"] = pd.Timestamp.now().isoformat()
 
     with open(metadata_file, "w") as file:
         json.dump(metadata, file, indent=4)
     
-    return "Section edited successfully", 200
+    return {
+        "assets": new_assets,
+        "preview": new_preview
+    }, 200
+
+@app.route("/change_slide_data", methods=["POST"])
+def change_slide_data():
+    data_file = request.json["data_file"]
+    check_file_extension(data_file)
+
+    current_report = request.json["report_directory"]
+    # metadata, slide, slide_index, controller
+
+    slide_id = request.json["slide_id"]
+    metadata_file = os.path.join(current_report, "metadata.json")
+
+    with open(metadata_file, "r") as file:
+        metadata = json.load(file)
+
+    index, slide = next(((index, slide) for (index, slide) in enumerate(metadata["slides"]) if slide["id"] == slide_id), (None, None))
+    if slide is None:
+        raise DescriptiveError(404, f"Slide not found in the report metadata. Possibly wrong id ({slide_id})")
+
+    slide_type = slide["type"]
+    controller = next((controller for controller in AVAILABLE_SLIDE_TYPES if controller.type_id() == slide_type), None)
+    if controller is None:
+        raise DescriptiveError(404, f"Slide type '{slide_type}' not found. Possibly wrong section type")
+
+    new_assets = controller.build_assets(data_file, current_report, slide["arguments"])
+    new_preview = render_preview(controller, current_report, slide["arguments"], new_assets)
+
+    slide["data_file"] = data_file
+    slide["preview"] = new_preview
+    slide["assets"] = new_assets
+
+    metadata["slides"][index] = slide
+    metadata["last_edit"] = pd.Timestamp.now().isoformat()
+
+    with open(metadata_file, "w") as file:
+        json.dump(metadata, file, indent=4)    
+
+    return {
+        "assets": new_assets,
+        "preview": new_preview
+    }, 200
 
 if __name__ == '__main__':
     logging.basicConfig(filename='logs.log')

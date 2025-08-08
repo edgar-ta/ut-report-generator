@@ -1,8 +1,12 @@
 import 'package:http/http.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
-Future<Response> verifyConnection() {
-  return sendRequest(route: "hello", body: {"message": "Hello"});
+Future<VerifyConnection_Response> verifyConnection() {
+  return sendRequest(
+    route: "hello",
+    body: {"message": "Hello"},
+    callback: VerifyConnection_Response.fromJson,
+  );
 }
 
 // ignore: camel_case_types
