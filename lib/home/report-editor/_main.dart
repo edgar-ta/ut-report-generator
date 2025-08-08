@@ -10,7 +10,6 @@ import 'package:ut_report_generator/api/types/slide_class.dart';
 import 'package:ut_report_generator/api/types/slide_type.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/components/input_component.dart';
-import 'package:ut_report_generator/home/report-editor/_test.dart';
 import 'package:ut_report_generator/home/report-editor/failure_section/widget.dart';
 
 Widget buildSlideEditor(
