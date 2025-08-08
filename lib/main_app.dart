@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/start_report.dart';
 import 'package:ut_report_generator/api/types/slide_class.dart';
+import 'package:ut_report_generator/api/types/slide_type.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/home/_main.dart';
 import 'package:ut_report_generator/home/report-editor/_main.dart';
@@ -19,7 +20,7 @@ class MainApp extends StatelessWidget {
         slides: [
           SlideClass(
             id: "cd6f1a07-455f-4c90-acf0-93bacd3d10df",
-            type: "failure_rate",
+            type: SlideType.failureRate,
             assets: [
               AssetClass(
                 name: "main-chart",

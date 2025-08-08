@@ -32,7 +32,7 @@ class SlideClass {
     );
   }
 
-  copyWith({
+  SlideClass copyWith({
     String? id,
     SlideType? type,
     List<AssetClass>? assets,

@@ -14,14 +14,14 @@ import 'package:ut_report_generator/home/report-editor/failure_section/failure_s
 import 'package:ut_report_generator/home/report-editor/failure_section/pick_file_button.dart';
 
 class FailureSection extends StatefulWidget {
-  SlideClass initialData;
+  SlideClass slideData;
   Future<void> Function(String slideId, Map<String, dynamic> arguments)
   editSlide;
   Future<void> Function(String slideId, String newFilePath) changeSlideData;
 
   FailureSection({
     super.key,
-    required this.initialData,
+    required this.slideData,
     required this.editSlide,
     required this.changeSlideData,
   });
@@ -31,47 +31,22 @@ class FailureSection extends StatefulWidget {
 }
 
 class _FailureSectionState extends State<FailureSection> {
-  late SlideClass slideData;
-
-  String? selectedAsset;
+  // @todo. This index should go back to zero whenever the slide data or the
+  // slide arguments change
+  int selectedImageIndex = 0;
   bool isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-
-    slideData = widget.initialData;
-    selectedAsset = widget.initialData.preview; // Default to the preview image
-  }
-
-  void updateArguments(FailureSectionArguments arguments) async {
+  void _updateArguments(FailureSectionArguments arguments) async {
     setState(() {
-      slideData = slideData.copyWith(
-        assets: slideData.assets,
-        arguments: arguments.toJson(),
-        preview: slideData.preview,
-      );
       isLoading = true;
     });
-
     try {
-      await editSlide(
-        slideData.reportDirectory,
-        slideData.slideId,
-        arguments.toJson(),
-      ).then((result) {
-        setState(() {
-          // slideData = slideData.copyWith(
-          //   assets: result.assets,
-          //   arguments: slideData.arguments,
-          //   preview: result.preview,
-          // );
-          selectedAsset =
-              result.preview; // Update the selected asset to the new preview
-        });
-      });
+      await widget.editSlide(widget.slideData.id, arguments.toJson());
     } catch (e) {
       print("Error updating arguments: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("No se pudo actualizar la imagen")),
+      );
     } finally {
       setState(() {
         isLoading = false;
@@ -82,15 +57,19 @@ class _FailureSectionState extends State<FailureSection> {
   @override
   Widget build(BuildContext context) {
     FailureSectionArguments arguments = FailureSectionArguments.fromJson(
-      slideData.arguments,
+      widget.slideData.arguments,
     );
     var imageList =
-        slideData.assets.where((value) {
+        widget.slideData.assets.where((value) {
           return value.type == "image";
         }).toList();
     imageList.insert(
       0,
-      AssetClass(name: "Preview", value: slideData.preview, type: "image"),
+      AssetClass(
+        name: "Preview",
+        value: widget.slideData.preview,
+        type: "image",
+      ),
     );
 
     return Card(
@@ -118,10 +97,9 @@ class _FailureSectionState extends State<FailureSection> {
                     // Selected Image Display
                     SizedBox(
                       height: 250, // Fixed height for the selected image
-                      child:
-                          selectedAsset != null
-                              ? Image.file(File(selectedAsset!))
-                              : Center(child: Text("No image selected")),
+                      child: Image.file(
+                        File(imageList[selectedImageIndex].value),
+                      ),
                     ),
 
                     // Thumbnails and Buttons
@@ -152,11 +130,9 @@ class _FailureSectionState extends State<FailureSection> {
                                     isLoading = true;
                                   });
                                   try {
-                                    await changeSlideData(
-                                      newDataFile: filePath,
-                                      reportDirectory:
-                                          slideData.reportDirectory,
-                                      slideId: slideData.slideId,
+                                    await widget.changeSlideData(
+                                      widget.slideData.id,
+                                      filePath,
                                     );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -184,11 +160,14 @@ class _FailureSectionState extends State<FailureSection> {
                             scrollDirection: Axis.horizontal,
                             child: Row(
                               children:
-                                  imageList.map((asset) {
+                                  imageList.indexed.map((tuple) {
+                                    var index = tuple.$1;
+                                    var asset = tuple.$2;
+
                                     return GestureDetector(
                                       onTap: () {
                                         setState(() {
-                                          selectedAsset = asset.value;
+                                          selectedImageIndex = index;
                                         });
                                       },
                                       child: Padding(
@@ -227,20 +206,15 @@ class _FailureSectionState extends State<FailureSection> {
                 // Unit Dropdown
                 DropdownButton<int>(
                   value: arguments.unit,
-                  items: List.generate(6, (index) {
+                  items: List.generate(5, (index) {
                     return DropdownMenuItem(
                       value: index + 1,
-                      child: Text("Unit ${index + 1}"),
+                      child: Text("Unidad ${index + 1}"),
                     );
                   }),
                   onChanged: (value) {
                     if (value != null) {
-                      updateArguments(
-                        FailureSectionArguments(
-                          unit: value,
-                          showDelayedTeachers: arguments.showDelayedTeachers,
-                        ),
-                      );
+                      _updateArguments(arguments.copyWith(unit: value));
                     }
                   },
                 ),

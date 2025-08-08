@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:ut_report_generator/api/change_slide_data.dart';
 import 'package:ut_report_generator/api/edit_slide.dart';
 import 'package:ut_report_generator/api/start_report.dart';
+import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/types/report_class.dart';
 import 'package:ut_report_generator/api/types/slide_class.dart';
 import 'package:ut_report_generator/api/types/slide_type.dart';
@@ -12,29 +13,19 @@ import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/home/report-editor/_test.dart';
 import 'package:ut_report_generator/home/report-editor/failure_section/widget.dart';
 
-Widget buildSlideEditor(SlideClass slide, String reportDirectory) {
+Widget buildSlideEditor(
+  SlideClass slide,
+  Future<void> Function(String slideId, String newFilePath) changeSlideData,
+  Future<void> Function(String slideId, Map<String, dynamic> arguments)
+  editSlide,
+) {
   switch (slide.type) {
     case SlideType.failureRate:
       return FailureSection(
-        initialData: slide,
-        editSlide: (slideId, arguments) async {
-          return editSlide(
-            reportDirectory: reportDirectory,
-            slideId: slideId,
-            arguments: arguments,
-          ).then((value) {
-            // Something will occur to me
-          });
-        },
-        changeSlideData: (slideId, newFilePath) async {
-          return changeSlideData(
-            newDataFile: newFilePath,
-            reportDirectory: reportDirectory,
-            slideId: slideId,
-          ).then((value) {
-            // Handle the response if needed
-          });
-        },
+        key: ValueKey(slide.id),
+        slideData: slide,
+        editSlide: editSlide,
+        changeSlideData: changeSlideData,
       );
     case SlideType.average:
       return Center(child: Text("Tipo de diapositiva no soportado"));
@@ -65,6 +56,58 @@ class _ReportEditorState extends State<ReportEditor> {
     );
   }
 
+  void setSlideData({
+    required String slideId,
+    List<AssetClass>? assets,
+    String? preview,
+    Map<String, dynamic>? arguments,
+  }) {
+    setState(() {
+      var slides =
+          report.slides.map((slide) {
+            if (slide.id == slideId) {
+              return slide.copyWith(
+                assets: assets,
+                preview: preview,
+                arguments: arguments,
+              );
+            }
+            return slide;
+          }).toList();
+      var newReport = report.copyWith(slides: slides);
+      report = newReport;
+    });
+  }
+
+  Future<void> _changeSlideData(String slideId, String newFilePath) async {
+    return changeSlideData(
+      newDataFile: newFilePath,
+      reportDirectory: report.reportDirectory,
+      slideId: slideId,
+    ).then((value) {
+      setSlideData(
+        slideId: slideId,
+        assets: value.assets,
+        preview: value.preview,
+      );
+    });
+  }
+
+  Future<void> _editSlide(String slideId, Map<String, dynamic> arguments) {
+    return editSlide(
+      reportDirectory: report.reportDirectory,
+      slideId: slideId,
+      arguments: arguments,
+    ).then((value) {
+      setSlideData(
+        slideId: slideId,
+        assets: value.assets,
+        preview: value.preview,
+        arguments: arguments,
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
@@ -84,7 +127,13 @@ class _ReportEditorState extends State<ReportEditor> {
                     hint: "Ingrese el nombre del reporte",
                     controller: reportNameController,
                   ),
-                  // FailureSection(initialData: widget.report.slides[0]),
+                  ...(report.slides.map((slide) {
+                    return buildSlideEditor(
+                      slide,
+                      _changeSlideData,
+                      _editSlide,
+                    );
+                  }).toList()),
                 ],
               ),
             ),

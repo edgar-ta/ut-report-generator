@@ -21,4 +21,16 @@ class ReportClass {
               .toList(),
     );
   }
+
+  ReportClass copyWith({
+    String? reportName,
+    String? reportDirectory,
+    List<SlideClass>? slides,
+  }) {
+    return ReportClass(
+      reportName: reportName ?? this.reportName,
+      reportDirectory: reportDirectory ?? this.reportDirectory,
+      slides: slides ?? this.slides,
+    );
+  }
 }
