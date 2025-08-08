@@ -38,13 +38,7 @@ class StartReport_Response {
       reportName: json['report_name'] as String,
       assets:
           (json['assets'] as List<dynamic>)
-              .map(
-                (asset) => (
-                  name: asset['name'] as String,
-                  value: asset['value'] as String,
-                  type: asset["type"] as String,
-                ),
-              )
+              .map((asset) => AssetType.fromJson(asset))
               .toList(),
       slideId: json['slide_id'] as String,
       arguments: json['arguments'] as Map<String, dynamic>,

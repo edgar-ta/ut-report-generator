@@ -28,13 +28,7 @@ class EditSlide_Response {
     return EditSlide_Response(
       assets:
           (json['assets'] as List<dynamic>)
-              .map(
-                (asset) => (
-                  name: asset['name'] as String,
-                  value: asset['value'] as String,
-                  type: asset["type"] as String,
-                ),
-              )
+              .map((asset) => AssetType.fromJson(asset))
               .toList(),
       preview: json['preview'] as String,
     );

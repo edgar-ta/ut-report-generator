@@ -153,9 +153,8 @@ def change_slide_data():
     check_file_extension(data_file)
 
     current_report = request.json["report_directory"]
-    # metadata, slide, slide_index, controller
-
     slide_id = request.json["slide_id"]
+
     metadata_file = os.path.join(current_report, "metadata.json")
 
     with open(metadata_file, "r") as file:
@@ -169,9 +168,15 @@ def change_slide_data():
     controller = next((controller for controller in AVAILABLE_SLIDE_TYPES if controller.type_id() == slide_type), None)
     if controller is None:
         raise DescriptiveError(404, f"Slide type '{slide_type}' not found. Possibly wrong section type")
-
+    
     new_assets = controller.build_assets(data_file, current_report, slide["arguments"])
     new_preview = render_preview(controller, current_report, slide["arguments"], new_assets)
+
+    for asset in slide["assets"]:
+        if asset["type"] == "image" and os.path.exists(asset["value"]):
+            os.remove(asset["value"])
+    if os.path.exists(slide["preview"]):
+        os.remove(slide["preview"])
 
     slide["data_file"] = data_file
     slide["preview"] = new_preview
