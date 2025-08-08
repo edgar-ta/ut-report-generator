@@ -51,7 +51,8 @@ class _HomePageState extends State<HomePage> {
                           context,
                           MaterialPageRoute(
                             builder:
-                                (context) => ReportEditor(response: response),
+                                (context) =>
+                                    ReportEditor(initialReport: response),
                           ),
                         );
                       })

@@ -1,4 +1,4 @@
-import 'package:ut_report_generator/api/asset_type.dart';
+import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
 Future<ChangeSlideData_Response> changeSlideData({
@@ -19,7 +19,7 @@ Future<ChangeSlideData_Response> changeSlideData({
 
 // ignore: camel_case_types
 class ChangeSlideData_Response {
-  List<AssetType> assets;
+  List<AssetClass> assets;
   String preview;
 
   ChangeSlideData_Response({required this.assets, required this.preview});
@@ -28,7 +28,7 @@ class ChangeSlideData_Response {
     return ChangeSlideData_Response(
       assets:
           (json['assets'] as List)
-              .map((asset) => AssetType.fromJson(asset))
+              .map((asset) => AssetClass.fromJson(asset))
               .toList(),
       preview: json['preview'] as String,
     );

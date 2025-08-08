@@ -75,20 +75,20 @@ def start_report():
     creation_date = pd.Timestamp.now().isoformat()
     report_name = "Mi reporte"
 
+    slide_data = {
+        "id": slide_id,
+        "type": FailureRate_Controller.type_id(),
+        "assets": assets,
+        "arguments": default_arguments,
+        "data_file": data_file,
+        "preview": preview
+    }
+
     json_metadata = {
         "report_name": report_name,
         "creation_date": creation_date,
         "last_edit": creation_date,
-        "slides": [
-            {
-                "id": slide_id,
-                "type": FailureRate_Controller.type_id(),
-                "assets": assets,
-                "arguments": default_arguments,
-                "data_file": data_file,
-                "preview": preview
-            }
-        ]
+        "slides": [slide_data]
     }
 
     with open(os.path.join(current_report, "metadata.json"), "w") as json_file:
@@ -97,10 +97,7 @@ def start_report():
     return { 
         "report_directory": current_report,
         "report_name": report_name,
-        "assets": assets, 
-        "slide_id": slide_id,
-        "arguments": default_arguments,
-        "preview": preview
+        "slides": [slide_data]
     }, 200
 
 @app.route("/edit_slide", methods=["POST"])
