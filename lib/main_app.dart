@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/api/asset_type.dart';
 import 'package:ut_report_generator/api/start_report.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/home/_main.dart';
@@ -15,7 +16,7 @@ class MainApp extends StatelessWidget {
         reportDirectory: "8fe5d3ef-804c-4be3-a88b-c16c3139de6d",
         reportName: "Mi reporte",
         assets: [
-          (
+          AssetType(
             name: "main-chart",
             value:
                 r"D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\python-app\reports\8fe5d3ef-804c-4be3-a88b-c16c3139de6d\images\c5f52263-cd31-4429-93b8-c2f03ba33f22.png",

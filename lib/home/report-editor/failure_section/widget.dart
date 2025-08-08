@@ -2,10 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ut_report_generator/api/asset_type.dart';
+import 'package:ut_report_generator/api/change_slide_data.dart';
 import 'package:ut_report_generator/api/edit_slide.dart';
 import 'package:ut_report_generator/api/start_report.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 import 'package:ut_report_generator/components/input_component.dart';
+import 'package:ut_report_generator/home/report-editor/failure_section/pick_file_button.dart';
 
 class FailureSectionArguments {
   int unit;
@@ -110,11 +113,10 @@ class _FailureSectionState extends State<FailureSection> {
         response.assets.where((value) {
           return value.type == "image";
         }).toList();
-    imageList.insert(0, (
-      name: "Preview",
-      value: response.preview,
-      type: "image",
-    ));
+    imageList.insert(
+      0,
+      AssetType(name: "Preview", value: response.preview, type: "image"),
+    );
 
     return Card(
       margin: const EdgeInsets.all(16.0),
@@ -167,6 +169,34 @@ class _FailureSectionState extends State<FailureSection> {
                                   // Save logic
                                 },
                                 child: Text("Save"),
+                              ),
+                              PickFileButton(
+                                message: "Cambiar datos",
+                                onFilePicked: (filePath) async {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  try {
+                                    await changeSlideData(
+                                      newDataFile: filePath,
+                                      reportDirectory: response.reportDirectory,
+                                      slideId: response.slideId,
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Archivo cambiado correctamente",
+                                        ),
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    rethrow;
+                                  } finally {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
+                                },
                               ),
                             ],
                           ),
