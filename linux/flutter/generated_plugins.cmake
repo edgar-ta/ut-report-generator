@@ -3,6 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  image_clipboard
+  open_file_linux
+  pasteboard
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

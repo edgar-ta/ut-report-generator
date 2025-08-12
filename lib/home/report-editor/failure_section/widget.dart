@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
+import 'package:image_clipboard/image_clipboard.dart';
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/change_slide_data.dart';
 import 'package:ut_report_generator/api/edit_slide.dart';
@@ -19,12 +20,14 @@ class FailureSection extends StatefulWidget {
   Future<void> Function(String slideId, Map<String, dynamic> arguments)
   editSlide;
   Future<void> Function(String slideId, String newFilePath) changeSlideData;
+  ImageClipboard imageClipboard;
 
   FailureSection({
     super.key,
     required this.slideData,
     required this.editSlide,
     required this.changeSlideData,
+    required this.imageClipboard,
   });
 
   @override
@@ -38,6 +41,7 @@ class _FailureSectionState extends State<FailureSection> {
       slideData: widget.slideData,
       editSlide: widget.editSlide,
       changeSlideData: widget.changeSlideData,
+      imageClipboard: widget.imageClipboard,
       controlPanelBuilder: (arguments, updateArguments) {
         var parsedArguments = FailureSectionArguments.fromJson(arguments);
 

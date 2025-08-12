@@ -1,8 +1,9 @@
-from lib.section_controller import SlideController
+from lib.slide_controller import SlideController
 from lib.descriptive_error import DescriptiveError
 from lib.sections.failure_rate.source import read_excel, get_clean_data_frame, create_unit_name, graph_failure_rate
 from lib.asset_dict import asset_dict
 from lib.get_asset import get_string_asset, get_image_asset
+from lib.get_or_panic import get_or_panic
 
 from pandas import DataFrame
 from pptx import Presentation
@@ -65,13 +66,12 @@ class FailureRate_Controller(SlideController):
     @staticmethod
     def validate_arguments(arguments: dict[str, any]) -> None:
         # UNIT
-        unit = arguments["unit"]        
+        unit = get_or_panic(arguments, "unit", "La unidad del gráfico debe estar presente")
         if unit > 5:
             raise DescriptiveError(400, "No subject has more than 5 units")
 
         # SHOW_DELAYED_TEACHERS
-        print(f'{arguments}')
-        show_delayed_teachers = arguments["show_delayed_teachers"]
+        show_delayed_teachers = get_or_panic(arguments, "show_delayed_teachers", "La opción de mostrar profesores con calificaciones atrasadas debe estar presente")
         if not type(show_delayed_teachers) is bool:
             raise DescriptiveError(400, f"Invalid value for 'show_delayed_teachers'. Expected 'true' or 'false', found {show_delayed_teachers}")
 
