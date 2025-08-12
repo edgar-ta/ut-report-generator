@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_clipboard/image_clipboard.dart';
 import 'package:ut_report_generator/api/change_slide_data.dart';
 import 'package:ut_report_generator/api/edit_slide.dart';
+import 'package:ut_report_generator/api/render_report.dart';
 import 'package:ut_report_generator/api/start_report.dart';
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/types/report_class.dart';
@@ -11,12 +13,14 @@ import 'package:ut_report_generator/api/types/slide_type.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/home/report-editor/failure_section/widget.dart';
+import 'package:ut_report_generator/home/report-editor/progress_alert_dialog/widget.dart';
 
 Widget buildSlideEditor(
   SlideClass slide,
   Future<void> Function(String slideId, String newFilePath) changeSlideData,
   Future<void> Function(String slideId, Map<String, dynamic> arguments)
   editSlide,
+  ImageClipboard imageClipboard,
 ) {
   switch (slide.type) {
     case SlideType.failureRate:
@@ -25,6 +29,7 @@ Widget buildSlideEditor(
         slideData: slide,
         editSlide: editSlide,
         changeSlideData: changeSlideData,
+        imageClipboard: imageClipboard,
       );
     case SlideType.average:
       return Center(child: Text("Tipo de diapositiva no soportado"));
@@ -34,7 +39,8 @@ Widget buildSlideEditor(
 }
 
 class ReportEditor extends StatefulWidget {
-  ReportClass initialReport;
+  final ReportClass initialReport;
+  final ImageClipboard imageClipboard = ImageClipboard();
 
   ReportEditor({super.key, required this.initialReport});
 
@@ -107,52 +113,60 @@ class _ReportEditorState extends State<ReportEditor> {
     });
   }
 
+  Future<RenderReport_Response> _renderReport() {
+    return renderReport(
+      outputFile: "${report.reportDirectory}/${report.reportName}.pptx",
+      reportDirectory: report.reportDirectory,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      child: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 128.0,
-                vertical: 64,
+      floatingActionButton: Builder(
+        builder: (innerContext) {
+          return FloatingActionButton.extended(
+            onPressed: () {
+              showDialog(
+                context: innerContext,
+                builder:
+                    (_) => ProgressAlertDialog(
+                      renderReportCallback: _renderReport,
+                      onReportGenerated: (String outputFile) {
+                        setState(() {
+                          report = report.copyWith(renderedFile: outputFile);
+                        });
+                      },
+                    ),
+              );
+            },
+            label: const Text("Generar PPTX"),
+            icon: const Icon(Icons.check),
+          );
+        },
+      ),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 128.0, vertical: 64),
+          child: Column(
+            spacing: 32,
+            children: [
+              InputComponent(
+                label: "Nombre del reporte",
+                hint: "Ingrese el nombre del reporte",
+                controller: reportNameController,
               ),
-              child: Column(
-                spacing: 32,
-                children: [
-                  InputComponent(
-                    label: "Nombre del reporte",
-                    hint: "Ingrese el nombre del reporte",
-                    controller: reportNameController,
-                  ),
-                  ...(report.slides.map((slide) {
-                    return buildSlideEditor(
-                      slide,
-                      _changeSlideData,
-                      _editSlide,
-                    );
-                  }).toList()),
-                ],
-              ),
-            ),
+              ...(report.slides.map((slide) {
+                return buildSlideEditor(
+                  slide,
+                  _changeSlideData,
+                  _editSlide,
+                  widget.imageClipboard,
+                );
+              }).toList()),
+            ],
           ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: TextButton.icon(
-              onPressed: () {},
-              label: Text("Generar reporte"),
-              icon: Icon(Icons.check),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-                backgroundColor: Colors.greenAccent,
-                foregroundColor: Colors.white,
-                textStyle: TextStyle(fontWeight: FontWeight.normal),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

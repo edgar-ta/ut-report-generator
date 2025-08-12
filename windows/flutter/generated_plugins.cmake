@@ -3,6 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  image_clipboard
+  pasteboard
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

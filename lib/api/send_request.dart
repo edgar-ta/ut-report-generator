@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:ut_report_generator/control_variables.dart';
+import 'package:ut_report_generator/utils/control_variables.dart';
 
 Future<K> sendRequest<K>({
   required String route,
@@ -14,8 +14,9 @@ Future<K> sendRequest<K>({
 
   return http
       .post(
-        Uri.parse("http://localhost:5000/$route"),
-        // Uri.parse("http://localhost:$SERVER_PORT/$route"),
+        IS_DEVELOPMENT_MODE
+            ? Uri.parse("http://localhost:5000/$route")
+            : Uri.parse("http://localhost:$SERVER_PORT/$route"),
         body: jsonEncode(body),
         headers: {'Content-Type': 'application/json'},
       )

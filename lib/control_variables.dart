@@ -1,2 +1,0 @@
-bool IS_DEVELOPMENT_MODE = true;
-int SERVER_PORT = 55001;

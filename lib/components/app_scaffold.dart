@@ -12,12 +12,14 @@ class AppScaffold extends StatefulWidget {
   Future<bool> Function(int)? allowNewDestination;
   bool verifyConnection;
   Widget? child;
+  Widget? floatingActionButton;
 
   AppScaffold({
     super.key,
     this.allowNewDestination,
     this.child,
     this.verifyConnection = false,
+    this.floatingActionButton,
   });
 
   @override
@@ -114,6 +116,7 @@ class _AppScaffoldState extends State<AppScaffold> {
                   FooterComponent(),
                 ],
               ),
+              floatingActionButton: widget.floatingActionButton,
             ),
           ),
           Positioned(top: 0, left: 0, right: 0, child: HeaderComponent()),

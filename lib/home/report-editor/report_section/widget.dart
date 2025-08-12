@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_clipboard/image_clipboard.dart';
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/types/slide_class.dart';
 import 'package:ut_report_generator/home/report-editor/failure_section/pick_file_button.dart';
@@ -16,6 +17,7 @@ class ReportSection extends StatefulWidget {
     Future<void> Function(Map<String, dynamic> arguments),
   )
   controlPanelBuilder;
+  ImageClipboard imageClipboard;
 
   ReportSection({
     super.key,
@@ -23,6 +25,7 @@ class ReportSection extends StatefulWidget {
     required this.editSlide,
     required this.changeSlideData,
     required this.controlPanelBuilder,
+    required this.imageClipboard,
   });
 
   @override
@@ -100,7 +103,11 @@ class _ReportSectionState extends State<ReportSection> {
             children: [
               Expanded(
                 flex: 2,
-                child: AssetsPanel(images: imageList, isLoading: isLoading),
+                child: AssetsPanel(
+                  images: imageList,
+                  isLoading: isLoading,
+                  imageClipboard: widget.imageClipboard,
+                ),
               ),
               Expanded(
                 flex: 1,

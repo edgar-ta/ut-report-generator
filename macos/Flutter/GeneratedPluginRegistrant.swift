@@ -6,7 +6,13 @@ import FlutterMacOS
 import Foundation
 
 import file_picker
+import image_clipboard
+import open_file_mac
+import pasteboard
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FilePickerPlugin.register(with: registry.registrar(forPlugin: "FilePickerPlugin"))
+  ImageClipboardPlugin.register(with: registry.registrar(forPlugin: "ImageClipboardPlugin"))
+  OpenFilePlugin.register(with: registry.registrar(forPlugin: "OpenFilePlugin"))
+  PasteboardPlugin.register(with: registry.registrar(forPlugin: "PasteboardPlugin"))
 }

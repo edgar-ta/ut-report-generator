@@ -1,13 +1,23 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_clipboard/image_clipboard.dart';
+
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/home/report-editor/failure_section/pick_file_button.dart';
 
 class AssetsPanel extends StatefulWidget {
   List<AssetClass> images;
   bool isLoading;
-  AssetsPanel({super.key, required this.images, required this.isLoading});
+  ImageClipboard imageClipboard;
+
+  AssetsPanel({
+    super.key,
+    required this.images,
+    required this.isLoading,
+    required this.imageClipboard,
+  });
 
   @override
   State<AssetsPanel> createState() => _AssetsPanelState();
@@ -41,16 +51,39 @@ class _AssetsPanelState extends State<AssetsPanel> {
                     child: Row(
                       children: [
                         ElevatedButton(
-                          onPressed: () {
-                            // Copy to clipboard logic
+                          onPressed: () async {
+                            try {
+                              var imagePath =
+                                  widget.images[selectedImageIndex].value;
+                              print("The image path is this");
+                              print(imagePath);
+                              await widget.imageClipboard.copyImage(imagePath);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Ruta de la imagen copiada al portapapeles",
+                                  ),
+                                ),
+                              );
+                            } catch (e) {
+                              // Handle errors
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Error al copiar la imagen: $e",
+                                  ),
+                                ),
+                              );
+                            }
                           },
-                          child: Text("Copy"),
+                          child: Text("Copiar"),
                         ),
                         ElevatedButton(
                           onPressed: () {
                             // Save logic
                           },
-                          child: Text("Save"),
+                          child: Text("Guardar"),
                         ),
                       ],
                     ),
