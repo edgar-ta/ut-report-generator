@@ -3,7 +3,7 @@ from lib.descriptive_error import DescriptiveError
 from lib.get_or_panic import get_or_panic
 from lib.random_message import random_message, RandomMessageType
 
-from control_variables import AVAILABLE_SLIDE_TYPES
+from control_variables import AVAILABLE_SLIDE_CONTROLLERS
 
 from flask import request
 from pptx import Presentation
@@ -22,6 +22,9 @@ def render_report():
     if not any(output_file.endswith(ext) for ext in valid_extensions):
         raise DescriptiveError(400, f"Invalid file extension. Allowed extensions are: {', '.join(valid_extensions)}")
 
+    if os.path.exists(output_file):
+        raise DescriptiveError(400, f"The file '{output_file}' already exists. Please choose a different name.")
+
     metadata_file = os.path.join(current_report, "metadata.json")
     if not os.path.exists(metadata_file):
         raise DescriptiveError(404, "Metadata file not found.")
@@ -33,7 +36,7 @@ def render_report():
 
     for slide_metadata in metadata["slides"]:
         slide_type = slide_metadata["type"]
-        controller = next((controller for controller in AVAILABLE_SLIDE_TYPES if controller.type_id() == slide_type), None)
+        controller = next((controller for controller in AVAILABLE_SLIDE_CONTROLLERS if controller.slide_type() == slide_type), None)
         if controller is None:
             raise DescriptiveError(404, f"Controller for slide type '{slide_type}' not found.")
 
@@ -42,7 +45,7 @@ def render_report():
 
         controller.render_slide(presentation, arguments, assets)
 
-    metadata["rendered_file"] = output_file
+    metadata["output_file"] = output_file
     metadata["last_edit"] = pd.Timestamp.now().isoformat()
 
     with open(metadata_file, "w") as file:

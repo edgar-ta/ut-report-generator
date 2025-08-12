@@ -3,7 +3,7 @@ from lib.descriptive_error import DescriptiveError
 from lib.render_preview import render_preview
 from lib.get_or_panic import get_or_panic
 
-from control_variables import AVAILABLE_SLIDE_TYPES
+from control_variables import AVAILABLE_SLIDE_CONTROLLERS
 
 from flask import request
 
@@ -27,7 +27,7 @@ def edit_slide():
         raise DescriptiveError(404, f"Slide not found in the report metadata. Possibly wrong id ({slide_id})")
     
     slide_type = slide["type"]
-    controller = next((controller for controller in AVAILABLE_SLIDE_TYPES if controller.type_id() == slide_type), None)
+    controller = next((controller for controller in AVAILABLE_SLIDE_CONTROLLERS if controller.slide_type() == slide_type), None)
     if controller is None:
         raise DescriptiveError(500, f"Slide type '{slide_type}' not found. Possibly wrong section type")
     

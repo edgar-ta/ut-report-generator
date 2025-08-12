@@ -1,10 +1,14 @@
 import abc
+
 from pptx import Presentation
+
+from models.slide_type import SlideType
+from models.asset import Asset
 
 class SlideController():
     @staticmethod
     @abc.abstractmethod
-    def type_id() -> str:
+    def slide_type() -> SlideType:
         '''
         Returns a unique string to identify the type of section this controller handles. 
         Commonly, it is a descriptive name that matches the class's name
@@ -23,10 +27,10 @@ class SlideController():
 
     @staticmethod
     @abc.abstractmethod
-    def build_assets(data_file: str, report_directory: str, arguments: dict[str, str]) -> list[dict[str, str]]:
+    def build_assets(data_files: list[str], base_directory: str, arguments: dict[str, str]) -> list[Asset]:
         '''
         Returns a dict of the assets needed to render this section's slide in a PowerPoint presentation.
-        The assets are entries of the form (name, path), where `name` is a local name that's used later 
+        The assets are entries of the form (name, value, type), where `name` is a local name that's used later 
         in `render_slide`
         '''
         pass

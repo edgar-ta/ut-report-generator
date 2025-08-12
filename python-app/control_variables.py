@@ -3,7 +3,7 @@ from lib.sections.failure_rate.controller import FailureRate_Controller
 
 import os
 
-AVAILABLE_SLIDE_TYPES: list[type[SlideController]] = [
+AVAILABLE_SLIDE_CONTROLLERS: list[type[SlideController]] = [
     FailureRate_Controller
 ]
 
