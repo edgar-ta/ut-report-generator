@@ -32,6 +32,8 @@ class SlideController():
         Returns a dict of the assets needed to render this section's slide in a PowerPoint presentation.
         The assets are entries of the form (name, value, type), where `name` is a local name that's used later 
         in `render_slide`
+
+        :param base_directory The directory where the image assets are going to be placed
         '''
         pass
     

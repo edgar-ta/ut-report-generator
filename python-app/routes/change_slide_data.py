@@ -11,16 +11,16 @@ def change_slide_data():
     base_directory = get_or_panic(request.json, "report_directory", "El directorio del reporte debe estar presente")
     slide_id = get_or_panic(request.json, "slide_id", "La id de la diapositiva debe estar presente")
 
-    report = Report.from_base_directory(base_directory)
+    report = Report.from_root_directory(base_directory)
     slide = report[slide_id]
 
     slide.data_files = data_files
 
     slide.clear_old_assets()
-    new_assets = slide.build_assets()
-    new_preview = slide.build_preview()
+    new_assets = slide.build_new_assets()
+    new_preview = slide.build_new_preview()
 
-    report.save_edit()
+    report.save()
 
     return {
         "assets": [ asset.to_dict() for asset in new_assets],

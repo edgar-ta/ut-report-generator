@@ -9,3 +9,7 @@ AVAILABLE_SLIDE_CONTROLLERS: list[type[SlideController]] = [
 
 CURRENT_FILE_PATH = os.path.abspath(__file__)
 CURRENT_DIRECTORY_PATH = os.path.dirname(CURRENT_FILE_PATH)
+
+CURRENT_PROJECT_VERSION = "0.1.0"
+
+EXPORTED_REPORTS_EXTENSION = "reporte-ut"

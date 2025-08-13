@@ -23,14 +23,18 @@ def start_report():
     report = Report.cold_create()
     report.makedirs()
 
+    print("Hello -1")
     slide = Slide.from_data_files(
-        base_directory=report.base_directory, 
+        base_directory=report.root_directory, 
         files=data_files
     )
     slide.makedirs()
-    slide.build_assets()
-    slide.build_preview()
 
+    print("Hello 0")
+    slide.build_new_assets()
+    slide.build_new_preview()
+
+    print("Hello 1")
     report.add_slide(slide)
     report.save()
 

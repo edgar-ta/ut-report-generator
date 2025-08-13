@@ -1,8 +1,8 @@
-from lib.check_file_extension import check_file_extension
+from lib.file_extension import check_file_extension
 from lib.sections.failure_rate.controller import FailureRate_Controller
 from lib.slide_controller import SlideController
 from lib.descriptive_error import DescriptiveError
-from lib.directory_definitions import images_directory_of_slide
+from lib.directory_definitions import assets_directory_of_slide, base_directory_of_slide, preview_image_of_slide
 
 from spire.presentation import Presentation as SpirePresentation
 
@@ -15,6 +15,7 @@ from models.asset import Asset
 from models.asset_type import AssetType
 
 from functools import cached_property
+from pandas import Timestamp
 
 import uuid
 import os
@@ -26,16 +27,45 @@ class Slide():
                  assets: list[Asset], 
                  arguments: dict[str, any], 
                  data_files: list[str], 
-                 preview: str | None,
-                 base_directory: str
+                 last_edit: Timestamp,
+                 last_render: Timestamp | None,
+                 root_directory: str,
                  ) -> None:
         self.id = id
         self._type = _type
         self.assets = assets
-        self.arguments = arguments
-        self.data_files = data_files
-        self.preview = preview
-        self.base_directory = base_directory
+        self._arguments = arguments
+        self._data_files = data_files
+        self.last_edit = last_edit
+        self.last_render = last_render
+
+        self.root_directory = root_directory
+    
+    @property
+    def arguments(self) -> dict[str, any]:
+        '''
+        Arguments are validated when using dot syntax. I. e., `slide.arguments = new_arguments`
+        calls a setter function under the hood
+        '''
+        return self._arguments
+    
+    @arguments.setter
+    def arguments(self, new_arguments: dict[str, any]) -> None:
+        merged_arguments = { **self.arguments, **new_arguments }
+        self.controller.validate_arguments(merged_arguments)
+        self._arguments = merged_arguments
+        self.last_edit = Timestamp.now()
+    
+    @property
+    def data_files(self) -> list[str]:
+        return self._data_files
+
+    @data_files.setter
+    def data_files(self, new_data_files: list[str]) -> None:
+        files_changed = set(self.data_files) != set(new_data_files)
+        if files_changed:
+            self._data_files = new_data_files
+            self.last_edit = Timestamp.now()
     
     def to_dict(self) -> dict[str, any]:
         return {
@@ -44,19 +74,21 @@ class Slide():
             "assets": [ asset.to_dict() for asset in self.assets ],
             "arguments": self.arguments,
             "data_files": self.data_files,
-            "preview": self.preview
+            "last_edit": self.last_edit.isoformat(),
+            "last_render": None if self.last_render is None else self.last_render.isoformat()
         }
 
     @classmethod
-    def from_json(cls, json_data: dict[str, any], base_directory: str) -> "Slide":
+    def from_json(cls, json_data: dict[str, any], root_directory: str) -> "Slide":
         return cls(
             id=json_data["id"],
             _type=SlideType(json_data["type"]),
             assets=[ Asset.from_json(asset) for asset in json_data["assets"] ],
             arguments=json_data["arguments"],
             data_files=json_data["data_files"],
-            preview=json_data.get("preview", None),
-            base_directory=base_directory
+            last_edit=Timestamp(json_data["last_edit"]),
+            last_render=None if (last_render := json_data.get("last_render")) is None else Timestamp(last_render),
+            root_directory=root_directory,
         )
     
     def controller_for_files(file_path: list[str]) -> type[SlideController]:
@@ -83,8 +115,9 @@ class Slide():
             assets=[],
             arguments=controller.default_arguments(),
             data_files=files,
-            preview=None,
-            base_directory=base_directory
+            last_edit=Timestamp.now(),
+            last_render=None,
+            root_directory=base_directory,
         )
 
         return slide
@@ -97,26 +130,37 @@ class Slide():
         return controller
 
     @cached_property
-    def images_directory(self) -> str:
-        return images_directory_of_slide(base_directory=self.base_directory, slide_id=self.id)
+    def assets_directory(self) -> str:
+        return assets_directory_of_slide(root_directory=self.root_directory, slide_id=self.id)
+    
+    @cached_property
+    def base_directory(self) -> str:
+        return base_directory_of_slide(root_directory=self.root_directory, slide_id=self.id)
     
     @cached_property
     def preview_image(self) -> str:
-        return os.path.join(self.images_directory, "preview.png")
+        return preview_image_of_slide(root_directory=self.root_directory, slide_id=self.id)
 
-    def build_assets(self) -> list[Asset]:
+    def build_new_assets(self) -> list[Asset]:
+        if self.is_up2date:
+            return self.assets
+        
         assets = self.controller.build_assets(
             data_files=self.data_files, 
             arguments=self.arguments, 
-            base_directory=self.base_directory
+            base_directory=self.assets_directory
         )
         self.assets = assets
         return assets
 
-    def makedirs(self):
-        os.makedirs(self.images_directory)
+    def makedirs(self, exist_ok: bool = True):
+        os.makedirs(self.base_directory, exist_ok=exist_ok)
+        os.makedirs(self.assets_directory, exist_ok=exist_ok)
 
-    def build_preview(self) -> str:
+    def build_new_preview(self) -> str:
+        if self.is_up2date:
+            return self.preview_image
+
         presentation = LibrePresentation()
         self.controller.render_slide(
             presentation=presentation,
@@ -124,7 +168,7 @@ class Slide():
             assets=self.assets,
         )
 
-        pptx_preview_path = os.path.join(self.base_directory, str(uuid.uuid4()) + ".pptx")
+        pptx_preview_path = os.path.join(self.root_directory, str(uuid.uuid4()) + ".pptx")
         presentation.save(pptx_preview_path)
 
         spire_presentation = SpirePresentation()
@@ -140,14 +184,22 @@ class Slide():
         spire_presentation.Dispose()
         os.remove(pptx_preview_path)
 
+        self.last_render = Timestamp.now()
+
         return self.preview_image
 
     def clear_old_assets(self) -> None:
+        if self.is_up2date:
+            return
+
         for asset in self.assets:
             if asset.type == AssetType.IMAGE and os.path.exists(asset.value):
                 os.remove(asset.value)
         self.assets = []
 
-        if self.preview is not None and os.path.exists(self.preview):
-            os.remove(self.preview)
-        self.preview = None
+        if os.path.exists(self.preview_image):
+            os.remove(self.preview_image)
+
+    @property
+    def is_up2date(self) -> bool:
+        return self.last_render is not None and self.last_render >= self.last_edit

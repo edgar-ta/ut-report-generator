@@ -1,82 +1,72 @@
 from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
-from lib.get_metadata import get_metadata
-from lib.section_controller import AVAILABLE_SLIDE_TYPES
+from lib.file_extension import get_file_extension, with_extension
+from lib.random_message import random_message, RandomMessageType
 
-from flask import request, jsonify
+from control_variables import EXPORTED_REPORTS_EXTENSION
+
+from models.report import Report
+
+from flask import request
 
 import os
 import shutil
 import zipfile
-import json
-import uuid
 
 
 @with_app("/export_report", methods=["POST"])
 def export_report():
-    current_report = get_or_panic(request.json, "report_directory", "El directorio del reporte debe estar presente")
-    filename = get_or_panic(request.json, "filename", "El nombre del archivo de salida debe estar presente")
+    root_directory = get_or_panic(request.json, "report_directory", "El directorio del reporte debe estar presente")
 
-    temporary_directory = os.path.join(current_report, f"temporary-{uuid.uuid4()}")
-    if os.path.exists(temporary_directory):
-        shutil.rmtree(temporary_directory)
-    shutil.copytree(current_report, temporary_directory)
+    report = Report.from_root_directory(root_directory=root_directory)
 
-    try:
-        metadata = get_metadata(current_report)
-        for slide in metadata["slides"]:
-            slide_type = slide["type"]
-            controller = next((c for c in AVAILABLE_SLIDE_TYPES if c.type_id() == slide_type), None)
-            if controller is None:
-                raise Exception(f"No se encontró un controlador para el tipo de slide '{slide_type}'")
+    os.makedirs(report.export_directory, exist_ok=True)
+    for item in os.listdir(root_directory):
+        source = os.path.join(root_directory, item)
+        destination = os.path.join(report.export_directory, item)
 
-            arguments = slide["arguments"]
-            assets = controller.build_assets(slide["data_file"], temporary_directory, arguments)
+        if os.path.abspath(source) == os.path.abspath(report.export_directory):
+            continue
 
-            # @todo Este código está mal. El método para renderizar una slide es diferente
-            controller.render_slide(None, arguments, assets)
+        if os.path.isdir(source):
+            shutil.copytree(source, destination, dirs_exist_ok=True)
+        else:
+            shutil.copy2(source, destination)
+    
+    unique_data_files = { file for slide in report.slides for file in slide.data_files }
 
-        data_files_dir = os.path.join(temporary_directory, "data-files")
-        os.makedirs(data_files_dir, exist_ok=True)
+    exported_report = Report.from_root_directory(root_directory=report.export_directory)
 
-        # @todo Crear un set de los archivos de datos de las slides antes de copiarlos
-        for i, slide in enumerate(metadata["slides"], start=1):
-            original_data_file = slide["data_file"]
+    files_equivalence = {
+        data_file: os.path.join(exported_report.data_directory, f"archivo-{i + 1}.{get_file_extension(data_file)}") 
+        for i, data_file in enumerate(unique_data_files)
+    }
 
-            # @todo Añadir la extensión del archivo original
-            new_data_file_name = f"archivo-{i}.json"
-            new_data_file_path = os.path.join(data_files_dir, new_data_file_name)
+    for source, destination in files_equivalence.items():
+        shutil.copy(src=source, dst=destination)
+    
+    for slide in exported_report.slides:
+        slide._data_files = [ 
+            os.path.relpath(report.export_directory, files_equivalence[data_file]) 
+            for data_file in slide._data_files 
+        ]
 
-            shutil.copy2(original_data_file, new_data_file_path)
-            slide["data_file"] = os.path.relpath(new_data_file_path, temporary_directory)  # Ruta relativa
+    exported_report.save()
 
-        # Actualizar las rutas absolutas en el archivo de metadata
-        for slide in metadata["slides"]:
-            for key, value in slide["arguments"].items():
-                if isinstance(value, str) and os.path.isabs(value):
-                    slide["arguments"][key] = os.path.relpath(value, temporary_directory)
+    if os.path.exists(report.export_file):
+        os.remove(report.export_file)
 
-        # Guardar el archivo de metadata actualizado
-        metadata_path = os.path.join(temporary_directory, "metadata.json")
-        with open(metadata_path, "w") as metadata_file:
-            json.dump(metadata, metadata_file, indent=4)
+    with zipfile.ZipFile(report.export_file, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for root, _, files in os.walk(report.export_directory):
+            for file in files:
+                file_path = os.path.join(root, file)
+                archive_name = os.path.relpath(file_path, report.export_directory)
+                zip_file.write(file_path, archive_name)
+    
+    shutil.rmtree(report.export_directory)
+    os.rename(report.export_file, with_extension(report.export_file, EXPORTED_REPORTS_EXTENSION))
 
-        # Crear el archivo .zip
-        zip_path = os.path.join(current_report, filename)
-        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-            for root, _, files in os.walk(temporary_directory):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    arcname = os.path.relpath(file_path, temporary_directory)
-                    zipf.write(file_path, arcname)
-
-        # Limpiar la carpeta temporal
-        shutil.rmtree(temporary_directory)
-
-        # Responder con éxito
-        return jsonify({"message": f"Reporte exportado exitosamente como '{filename}'"}), 200
-
-    except Exception as e:
-        # Limpiar la carpeta temporal en caso de error
-        shutil.rmtree(temporary_directory, ignore_errors=True)
-        return jsonify({"error": str(e)}), 500
+    return {
+        "message": random_message(_type=RandomMessageType.EXPORT_SUCCESFUL),
+        "export-file": report.export_file
+    }, 200

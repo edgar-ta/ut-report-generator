@@ -22,3 +22,14 @@ class Asset:
             value=data["value"],
             _type=AssetType(data["type"]),
         )
+    
+    @classmethod
+    def list_from(cls, raw_assets: list[tuple[str, str, str]]) -> "list[Asset]":
+        return [ 
+            cls(
+                name=name,
+                value=value,
+                _type=AssetType(_type)
+            ) 
+            for (name, value, _type) in raw_assets 
+        ]

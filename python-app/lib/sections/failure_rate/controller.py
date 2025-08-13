@@ -1,7 +1,6 @@
 from lib.slide_controller import SlideController
 from lib.descriptive_error import DescriptiveError
 from lib.sections.failure_rate.source import read_excel, get_clean_data_frame, create_unit_name, graph_failure_rate
-from lib.asset_dict import asset_dict
 from lib.get_asset import get_string_asset, get_image_asset
 from lib.get_or_panic import get_or_panic
 
@@ -56,10 +55,10 @@ class FailureRate_Controller(SlideController):
         subjects_without_grades = grades[(grades == 0).all(axis=1)]
         subjects_with_grades = grades[(grades != 0).any(axis=1)]
 
-        main_chart_path = os.path.join(base_directory, "images", str(uuid.uuid4()) + ".png")
+        main_chart_path = os.path.join(base_directory, str(uuid.uuid4()) + ".png")
         graph_failure_rate(subjects_with_grades, main_chart_path)
 
-        return asset_dict([ 
+        return Asset.list_from([ 
             ("main_chart", main_chart_path, "image"), 
             ("delayed_teachers", delayed_teachers_legend(subjects_without_grades, unit), "text") 
         ])
