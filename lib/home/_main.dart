@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/api/start_report.dart';
+import 'package:ut_report_generator/home/report-editor/report_section/pick_file_button.dart';
 import 'package:ut_report_generator/components/server_connection_loader/widget.dart';
 import 'package:ut_report_generator/home/file_picker_button.dart';
 import 'package:ut_report_generator/home/report-editor/_main.dart';
@@ -35,12 +36,14 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(fontSize: 32),
               ),
               FilePickerButton(
-                onFileSelected: (filePath) async {
+                onFilesPicked: (files) async {
                   setState(() {
                     isLoading = true;
                   });
 
-                  await startReport(filePath)
+                  await startReport(
+                        files.map((file) => file.absolute.path).toList(),
+                      )
                       .then((response) {
                         setState(() {
                           isLoading = false;
@@ -62,7 +65,7 @@ class _HomePageState extends State<HomePage> {
                         print(error);
                         setState(() {
                           isLoading = false;
-                          errorMessage = "Hubo un error al cargar el archivo";
+                          errorMessage = "Hubo un error al cargar los archivos";
                         });
                       });
                 },

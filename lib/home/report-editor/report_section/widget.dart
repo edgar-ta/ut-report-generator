@@ -4,20 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:image_clipboard/image_clipboard.dart';
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/types/slide_class.dart';
-import 'package:ut_report_generator/home/report-editor/failure_section/pick_file_button.dart';
+import 'package:ut_report_generator/home/report-editor/report_section/pick_file_button.dart';
 import 'package:ut_report_generator/home/report-editor/report_section/assets_panel.dart';
 
 class ReportSection extends StatefulWidget {
   SlideClass slideData;
   Future<void> Function(String slideId, Map<String, dynamic> arguments)
   editSlide;
-  Future<void> Function(String slideId, String newFilePath) changeSlideData;
+  Future<void> Function(String slideId, List<File> dataFiles) changeSlideData;
   Widget Function(
     Map<String, dynamic> arguments,
     Future<void> Function(Map<String, dynamic> arguments),
   )
   controlPanelBuilder;
-  ImageClipboard imageClipboard;
 
   ReportSection({
     super.key,
@@ -25,7 +24,6 @@ class ReportSection extends StatefulWidget {
     required this.editSlide,
     required this.changeSlideData,
     required this.controlPanelBuilder,
-    required this.imageClipboard,
   });
 
   @override
@@ -42,7 +40,6 @@ class _ReportSectionState extends State<ReportSection> {
     try {
       await widget.editSlide(widget.slideData.id, arguments);
     } catch (e) {
-      print("Error updating arguments: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("No se pudo actualizar la imagen")),
       );
@@ -53,12 +50,12 @@ class _ReportSectionState extends State<ReportSection> {
     }
   }
 
-  Future<void> _changeSlideData(String filePath) async {
+  Future<void> _changeSlideData(List<File> dataFiles) async {
     setState(() {
       isLoading = true;
     });
     try {
-      await widget.changeSlideData(widget.slideData.id, filePath);
+      await widget.changeSlideData(widget.slideData.id, dataFiles);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Archivo cambiado correctamente")));
@@ -88,46 +85,55 @@ class _ReportSectionState extends State<ReportSection> {
 
     return Card(
       margin: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          // Header
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              "Reprobados por Unidad",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Column(
+          spacing: 12,
+          children: [
+            // Header
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "Reprobados por Unidad",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Spacer(),
+              ],
             ),
-          ),
 
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: AssetsPanel(
-                  images: imageList,
-                  isLoading: isLoading,
-                  imageClipboard: widget.imageClipboard,
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: AssetsPanel(
+                    key: ValueKey(widget.slideData.key),
+                    images: imageList,
+                    isLoading: isLoading,
+                  ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Column(
-                  children: [
-                    widget.controlPanelBuilder(
-                      widget.slideData.arguments,
-                      _updateArguments,
-                    ),
-                    PickFileButton(
-                      message: "Cambiar datos",
-                      onFilePicked:
-                          (String filePath) => _changeSlideData(filePath),
-                    ),
-                  ],
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      widget.controlPanelBuilder(
+                        widget.slideData.arguments,
+                        _updateArguments,
+                      ),
+                      PickFileButton(
+                        message: "Cambiar datos",
+                        onFilesPicked:
+                            (List<File> files) => _changeSlideData(files),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

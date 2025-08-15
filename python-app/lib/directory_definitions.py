@@ -1,6 +1,7 @@
 from control_variables import CURRENT_DIRECTORY_PATH
 
 from functools import cache
+from uuid import uuid4
 
 import os
 
@@ -44,6 +45,9 @@ def base_directory_of_slide(root_directory: str, slide_id: str) -> str:
 def assets_directory_of_slide(root_directory: str, slide_id: str) -> str:
     return os.path.join(root_directory, "slides", slide_id, "assets")
 
-@cache
 def preview_image_of_slide(root_directory: str, slide_id: str) -> str:
-    return os.path.join(root_directory, "slides", slide_id, "preview.png")
+    '''
+    Generates a new name for the preview image of a slide.
+    The file with said name is not guaranteed to actually exist
+    '''
+    return os.path.join(root_directory, "slides", slide_id, f"preview-{str(uuid4())}.png")

@@ -1,18 +1,20 @@
+import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
-Future<RenderReport_Response> renderReport({
-  required String outputFile,
-  required String reportDirectory,
-}) {
+Future<RenderReport_Response> renderReport({required String reportDirectory}) {
   return sendRequest(
     route: "render_report",
-    body: {"output_file": outputFile, "report_directory": reportDirectory},
+    body: {"report_directory": reportDirectory},
     callback: RenderReport_Response.fromJson,
   );
 }
 
-class RenderReport_Response {
+// ignore: camel_case_types
+class RenderReport_Response implements FileResponse {
+  @override
   String message;
+
+  @override
   String outputFile;
 
   RenderReport_Response({required this.message, required this.outputFile});

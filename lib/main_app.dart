@@ -12,15 +12,17 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return AppScaffold(verifyConnection: true);
+    return AppScaffold(verifyConnection: true);
     return ReportEditor(
       initialReport: StartReport_Response(
-        reportDirectory:
+        rootDirectory:
             r"D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\python-app\reports\ce4efb78-60bf-4745-8015-ec1dd3aa3d04",
         reportName: "Mi reporte",
+        creationDate: DateTime.now(),
         slides: [
           SlideClass(
             id: "5601ae90-7b60-4ff0-ae71-5855408a3427",
+            key: '5601ae90-7b60-4ff0-ae71-5855408a3427',
             type: SlideType.failureRate,
             assets: [
               AssetClass(
@@ -31,12 +33,15 @@ class MainApp extends StatelessWidget {
               ),
             ],
             arguments: {"unit": 1, "show_delayed_teachers": true},
-            dataFile:
-                "D:\\college\\cuatrimestre-6\\2025-06-16--estadias\\ut-report-generator\\.logistics-assets\\example-data--xd.xls",
+            dataFiles: [
+              "D:\\college\\cuatrimestre-6\\2025-06-16--estadias\\ut-report-generator\\.logistics-assets\\example-data.xls",
+            ],
             preview:
-                "D:\\college\\cuatrimestre-6\\2025-06-16--estadias\\ut-report-generator\\python-app\\reports\\ce4efb78-60bf-4745-8015-ec1dd3aa3d04\\images\\2b0d554e-f84f-4699-9d3d-86907eed7fec.png",
+                "D:\\college\\cuatrimestre-6\\2025-06-16--estadias\\ut-report-generator\\python-app\\reports\\e706722b-7d8b-4d24-92c8-97f16e3f5470\\slides\\78173aaf-780c-41d7-95cd-bace3038263e\\preview.png",
           ),
         ],
+        renderedFile:
+            "D:\\college\\cuatrimestre-6\\2025-06-16--estadias\\ut-report-generator\\python-app\\reports\\e706722b-7d8b-4d24-92c8-97f16e3f5470\\Mi reporte.pptx",
       ),
     );
   }

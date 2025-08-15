@@ -12,14 +12,14 @@ import 'package:ut_report_generator/api/send_request.dart';
 import 'package:ut_report_generator/api/types/slide_class.dart';
 import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/home/report-editor/failure_section/failure_section_arguments.dart';
-import 'package:ut_report_generator/home/report-editor/failure_section/pick_file_button.dart';
+import 'package:ut_report_generator/home/report-editor/report_section/pick_file_button.dart';
 import 'package:ut_report_generator/home/report-editor/report_section/widget.dart';
 
 class FailureSection extends StatefulWidget {
   SlideClass slideData;
   Future<void> Function(String slideId, Map<String, dynamic> arguments)
   editSlide;
-  Future<void> Function(String slideId, String newFilePath) changeSlideData;
+  Future<void> Function(String slideId, List<File> dataFiles) changeSlideData;
   ImageClipboard imageClipboard;
 
   FailureSection({
@@ -41,7 +41,6 @@ class _FailureSectionState extends State<FailureSection> {
       slideData: widget.slideData,
       editSlide: widget.editSlide,
       changeSlideData: widget.changeSlideData,
-      imageClipboard: widget.imageClipboard,
       controlPanelBuilder: (arguments, updateArguments) {
         var parsedArguments = FailureSectionArguments.fromJson(arguments);
 

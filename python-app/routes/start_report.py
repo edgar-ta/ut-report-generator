@@ -3,6 +3,8 @@ from lib.with_app_decorator import with_app
 from models.report import Report
 from models.slide import Slide
 
+from models.frontend.report_record import ReportRecord
+
 from control_variables import CURRENT_DIRECTORY_PATH
 
 from flask import request
@@ -23,19 +25,18 @@ def start_report():
     report = Report.cold_create()
     report.makedirs()
 
-    print("Hello -1")
     slide = Slide.from_data_files(
         base_directory=report.root_directory, 
         files=data_files
     )
     slide.makedirs()
 
-    print("Hello 0")
     slide.build_new_assets()
     slide.build_new_preview()
 
-    print("Hello 1")
     report.add_slide(slide)
     report.save()
 
-    return report.to_dict(), 200
+    response = ReportRecord.from_report(report).to_dict()
+
+    return response, 200

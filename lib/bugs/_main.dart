@@ -5,6 +5,6 @@ class BugReportPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("But report page");
+    return Text("Bug report page");
   }
 }

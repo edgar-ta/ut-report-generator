@@ -1,4 +1,4 @@
-from lib.file_extension import check_file_extension
+from lib.file_extension import check_file_extension, has_extension
 from lib.sections.failure_rate.controller import FailureRate_Controller
 from lib.slide_controller import SlideController
 from lib.descriptive_error import DescriptiveError
@@ -52,9 +52,10 @@ class Slide():
     @arguments.setter
     def arguments(self, new_arguments: dict[str, any]) -> None:
         merged_arguments = { **self.arguments, **new_arguments }
-        self.controller.validate_arguments(merged_arguments)
-        self._arguments = merged_arguments
-        self.last_edit = Timestamp.now()
+        if merged_arguments != self.arguments:
+            self.controller.validate_arguments(merged_arguments)
+            self._arguments = merged_arguments
+            self.last_edit = Timestamp.now()
     
     @property
     def data_files(self) -> list[str]:
@@ -77,7 +78,7 @@ class Slide():
             "last_edit": self.last_edit.isoformat(),
             "last_render": None if self.last_render is None else self.last_render.isoformat()
         }
-
+    
     @classmethod
     def from_json(cls, json_data: dict[str, any], root_directory: str) -> "Slide":
         return cls(
@@ -137,10 +138,17 @@ class Slide():
     def base_directory(self) -> str:
         return base_directory_of_slide(root_directory=self.root_directory, slide_id=self.id)
     
-    @cached_property
-    def preview_image(self) -> str:
-        return preview_image_of_slide(root_directory=self.root_directory, slide_id=self.id)
+    @property
+    def preview_image(self) -> str | None:
+        filename = next((
+            file for file in os.listdir(self.base_directory)
+            if has_extension(filename=file, extension="png")
+        ), None)
 
+        if filename is None:
+            return None        
+        return os.path.join(self.base_directory, filename)
+    
     def build_new_assets(self) -> list[Asset]:
         if self.is_up2date:
             return self.assets
@@ -158,7 +166,8 @@ class Slide():
         os.makedirs(self.assets_directory, exist_ok=exist_ok)
 
     def build_new_preview(self) -> str:
-        if self.is_up2date:
+        if self.is_up2date and self.preview_image is not None:
+            print("New preview was skipped")
             return self.preview_image
 
         presentation = LibrePresentation()
@@ -174,11 +183,12 @@ class Slide():
         spire_presentation = SpirePresentation()
         spire_presentation.LoadFromFile(pptx_preview_path)
 
-        if os.path.exists(self.preview_image):
-            os.remove(self.preview_image)
+        preview_name = preview_image_of_slide(root_directory=self.root_directory, slide_id=self.id)
+        if os.path.exists(preview_name):
+            os.remove(preview_name)
         
         image = spire_presentation.Slides[0].SaveAsImage()
-        image.Save(self.preview_image)
+        image.Save(preview_name)
         image.Dispose()
 
         spire_presentation.Dispose()
@@ -186,7 +196,7 @@ class Slide():
 
         self.last_render = Timestamp.now()
 
-        return self.preview_image
+        return preview_name
 
     def clear_old_assets(self) -> None:
         if self.is_up2date:
@@ -197,7 +207,7 @@ class Slide():
                 os.remove(asset.value)
         self.assets = []
 
-        if os.path.exists(self.preview_image):
+        if self.preview_image is not None:
             os.remove(self.preview_image)
 
     @property

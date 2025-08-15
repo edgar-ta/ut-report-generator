@@ -1,6 +1,6 @@
 from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
-from lib.file_extension import get_file_extension, with_extension
+from lib.file_extension import get_extension_or_panic, with_extension
 from lib.random_message import random_message, RandomMessageType
 
 from control_variables import EXPORTED_REPORTS_EXTENSION
@@ -38,7 +38,7 @@ def export_report():
     exported_report = Report.from_root_directory(root_directory=report.export_directory)
 
     files_equivalence = {
-        data_file: os.path.join(exported_report.data_directory, f"archivo-{i + 1}.{get_file_extension(data_file)}") 
+        data_file: os.path.join(exported_report.data_directory, f"archivo-{i + 1}.{get_extension_or_panic(data_file)}") 
         for i, data_file in enumerate(unique_data_files)
     }
 
@@ -53,8 +53,9 @@ def export_report():
 
     exported_report.save()
 
-    if os.path.exists(report.export_file):
-        os.remove(report.export_file)
+    final_name = report.export_file
+    if os.path.exists(final_name):
+        os.remove(final_name)
 
     with zipfile.ZipFile(report.export_file, "w", zipfile.ZIP_DEFLATED) as zip_file:
         for root, _, files in os.walk(report.export_directory):
@@ -64,9 +65,9 @@ def export_report():
                 zip_file.write(file_path, archive_name)
     
     shutil.rmtree(report.export_directory)
-    os.rename(report.export_file, with_extension(report.export_file, EXPORTED_REPORTS_EXTENSION))
+    os.rename(report.export_file, final_name)
 
     return {
         "message": random_message(_type=RandomMessageType.EXPORT_SUCCESFUL),
-        "export-file": report.export_file
+        "output_file": final_name
     }, 200

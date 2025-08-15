@@ -3,6 +3,7 @@ from models.report import Report
 from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
 
+from uuid import uuid4
 from flask import request
 
 @with_app("/change_slide_data", methods=["POST"])
@@ -24,5 +25,6 @@ def change_slide_data():
 
     return {
         "assets": [ asset.to_dict() for asset in new_assets],
-        "preview": new_preview
+        "preview": new_preview,
+        "key": str(uuid4())
     }, 200

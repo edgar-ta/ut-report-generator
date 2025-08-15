@@ -4,6 +4,7 @@ from lib.get_or_panic import get_or_panic
 from models.report import Report
 
 from flask import request
+from uuid import uuid4
 
 
 @with_app("/edit_slide", methods=["POST"])
@@ -14,20 +15,21 @@ def edit_slide():
 
     report = Report.from_root_directory(root_directory=root_directory)
     slide = report[slide_id]
-    print("Hello 1")
 
     slide.arguments = arguments
 
-    print("Hello 1.1")
+    print(f"1. {slide.is_up2date = }")
     slide.clear_old_assets()
+    print(f"1.1 {slide.is_up2date = }")
     new_assets = slide.build_new_assets()
+    print(f"1.2 {slide.is_up2date = }")
     new_preview = slide.build_new_preview()
+    print(f"2. {slide.is_up2date = }")
 
-    print("Hello 2")
     report.save()
-    print("Hello 3")
 
     return {
         "assets": [ asset.to_dict() for asset in new_assets ],
-        "preview": new_preview
+        "preview": new_preview,
+        "key": str(uuid4())
     }
