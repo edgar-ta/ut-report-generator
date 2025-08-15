@@ -2,7 +2,7 @@ import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
 Future<ChangeSlideData_Response> changeSlideData({
-  required String newDataFile,
+  required List<String> dataFiles,
   required String reportDirectory,
   required String slideId,
 }) {
@@ -10,7 +10,7 @@ Future<ChangeSlideData_Response> changeSlideData({
     route: "change_slide_data",
     callback: (json) => ChangeSlideData_Response.fromJson(json),
     body: {
-      "data_file": newDataFile,
+      "data_files": dataFiles,
       "report_directory": reportDirectory,
       "slide_id": slideId,
     },
@@ -21,8 +21,13 @@ Future<ChangeSlideData_Response> changeSlideData({
 class ChangeSlideData_Response {
   List<AssetClass> assets;
   String preview;
+  String key;
 
-  ChangeSlideData_Response({required this.assets, required this.preview});
+  ChangeSlideData_Response({
+    required this.assets,
+    required this.preview,
+    required this.key,
+  });
 
   factory ChangeSlideData_Response.fromJson(Map<String, dynamic> json) {
     return ChangeSlideData_Response(
@@ -31,6 +36,7 @@ class ChangeSlideData_Response {
               .map((asset) => AssetClass.fromJson(asset))
               .toList(),
       preview: json['preview'] as String,
+      key: json['key'] as String,
     );
   }
 }

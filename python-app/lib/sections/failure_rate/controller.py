@@ -1,9 +1,11 @@
 from lib.slide_controller import SlideController
 from lib.descriptive_error import DescriptiveError
 from lib.sections.failure_rate.source import read_excel, get_clean_data_frame, create_unit_name, graph_failure_rate
-from lib.asset_dict import asset_dict
 from lib.get_asset import get_string_asset, get_image_asset
 from lib.get_or_panic import get_or_panic
+
+from models.slide_type import SlideType
+from models.asset import Asset
 
 from pandas import DataFrame
 from pptx import Presentation
@@ -32,9 +34,8 @@ def delayed_teachers_legend(subjects_without_grades: DataFrame, unit: int) -> st
 
 class FailureRate_Controller(SlideController):
     @staticmethod
-    def type_id() -> str:
-        return "failure_rate"
-
+    def slide_type() -> SlideType:
+        return SlideType.FAILURE_RATE
 
     @staticmethod
     def default_arguments() -> dict[str, any]:
@@ -44,8 +45,8 @@ class FailureRate_Controller(SlideController):
         }
 
     @staticmethod
-    def build_assets(data_file: str, report_directory: str, arguments: dict[str, any]) -> list[dict[str, str]]:
-        data_frame = read_excel(data_file)
+    def build_assets(data_files: list[str], base_directory: str, arguments: dict[str, any]) -> list[Asset]:
+        data_frame = read_excel(data_files[0])
         data_frame = get_clean_data_frame(data_frame)
 
         unit = arguments["unit"]
@@ -54,10 +55,10 @@ class FailureRate_Controller(SlideController):
         subjects_without_grades = grades[(grades == 0).all(axis=1)]
         subjects_with_grades = grades[(grades != 0).any(axis=1)]
 
-        main_chart_path = os.path.join(report_directory, "images", str(uuid.uuid4()) + ".png")
+        main_chart_path = os.path.join(base_directory, str(uuid.uuid4()) + ".png")
         graph_failure_rate(subjects_with_grades, main_chart_path)
 
-        return asset_dict([ 
+        return Asset.list_from([ 
             ("main_chart", main_chart_path, "image"), 
             ("delayed_teachers", delayed_teachers_legend(subjects_without_grades, unit), "text") 
         ])
@@ -77,7 +78,7 @@ class FailureRate_Controller(SlideController):
 
 
     @staticmethod
-    def render_slide(presentation: Presentation, arguments: dict[str, any], assets: list[dict[str, str]]) -> None:
+    def render_slide(presentation: Presentation, arguments: dict[str, any], assets: list[Asset]) -> None:
         slide = presentation.slides.add_slide(presentation.slide_layouts[5])
 
         main_chart_path = get_image_asset(assets, "main_chart")

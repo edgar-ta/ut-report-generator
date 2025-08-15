@@ -21,8 +21,13 @@ Future<EditSlide_Response> editSlide({
 class EditSlide_Response {
   List<AssetClass> assets;
   String preview;
+  String key;
 
-  EditSlide_Response({required this.assets, required this.preview});
+  EditSlide_Response({
+    required this.assets,
+    required this.preview,
+    required this.key,
+  });
 
   static EditSlide_Response fromJson(Map<String, dynamic> json) {
     return EditSlide_Response(
@@ -31,6 +36,7 @@ class EditSlide_Response {
               .map((asset) => AssetClass.fromJson(asset))
               .toList(),
       preview: json['preview'] as String,
+      key: json['key'] as String,
     );
   }
 }

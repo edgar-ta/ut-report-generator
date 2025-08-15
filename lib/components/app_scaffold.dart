@@ -13,6 +13,7 @@ class AppScaffold extends StatefulWidget {
   bool verifyConnection;
   Widget? child;
   Widget? floatingActionButton;
+  List<Widget>? actions;
 
   AppScaffold({
     super.key,
@@ -20,6 +21,7 @@ class AppScaffold extends StatefulWidget {
     this.child,
     this.verifyConnection = false,
     this.floatingActionButton,
+    this.actions,
   });
 
   @override
@@ -62,6 +64,7 @@ class _AppScaffoldState extends State<AppScaffold> {
                   ),
                 ),
                 centerTitle: true,
+                actions: widget.actions,
               ),
               body: Column(
                 children: [

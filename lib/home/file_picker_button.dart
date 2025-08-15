@@ -4,8 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class FilePickerButton extends StatefulWidget {
-  Future<void> Function(String filePath)? onFileSelected;
-  FilePickerButton({super.key, this.onFileSelected});
+  Future<void> Function(List<File> files)? onFilesPicked;
+  FilePickerButton({super.key, this.onFilesPicked});
 
   @override
   State<FilePickerButton> createState() => _FilePickerButtonState();
@@ -25,8 +25,9 @@ class _FilePickerButtonState extends State<FilePickerButton> {
             onPressed: () async {
               FilePickerResult? result = await FilePicker.platform.pickFiles();
               if (result != null) {
-                File file = File(result.files.single.path!);
-                await widget.onFileSelected?.call(file.absolute.path);
+                var files =
+                    result.files.map((file) => File(file.path!)).toList();
+                await widget.onFilesPicked?.call(files);
               }
             },
             style: TextButton.styleFrom(

@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:image_clipboard/image_clipboard.dart';
 import 'package:ut_report_generator/api/change_slide_data.dart';
 import 'package:ut_report_generator/api/edit_slide.dart';
+import 'package:ut_report_generator/api/export_report.dart';
+import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/render_report.dart';
-import 'package:ut_report_generator/api/start_report.dart';
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/types/report_class.dart';
 import 'package:ut_report_generator/api/types/slide_class.dart';
@@ -13,11 +14,12 @@ import 'package:ut_report_generator/api/types/slide_type.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/home/report-editor/failure_section/widget.dart';
-import 'package:ut_report_generator/home/report-editor/progress_alert_dialog/widget.dart';
+import 'package:ut_report_generator/home/report-editor/progress_alert_dialog.dart';
+import 'package:ut_report_generator/home/report-editor/render_button.dart';
 
 Widget buildSlideEditor(
   SlideClass slide,
-  Future<void> Function(String slideId, String newFilePath) changeSlideData,
+  Future<void> Function(String slideId, List<File> dataFiles) changeSlideData,
   Future<void> Function(String slideId, Map<String, dynamic> arguments)
   editSlide,
   ImageClipboard imageClipboard,
@@ -25,7 +27,6 @@ Widget buildSlideEditor(
   switch (slide.type) {
     case SlideType.failureRate:
       return FailureSection(
-        key: ValueKey(slide.id),
         slideData: slide,
         editSlide: editSlide,
         changeSlideData: changeSlideData,
@@ -51,6 +52,7 @@ class ReportEditor extends StatefulWidget {
 class _ReportEditorState extends State<ReportEditor> {
   late TextEditingController reportNameController;
   late ReportClass report;
+  String? lastRenderedReport;
 
   @override
   void initState() {
@@ -61,8 +63,9 @@ class _ReportEditorState extends State<ReportEditor> {
     );
   }
 
-  void setSlideData({
+  void _setSlideData({
     required String slideId,
+    String? key,
     List<AssetClass>? assets,
     String? preview,
     Map<String, dynamic>? arguments,
@@ -73,8 +76,9 @@ class _ReportEditorState extends State<ReportEditor> {
             if (slide.id == slideId) {
               return slide.copyWith(
                 assets: assets,
-                preview: preview,
                 arguments: arguments,
+                preview: preview,
+                key: key,
               );
             }
             return slide;
@@ -84,67 +88,119 @@ class _ReportEditorState extends State<ReportEditor> {
     });
   }
 
-  Future<void> _changeSlideData(String slideId, String newFilePath) async {
+  Future<void> _changeSlideData(String slideId, List<File> files) async {
     return changeSlideData(
-      newDataFile: newFilePath,
-      reportDirectory: report.reportDirectory,
+      dataFiles: files.map((file) => file.absolute.path).toList(),
+      reportDirectory: report.rootDirectory,
       slideId: slideId,
     ).then((value) {
-      setSlideData(
+      _setSlideData(
         slideId: slideId,
         assets: value.assets,
         preview: value.preview,
+        key: value.key,
       );
     });
   }
 
   Future<void> _editSlide(String slideId, Map<String, dynamic> arguments) {
     return editSlide(
-      reportDirectory: report.reportDirectory,
+      reportDirectory: report.rootDirectory,
       slideId: slideId,
       arguments: arguments,
     ).then((value) {
-      setSlideData(
+      _setSlideData(
         slideId: slideId,
         assets: value.assets,
         preview: value.preview,
         arguments: arguments,
+        key: value.key,
       );
     });
   }
 
   Future<RenderReport_Response> _renderReport() {
-    return renderReport(
-      outputFile: "${report.reportDirectory}/${report.reportName}.pptx",
-      reportDirectory: report.reportDirectory,
+    return renderReport(reportDirectory: report.rootDirectory);
+  }
+
+  Future<ExportReport_Response> _exportReport() {
+    return exportReport(reportDirectory: report.rootDirectory);
+  }
+
+  Future<FileResponse> _renderReportAsPdf() {
+    return Future.error(
+      Exception("El sistema aun no soporta este tipo de archivo"),
+    );
+  }
+
+  Widget _optionComponent<ResponseType extends FileResponse>({
+    required void Function() close,
+    required Future<ResponseType> Function() callback,
+    required String label,
+    required IconData icon,
+    required String alertTitle,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: () {
+        close();
+        showDialog(
+          context: context,
+          builder: (context) {
+            return ProgressAlertDialog(callback: callback, title: alertTitle);
+          },
+        );
+      },
+      label: Text(label),
+      icon: Icon(icon),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      floatingActionButton: Builder(
-        builder: (innerContext) {
-          return FloatingActionButton.extended(
-            onPressed: () {
-              showDialog(
-                context: innerContext,
-                builder:
-                    (_) => ProgressAlertDialog(
-                      renderReportCallback: _renderReport,
-                      onReportGenerated: (String outputFile) {
-                        setState(() {
-                          report = report.copyWith(renderedFile: outputFile);
-                        });
-                      },
-                    ),
+      floatingActionButton: RenderButton(
+        distance: 8,
+        builder: (close, index) {
+          switch (index) {
+            case 0:
+              return _optionComponent(
+                close: close,
+                callback: _renderReport,
+                label: "PPTX",
+                icon: Icons.slideshow,
+                alertTitle: "Renderizando PPTX",
               );
-            },
-            label: const Text("Generar PPTX"),
-            icon: const Icon(Icons.check),
-          );
+            case 1:
+              return _optionComponent(
+                close: close,
+                callback: _exportReport,
+                label: "Reporte",
+                icon: Icons.edit_document,
+                alertTitle: "Exportando reporte",
+              );
+            default:
+              return _optionComponent(
+                close: close,
+                callback: _renderReportAsPdf,
+                label: "PDF",
+                icon: Icons.picture_as_pdf,
+                alertTitle: "Renderizando PDF",
+              );
+          }
         },
+        count: 3,
+        width: 192,
+        height: 48,
       ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            // @todo Use open_dir to open the report's directory
+            // OpenFile.open();
+          },
+          icon: Icon(Icons.remove_red_eye_outlined),
+        ),
+      ],
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 128.0, vertical: 64),

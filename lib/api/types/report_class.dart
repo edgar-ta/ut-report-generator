@@ -1,41 +1,46 @@
 import 'package:ut_report_generator/api/types/slide_class.dart';
 
 class ReportClass {
+  String rootDirectory;
   String reportName;
-  String reportDirectory;
-  String? renderedFile;
+  DateTime creationDate;
   List<SlideClass> slides;
+  String renderedFile;
 
   ReportClass({
+    required this.rootDirectory,
     required this.reportName,
-    required this.reportDirectory,
+    required this.creationDate,
     required this.slides,
-    this.renderedFile,
+    required this.renderedFile,
   });
 
   factory ReportClass.fromJson(Map<String, dynamic> json) {
     return ReportClass(
+      rootDirectory: json['report_directory'] as String,
       reportName: json['report_name'] as String,
-      reportDirectory: json['report_directory'] as String,
+      creationDate: DateTime.parse(json['creation_date']),
       slides:
           (json['slides'] as List)
               .map((slide) => SlideClass.fromJson(slide))
               .toList(),
-      renderedFile: json['rendered_file'] as String?,
+      renderedFile: json['rendered_file'] as String,
     );
   }
 
   ReportClass copyWith({
     String? reportName,
-    String? reportDirectory,
+    String? rootDirectory,
+    DateTime? creationDate,
     List<SlideClass>? slides,
     String? renderedFile,
   }) {
     return ReportClass(
       reportName: reportName ?? this.reportName,
-      reportDirectory: reportDirectory ?? this.reportDirectory,
+      rootDirectory: rootDirectory ?? this.rootDirectory,
+      creationDate: creationDate ?? this.creationDate,
       slides: slides ?? this.slides,
-      renderedFile: this.renderedFile ?? renderedFile,
+      renderedFile: renderedFile ?? this.renderedFile,
     );
   }
 }

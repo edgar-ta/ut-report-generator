@@ -1,14 +1,10 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
-import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 import 'package:ut_report_generator/api/types/report_class.dart';
 
-Future<StartReport_Response> startReport(String filename) {
+Future<StartReport_Response> startReport(List<String> dataFiles) {
   return sendRequest(
     route: "start_report",
-    body: {"data_file": filename},
+    body: {"data_files": dataFiles},
     callback: StartReport_Response.fromJson,
   );
 }
