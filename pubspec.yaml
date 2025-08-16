@@ -10,10 +10,12 @@ dependencies:
   file_picker: ^10.2.1
   flutter:
     sdk: flutter
+  go_router: ^16.1.0
   http: ^1.4.0
   image_clipboard: ^1.1.0+1
   open_dir: ^0.0.2+1
   open_file: ^3.5.10
+  provider: ^6.1.5
 
 dev_dependencies:
   flutter_lints: ^5.0.0

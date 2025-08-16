@@ -1,14 +1,14 @@
 import 'package:ut_report_generator/api/types/slide_class.dart';
 
 class ReportClass {
-  String rootDirectory;
+  String reportDirectory;
   String reportName;
   DateTime creationDate;
   List<SlideClass> slides;
   String renderedFile;
 
   ReportClass({
-    required this.rootDirectory,
+    required this.reportDirectory,
     required this.reportName,
     required this.creationDate,
     required this.slides,
@@ -17,7 +17,7 @@ class ReportClass {
 
   factory ReportClass.fromJson(Map<String, dynamic> json) {
     return ReportClass(
-      rootDirectory: json['report_directory'] as String,
+      reportDirectory: json['report_directory'] as String,
       reportName: json['report_name'] as String,
       creationDate: DateTime.parse(json['creation_date']),
       slides:
@@ -30,14 +30,14 @@ class ReportClass {
 
   ReportClass copyWith({
     String? reportName,
-    String? rootDirectory,
+    String? reportDirectory,
     DateTime? creationDate,
     List<SlideClass>? slides,
     String? renderedFile,
   }) {
     return ReportClass(
       reportName: reportName ?? this.reportName,
-      rootDirectory: rootDirectory ?? this.rootDirectory,
+      reportDirectory: reportDirectory ?? this.reportDirectory,
       creationDate: creationDate ?? this.creationDate,
       slides: slides ?? this.slides,
       renderedFile: renderedFile ?? this.renderedFile,

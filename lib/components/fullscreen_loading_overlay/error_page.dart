@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ErrorPage extends StatelessWidget {
-  void Function()? retry;
-  ErrorPage({super.key, this.retry});
+  ErrorPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,17 +18,6 @@ class ErrorPage extends StatelessWidget {
                 style: TextStyle(color: Colors.red),
               ),
             ],
-          ),
-          TextButton.icon(
-            onPressed: () {
-              retry?.call();
-            },
-            label: Text("Reintentar"),
-            icon: Icon(Icons.refresh, color: Colors.white),
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              foregroundColor: Colors.white,
-            ),
           ),
         ],
       ),

@@ -3,106 +3,74 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ut_report_generator/api/hello.dart';
+import 'package:ut_report_generator/api/recent_reports.dart';
 import 'package:ut_report_generator/api/start_report.dart';
+import 'package:ut_report_generator/components/app_scaffold.dart';
+import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
+import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
+import 'package:ut_report_generator/home/recent_reports/widget.dart';
 import 'package:ut_report_generator/home/report-editor/report_section/pick_file_button.dart';
-import 'package:ut_report_generator/components/server_connection_loader/widget.dart';
+import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
 import 'package:ut_report_generator/home/file_picker_button.dart';
 import 'package:ut_report_generator/home/report-editor/_main.dart';
 
 class HomePage extends StatefulWidget {
-  String? message;
-  HomePage({super.key, this.message});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isLoading = false;
-  String? errorMessage;
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 16,
+    return FullscreenLoadingOverlay(
+      callback: helloRequest,
+      errorScreen: ErrorPage(),
+      loadingScreen: LoadingPage(
+        messages: [
+          "Conectando con el servidor",
+          "Abriendo la base de datos",
+          "Pensando",
+          "Preguntándole a ChatGPT",
+          "Calentando motores",
+        ],
+        title: "Conectando con el servidor",
+      ),
+      builder:
+          (HelloRequest_Response helloRequestResponse) => Column(
             children: [
-              Text(
-                widget.message ?? "Bienvenido, profesor",
-                style: TextStyle(fontSize: 32),
-              ),
-              FilePickerButton(
-                onFilesPicked: (files) async {
-                  setState(() {
-                    isLoading = true;
-                  });
-
-                  await startReport(
-                        files.map((file) => file.absolute.path).toList(),
-                      )
-                      .then((response) {
-                        setState(() {
-                          isLoading = false;
-                        });
-
-                        if (!mounted) return;
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    ReportEditor(initialReport: response),
-                          ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 16,
+                  children: [
+                    Text(
+                      helloRequestResponse!.message,
+                      style: TextStyle(fontSize: 32),
+                    ),
+                    FilePickerButton(
+                      onFilesPicked: (files) async {
+                        context.go(
+                          "/home/report-editor",
+                          extra:
+                              () async => await startReport(
+                                files
+                                    .map((file) => file.absolute.path)
+                                    .toList(),
+                              ),
                         );
-                      })
-                      .catchError((error) {
-                        print("@home/_main.dart");
-                        print("Something went wrong");
-                        print(error);
-                        setState(() {
-                          isLoading = false;
-                          errorMessage = "Hubo un error al cargar los archivos";
-                        });
-                      });
-                },
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 8,
-            children: [
-              Text(
-                "Reportes recientes".toUpperCase(),
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-              ),
-              SizedBox(
-                height: 148,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 9,
-                  itemBuilder: (context, index) {
-                    return AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Container(color: Colors.blue),
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return SizedBox(width: 16);
-                  },
+                      },
+                    ),
+                  ],
                 ),
               ),
+              RecentReports(),
             ],
           ),
-        ),
-      ],
     );
   }
 }

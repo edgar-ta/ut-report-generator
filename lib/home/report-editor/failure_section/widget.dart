@@ -20,14 +20,12 @@ class FailureSection extends StatefulWidget {
   Future<void> Function(String slideId, Map<String, dynamic> arguments)
   editSlide;
   Future<void> Function(String slideId, List<File> dataFiles) changeSlideData;
-  ImageClipboard imageClipboard;
 
   FailureSection({
     super.key,
     required this.slideData,
     required this.editSlide,
     required this.changeSlideData,
-    required this.imageClipboard,
   });
 
   @override
