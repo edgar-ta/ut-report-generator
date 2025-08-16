@@ -3,19 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class LoadingPage extends StatefulWidget {
-  const LoadingPage({super.key});
+  final String title;
+  final List<String> messages;
+
+  const LoadingPage({super.key, required this.messages, required this.title});
 
   @override
   State<LoadingPage> createState() => _LoadingPageState();
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-  List<String> messages = [
-    "Conectando con el servidor...",
-    "Esperando respuesta...",
-    "Verificando conexión...",
-    "Casi listo...",
-  ];
   int _currentMessageIndex = 0;
   Timer? _messageTimer;
 
@@ -35,7 +32,8 @@ class _LoadingPageState extends State<LoadingPage> {
     _messageTimer = Timer.periodic(Duration(seconds: 3), (_) {
       if (mounted) {
         setState(() {
-          _currentMessageIndex = (_currentMessageIndex + 1) % messages.length;
+          _currentMessageIndex =
+              (_currentMessageIndex + 1) % widget.messages.length;
         });
       }
     });
@@ -48,7 +46,7 @@ class _LoadingPageState extends State<LoadingPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "Conectando al servidor",
+            widget.title,
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 32),
@@ -59,7 +57,7 @@ class _LoadingPageState extends State<LoadingPage> {
           ),
           const SizedBox(height: 24),
           Text(
-            messages[_currentMessageIndex],
+            widget.messages[_currentMessageIndex],
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ],

@@ -82,12 +82,15 @@ class _AssetsPanelState extends State<AssetsPanel> {
                                       selectedImageIndex == index
                                           ? Colors.blue
                                           : Colors.transparent,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4.0),
-                                    color: Colors.white,
-                                    width: 64,
-                                    height: 64,
-                                    child: Image.file(File(asset.value)),
+                                  child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4.0),
+                                      color: Colors.white,
+                                      width: 64,
+                                      height: 64,
+                                      child: Image.file(File(asset.value)),
+                                    ),
                                   ),
                                 ),
                               );

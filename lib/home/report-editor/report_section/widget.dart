@@ -84,7 +84,6 @@ class _ReportSectionState extends State<ReportSection> {
     );
 
     return Card(
-      margin: const EdgeInsets.all(16.0),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
