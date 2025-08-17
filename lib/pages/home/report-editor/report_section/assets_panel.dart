@@ -2,10 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_clipboard/image_clipboard.dart';
 
 import 'package:ut_report_generator/api/types/asset_class.dart';
-import 'package:ut_report_generator/home/report-editor/report_section/pick_file_button.dart';
 
 class AssetsPanel extends StatefulWidget {
   List<AssetClass> images;
@@ -80,7 +78,9 @@ class _AssetsPanelState extends State<AssetsPanel> {
                                   padding: const EdgeInsets.all(1.0),
                                   color:
                                       selectedImageIndex == index
-                                          ? Colors.blue
+                                          ? Theme.of(
+                                            context,
+                                          ).colorScheme.outline
                                           : Colors.transparent,
                                   child: MouseRegion(
                                     cursor: SystemMouseCursors.click,

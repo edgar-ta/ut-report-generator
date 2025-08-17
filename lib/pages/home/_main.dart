@@ -1,23 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/api/import_report.dart';
-import 'package:ut_report_generator/api/recent_reports.dart';
 import 'package:ut_report_generator/api/start_report.dart';
 import 'package:ut_report_generator/api/types/report_class.dart';
-import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
-import 'package:ut_report_generator/home/file_picker_button2.dart';
-import 'package:ut_report_generator/home/recent_reports/widget.dart';
-import 'package:ut_report_generator/home/report-editor/report_section/pick_file_button.dart';
+import 'package:ut_report_generator/main_app/route_observer.dart';
+import 'package:ut_report_generator/pages/home/file_picker_button2.dart';
+import 'package:ut_report_generator/pages/home/recent_reports/widget.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
-import 'package:ut_report_generator/home/file_picker_button.dart';
-import 'package:ut_report_generator/home/report-editor/_main.dart';
+import 'package:provider/provider.dart';
+import 'package:ut_report_generator/scaffold_controller.dart';
 
 Future<ReportClass> _createNewReport(List<File> files) async {
   return startReport(files.map((file) => file.absolute.path).toList());
@@ -65,7 +64,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with RouteAware {
   PossibleOption selectedValue = PossibleOption.createNewReport;
 
   Future<void> _openReportEditor(PossibleOption possibleOption) async {
@@ -81,6 +80,30 @@ class _HomePageState extends State<HomePage> {
         extra: () => possibleOption.callback(files),
       );
     }
+  }
+
+  bool _subscribed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_subscribed) {
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
+      _subscribed = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    context.read<ScaffoldController>()
+      ..setFab(null)
+      ..setAppBarBuilder(null);
   }
 
   @override
@@ -100,7 +123,7 @@ class _HomePageState extends State<HomePage> {
       ),
       builder:
           (helloRequestResponse) => Container(
-            color: const Color.fromARGB(50, 161, 160, 255),
+            color: Theme.of(context).colorScheme.surface,
             child: Column(
               children: [
                 Expanded(
@@ -134,10 +157,7 @@ class _HomePageState extends State<HomePage> {
                         triggerBuilder:
                             (option) => SizedBox(
                               width: 130,
-                              child: Text(
-                                option.displayName,
-                                style: TextStyle(color: Colors.white),
-                              ),
+                              child: Text(option.displayName),
                             ),
                         onItemSelected: (value) async {
                           setState(() {

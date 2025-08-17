@@ -9,12 +9,12 @@ class ScaffoldController extends ChangeNotifier {
     notifyListeners();
   }
 
-  PreferredSizeWidget Function(BuildContext context)? _appBarBuilder;
-  PreferredSizeWidget Function(BuildContext context)? get appBarBuilder =>
+  PreferredSizeWidget Function(BuildContext)? _appBarBuilder;
+  PreferredSizeWidget Function(BuildContext)? get appBarBuilder =>
       _appBarBuilder;
 
   void setAppBarBuilder(
-    PreferredSizeWidget Function(BuildContext context)? appBarBuilder,
+    PreferredSizeWidget Function(BuildContext)? appBarBuilder,
   ) {
     _appBarBuilder = appBarBuilder;
     notifyListeners();

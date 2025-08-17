@@ -131,11 +131,10 @@ class _FilePickerButton2State<T> extends State<FilePickerButton2<T>>
                                     child: Container(
                                       color:
                                           isSelected
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                                  .withOpacity(0.12)
-                                              : Colors.transparent,
+                                              ? Theme.of(
+                                                context,
+                                              ).colorScheme.tertiaryContainer
+                                              : null,
                                       child: widget.itemBuilder(
                                         value,
                                         isSelected,
@@ -157,8 +156,6 @@ class _FilePickerButton2State<T> extends State<FilePickerButton2<T>>
 
   @override
   Widget build(BuildContext context) {
-    int tealColor = 0xFF009966;
-
     return CompositedTransformTarget(
       link: _layerLink,
       child: IntrinsicHeight(
@@ -166,13 +163,15 @@ class _FilePickerButton2State<T> extends State<FilePickerButton2<T>>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 widget.onTriggerPressed(widget.selectedValue);
                 _closeDropdown();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(tealColor),
+                foregroundColor:
+                    Theme.of(context).colorScheme.onPrimaryContainer,
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.horizontal(
                     left: Radius.circular(12),
@@ -188,9 +187,10 @@ class _FilePickerButton2State<T> extends State<FilePickerButton2<T>>
                 duration: const Duration(milliseconds: 180),
                 child: const Icon(Icons.keyboard_arrow_down),
               ),
-              color: Colors.white,
               style: IconButton.styleFrom(
-                backgroundColor: Color(tealColor),
+                foregroundColor:
+                    Theme.of(context).colorScheme.onPrimaryContainer,
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.horizontal(
                     right: Radius.circular(12),
