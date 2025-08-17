@@ -2,26 +2,24 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_clipboard/image_clipboard.dart';
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/api/change_slide_data.dart';
 import 'package:ut_report_generator/api/edit_slide.dart';
 import 'package:ut_report_generator/api/export_report.dart';
 import 'package:ut_report_generator/api/file_response.dart';
-import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/api/render_report.dart';
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/types/report_class.dart';
 import 'package:ut_report_generator/api/types/slide_class.dart';
 import 'package:ut_report_generator/api/types/slide_type.dart';
-import 'package:ut_report_generator/components/app_scaffold.dart';
+import 'package:ut_report_generator/components/common_appbar.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
 import 'package:ut_report_generator/components/input_component.dart';
-import 'package:ut_report_generator/home/report-editor/failure_section/widget.dart';
-import 'package:ut_report_generator/home/report-editor/progress_alert_dialog.dart';
-import 'package:ut_report_generator/home/report-editor/render_button.dart';
+import 'package:ut_report_generator/pages/home/report-editor/failure_section/widget.dart';
+import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
+import 'package:ut_report_generator/pages/home/report-editor/render_button.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 
@@ -103,10 +101,17 @@ class _ReportEditorState extends State<ReportEditor> {
         ),
       );
       context.read<ScaffoldController>().setAppBarBuilder(
-        (innerContext) => AppBar(
+        commonAppbar(
+          title: "Editor de reportes",
+          actions: [
+            IconButton(onPressed: () {}, icon: Icon(Icons.threed_rotation)),
+          ],
           leading: IconButton(
             onPressed: () {
-              context.go("/home");
+              context.read<ScaffoldController>()
+                ..setAppBarBuilder(null)
+                ..setFab(null);
+              context.pop();
             },
             icon: Icon(Icons.arrow_back),
           ),
@@ -211,53 +216,6 @@ class _ReportEditorState extends State<ReportEditor> {
 
   @override
   Widget build(BuildContext context) {
-    // floatingActionButton:
-    //     report != null
-    //         ? (RenderButton(
-    //           distance: 8,
-    //           builder: (close, index) {
-    //             switch (index) {
-    //               case 0:
-    //                 return _optionComponent(
-    //                   close: close,
-    //                   callback: _renderReport,
-    //                   label: "PPTX",
-    //                   icon: Icons.slideshow,
-    //                   alertTitle: "Renderizando PPTX",
-    //                 );
-    //               case 1:
-    //                 return _optionComponent(
-    //                   close: close,
-    //                   callback: _exportReport,
-    //                   label: "Reporte",
-    //                   icon: Icons.edit_document,
-    //                   alertTitle: "Exportando reporte",
-    //                 );
-    //               default:
-    //                 return _optionComponent(
-    //                   close: close,
-    //                   callback: _renderReportAsPdf,
-    //                   label: "PDF",
-    //                   icon: Icons.picture_as_pdf,
-    //                   alertTitle: "Renderizando PDF",
-    //                 );
-    //             }
-    //           },
-    //           count: 3,
-    //           width: 192,
-    //           height: 48,
-    //         ))
-    //         : null,
-    // actions: [
-    //   IconButton(
-    //     onPressed: () {
-    //       // @todo Use open_dir to open the report's directory
-    //       // OpenFile.open();
-    //     },
-    //     icon: Icon(Icons.remove_red_eye_outlined),
-    //   ),
-    // ],
-
     return FullscreenLoadingOverlay(
       callback: _loadReport,
       errorScreen: ErrorPage(),
@@ -285,7 +243,7 @@ class _ReportEditorState extends State<ReportEditor> {
                     hint: "Ingrese el nombre del reporte",
                     controller: reportNameController,
                   ),
-                  ...(report!.slides.map((slide) {
+                  ...(report.slides.map((slide) {
                     return buildSlideEditor(
                       slide,
                       _changeSlideData,

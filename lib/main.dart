@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:ut_report_generator/utils/control_variables.dart';
-import 'package:ut_report_generator/main_app.dart';
+import 'package:ut_report_generator/main_app/main_app.dart';
 
 Future<Process> startPython() {
   return Process.start(LOCAL_PYTHON, [

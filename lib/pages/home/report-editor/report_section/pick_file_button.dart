@@ -53,19 +53,26 @@ class _PickFileButtonState extends State<PickFileButton> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: isLoading ? null : _pickFileAndSendRequest,
-      child:
-          isLoading
-              ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-              : Text(widget.message),
+    return SizedBox(
+      height: 48,
+      child: ElevatedButton(
+        onPressed: isLoading ? null : _pickFileAndSendRequest,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+          foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
+        ),
+        child:
+            isLoading
+                ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                : Text(widget.message),
+      ),
     );
   }
 }

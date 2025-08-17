@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/api/get_report.dart';
 import 'package:ut_report_generator/api/recent_reports.dart';
-import 'package:ut_report_generator/home/recent_reports/report_card.dart';
-import 'package:ut_report_generator/home/recent_reports/report_card_skeleton.dart';
-import 'package:ut_report_generator/home/report-editor/_main.dart';
+import 'package:ut_report_generator/pages/home/recent_reports/report_card.dart';
+import 'package:ut_report_generator/pages/home/recent_reports/report_card_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 
@@ -54,8 +53,9 @@ class _RecentReportsState extends State<RecentReports> {
     var isError = exception != null;
     var isSuccess = response != null;
 
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(16.0),
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 8,

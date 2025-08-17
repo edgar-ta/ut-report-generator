@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:ut_report_generator/api/hello_request.dart';
-import 'package:ut_report_generator/bugs/_main.dart';
+import 'package:ut_report_generator/components/common_appbar.dart';
 import 'package:ut_report_generator/components/footer_component.dart';
 import 'package:ut_report_generator/components/header_component.dart';
-import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
-import 'package:ut_report_generator/home/_main.dart';
-import 'package:ut_report_generator/main_app.dart';
-import 'package:ut_report_generator/profile/_main.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 
 class AppScaffold extends StatefulWidget {
@@ -33,24 +28,17 @@ class _AppScaffoldState extends State<AppScaffold> {
           child: Scaffold(
             floatingActionButton: fab,
             appBar:
-                appBarBuilder?.call(context) ??
-                AppBar(
-                  title: Text(
-                    "Generador de reportes de la UTSJR",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: const Color.fromARGB(45, 0, 0, 0),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  centerTitle: true,
-                ),
+                appBarBuilder != null
+                    ? appBarBuilder(context)
+                    : commonAppbar()(context),
             body: Column(
               children: [
                 Expanded(
                   child: Row(
                     children: [
                       NavigationRail(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.surfaceContainer,
                         destinations: [
                           NavigationRailDestination(
                             icon: Icon(Icons.house),

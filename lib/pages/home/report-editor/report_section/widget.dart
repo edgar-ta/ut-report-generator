@@ -1,11 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_clipboard/image_clipboard.dart';
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/types/slide_class.dart';
-import 'package:ut_report_generator/home/report-editor/report_section/pick_file_button.dart';
-import 'package:ut_report_generator/home/report-editor/report_section/assets_panel.dart';
+import 'package:ut_report_generator/pages/home/report-editor/report_section/pick_file_button.dart';
+import 'package:ut_report_generator/pages/home/report-editor/report_section/assets_panel.dart';
 
 class ReportSection extends StatefulWidget {
   SlideClass slideData;
@@ -84,6 +83,7 @@ class _ReportSectionState extends State<ReportSection> {
     );
 
     return Card(
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
@@ -104,6 +104,7 @@ class _ReportSectionState extends State<ReportSection> {
             ),
 
             Row(
+              spacing: 16,
               children: [
                 Expanded(
                   flex: 2,
@@ -116,6 +117,7 @@ class _ReportSectionState extends State<ReportSection> {
                 Expanded(
                   flex: 1,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       widget.controlPanelBuilder(
                         widget.slideData.arguments,

@@ -5,69 +5,38 @@ import 'package:ut_report_generator/api/start_report.dart';
 import 'package:ut_report_generator/api/types/report_class.dart';
 import 'package:ut_report_generator/api/types/slide_class.dart';
 import 'package:ut_report_generator/api/types/slide_type.dart';
-import 'package:ut_report_generator/bugs/_main.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
-import 'package:ut_report_generator/home/_main.dart';
-import 'package:ut_report_generator/home/report-editor/_main.dart';
+import 'package:ut_report_generator/pages/home/_main.dart';
+import 'package:ut_report_generator/pages/home/report-editor/_main.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ut_report_generator/profile/_main.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
+import 'package:ut_report_generator/main_app/router.dart';
 
 class MainApp extends StatelessWidget {
   MainApp({super.key});
-
-  final _router = GoRouter(
-    initialLocation: "/home",
-    routes: [
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return AppScaffold(child: navigationShell);
-        },
-        branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/home',
-                builder: (context, state) => HomePage(),
-                routes: [
-                  GoRoute(
-                    path: 'report-editor',
-                    builder: (context, state) {
-                      final reportCallback =
-                          state.extra as Future<ReportClass> Function();
-                      return ReportEditor(reportCallback: reportCallback);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/bug-report',
-                builder: (context, state) => BugReportPage(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => ProfilePage(),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ],
-  );
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ScaffoldController(),
-      child: MaterialApp.router(routerConfig: _router),
+      child: MaterialApp.router(
+        title: "Generador de Reportes de la UTSJR",
+        routerConfig: router,
+        // theme: ThemeData(
+        //   colorScheme: ColorScheme.fromSeed(
+        //     seedColor: Color(0xFF002855),
+        //     primaryContainer: Color(0xFF009966),
+        //     onPrimaryContainer: Colors.white,
+        //     tertiaryContainer: Color.fromARGB(255, 170, 250, 223),
+        //     onTertiaryContainer: const Color.fromARGB(255, 0, 0, 0),
+        //     surface: Color.fromARGB(255, 250, 250, 250),
+        //     onSurface: const Color.fromARGB(255, 78, 78, 78),
+        //     surfaceContainer: const Color.fromARGB(255, 245, 245, 245),
+        //     surfaceContainerHigh: const Color.fromARGB(255, 195, 211, 226),
+        //     outline: const Color.fromARGB(255, 33, 137, 255),
+        //   ),
+        // ),
+      ),
     );
     return ReportEditor(
       reportCallback:
