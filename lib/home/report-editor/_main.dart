@@ -8,7 +8,7 @@ import 'package:ut_report_generator/api/change_slide_data.dart';
 import 'package:ut_report_generator/api/edit_slide.dart';
 import 'package:ut_report_generator/api/export_report.dart';
 import 'package:ut_report_generator/api/file_response.dart';
-import 'package:ut_report_generator/api/hello.dart';
+import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/api/render_report.dart';
 import 'package:ut_report_generator/api/types/asset_class.dart';
 import 'package:ut_report_generator/api/types/report_class.dart';

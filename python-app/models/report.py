@@ -5,7 +5,7 @@ from control_variables import CURRENT_DIRECTORY_PATH, CURRENT_PROJECT_VERSION
 
 from pandas import Timestamp
 from pptx import Presentation
-from functools import cached_property, cache
+from functools import cached_property
 
 import os
 import uuid
@@ -73,8 +73,12 @@ class Report:
         return data_directory_of_report(root_directory=self.root_directory)
     
     @classmethod
+    def new_report_id(cls) -> str:
+        return str(uuid.uuid4())
+
+    @classmethod
     def cold_create(cls) -> "Report":
-        report_id = str(uuid.uuid4())
+        report_id = cls.new_report_id()
 
         report = Report(
             root_directory=root_directory_of_report(report_id),
@@ -103,6 +107,12 @@ class Report:
     def from_root_directory(cls, root_directory: str) -> "Report":
         with open(metadata_file_of_report(root_directory=root_directory), "r") as metadata_file:
             metadata = json.loads(metadata_file.read())
+        
+        print("The metadata is ")
+        print(f"{metadata = }")
+        version = metadata['version']
+        if version != CURRENT_PROJECT_VERSION:
+            raise DescriptiveError(message=f"El reporte no se puede abrir porque es de una versión desactualizada. La versión actual es {CURRENT_PROJECT_VERSION} y el reporte tiene {version}", http_error_code=400)
 
         return cls(
             root_directory=root_directory,
@@ -111,7 +121,7 @@ class Report:
             last_edit=Timestamp(metadata["last_edit"]),
             last_render=None if (last_render := metadata.get("last_render")) is None else Timestamp(last_render),
             slides=[Slide.from_json(json_data=slide, root_directory=root_directory) for slide in metadata.get("slides", [])],
-            version=metadata["version"]
+            version=version
         )
 
 

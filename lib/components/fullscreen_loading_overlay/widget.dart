@@ -43,24 +43,28 @@ class _FullscreenLoadingOverlayState<T extends Object>
         })
         .onError((error, _) {
           setState(() {
-            exception = error;
             response = null;
+            exception = error;
           });
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    var isLoading = exception == null && response == null;
+    var isError = exception != null;
     var isSuccess = response != null || widget.state != null;
+    var isLoading = !(isError || isSuccess);
 
     return Stack(
       children: [
-        AnimatedOpacity(
-          opacity: isLoading ? 1 : 0,
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeOut,
-          child: IgnorePointer(child: widget.loadingScreen),
+        IgnorePointer(
+          ignoring: isLoading,
+          child: AnimatedOpacity(
+            opacity: isLoading ? 1 : 0,
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeOut,
+            child: widget.loadingScreen,
+          ),
         ),
         if (!isLoading)
           AnimatedOpacity(

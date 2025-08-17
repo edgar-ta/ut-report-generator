@@ -4,6 +4,7 @@ import 'package:ut_report_generator/api/recent_reports.dart';
 import 'package:ut_report_generator/home/recent_reports/report_card.dart';
 import 'package:ut_report_generator/home/recent_reports/report_card_skeleton.dart';
 import 'package:ut_report_generator/home/report-editor/_main.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 
 class RecentReports extends StatefulWidget {
@@ -92,18 +93,12 @@ class _RecentReportsState extends State<RecentReports> {
                                 preview: report.preview,
                                 onTap: () {
                                   if (!mounted) return;
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) => ReportEditor(
-                                            reportCallback:
-                                                () async => getReport(
-                                                  reportDirectory:
-                                                      report.rootDirectory,
-                                                ),
-                                          ),
-                                    ),
+                                  context.go(
+                                    "/home/report-editor",
+                                    extra:
+                                        () => getReport(
+                                          reportDirectory: report.rootDirectory,
+                                        ),
                                   );
                                 },
                               );

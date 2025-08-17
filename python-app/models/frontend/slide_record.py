@@ -1,6 +1,7 @@
 from models.slide import Slide
 from models.slide_type import SlideType
 from models.asset import Asset
+from models.asset_type import AssetType
 
 from dataclasses import dataclass
 from copy import deepcopy
@@ -33,7 +34,7 @@ class SlideRecord:
             "id": self.id,
             "key": self.key,
             "type": self._type.value,
-            "assets": [asset.to_dict() for asset in self.assets],
+            "assets": [asset.to_dict() for asset in self.assets if asset.type == AssetType.IMAGE],
             "arguments": deepcopy(self.arguments),
             "data_files": list(self.data_files),
             "preview": self.preview

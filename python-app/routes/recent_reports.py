@@ -1,5 +1,6 @@
 from lib.with_app_decorator import with_app
 from lib.directory_definitions import get_reports_directory
+from lib.descriptive_error import DescriptiveError
 
 from models.report import Report
 
@@ -39,11 +40,14 @@ def recent_reports():
     reports.sort(key=lambda report: report.last_edit, reverse=True)
 
     if reference_report is not None:
-        reference_report = list(dropwhile(lambda report: report.root_directory != reference_report, reports))[1:]
+        reports = list(dropwhile(lambda report: report.root_directory != reference_report, reports))
+        if len(reports) == 0:
+            raise DescriptiveError(message=f"El reporte usado de referencia no existe: {reference_report}", http_error_code=400)
+        reports = reports[1:]
     
-    has_more = reports.__len__() > REPORTS_CHUNK_SIZE
+    has_more = len(reports) > REPORTS_CHUNK_SIZE
     reports = reports[:REPORTS_CHUNK_SIZE]
-    last_report = reports[-1]
+    last_report = reports[-1] if len(reports) > 0 else None
 
     return {
         "reports": [
@@ -55,5 +59,5 @@ def recent_reports():
             for report in reports
         ],
         "has_more": has_more,
-        "last_report": last_report.root_directory
+        "last_report": last_report.root_directory if last_report is not None else None
     }, 200

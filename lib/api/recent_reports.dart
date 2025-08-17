@@ -33,7 +33,7 @@ class RecentReports_ReportPreview {
 class RecentReports_Response {
   List<RecentReports_ReportPreview> reports;
   bool hasMore;
-  String lastReport;
+  String? lastReport;
 
   RecentReports_Response({
     required this.reports,
@@ -52,7 +52,7 @@ class RecentReports_Response {
               )
               .toList(),
       hasMore: json['has_more'] as bool,
-      lastReport: json['last_report'] as String,
+      lastReport: json['last_report'] as String?,
     );
   }
 }
