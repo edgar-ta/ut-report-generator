@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:ut_report_generator/api/hello.dart';
+import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/bugs/_main.dart';
 import 'package:ut_report_generator/components/footer_component.dart';
 import 'package:ut_report_generator/components/header_component.dart';
@@ -71,7 +71,7 @@ class _AppScaffoldState extends State<AppScaffold> {
                         },
                       ),
                       VerticalDivider(thickness: 1, width: 1),
-                      Expanded(child: Center(child: widget.child)),
+                      Expanded(child: widget.child),
                     ],
                   ),
                 ),

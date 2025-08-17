@@ -6,6 +6,7 @@ from routes.render_report import render_report
 from routes.export_report import export_report
 from routes.recent_reports import recent_reports
 from routes.get_report import get_report
+from routes.import_report import import_report
 
 from flask import Flask, request, jsonify
 
@@ -22,6 +23,7 @@ render_report(app)
 export_report(app)
 recent_reports(app)
 get_report(app)
+import_report(app)
 
 if __name__ == '__main__':
     logging.basicConfig(filename='logs.log')
