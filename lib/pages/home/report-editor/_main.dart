@@ -21,6 +21,7 @@ import 'package:ut_report_generator/pages/home/report-editor/failure_section/wid
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
 import 'package:ut_report_generator/pages/home/report-editor/render_button.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
+import 'package:ut_report_generator/utils/control_variables.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 
 Widget buildSlideEditor(

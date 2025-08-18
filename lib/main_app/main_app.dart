@@ -38,6 +38,7 @@ class MainApp extends StatelessWidget {
         // ),
       ),
     );
+
     return ReportEditor(
       reportCallback:
           () => Future(
