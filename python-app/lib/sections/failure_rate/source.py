@@ -25,8 +25,8 @@ def read_excel(filename: str) -> pd.DataFrame:
     except FileNotFoundError as error:
         raise DescriptiveError(404, f"Couldn't get the data frame with the following path {filename}") from error
 
-def create_unit_name(index: int, type: Literal["Letra"] | Literal["Número"]) -> str:
-    return f"U{index} - {type}"
+def create_unit_name(index: int) -> str:
+    return f"Unidad {index + 1}"
 
 def get_grades_statistics(index: pd.Index) -> tuple[list[str], list[str], list[int], int]:
     subject_names = unique_list( name for name in index.get_level_values(1) if not re.search(r"Unnamed", name) )
@@ -55,16 +55,16 @@ def get_units_per_subject(units_list: list[str]) -> list[int]:
 
 def create_clean_index(subject_names: list[str], professor_names: list[str], units_per_subject: list[int]) -> pd.MultiIndex:
     units_part = [ 
-        (subject, professor, f"U{index + 1} - {grade_type}") 
+        (subject, professor, f"Unidad {index + 1}", grade_type) 
         for subject, professor, units_count in zip(subject_names, professor_names, units_per_subject)
             for index in range(units_count)
                 for grade_type in UNIT_TYPES
     ]
 
-    left_part = [ tuple([header] * 3) for header in LEFT_COLUMN_HEADERS ]
+    left_part = [ tuple([header] * 4) for header in LEFT_COLUMN_HEADERS ]
     left_part.extend(units_part)
 
-    return pd.MultiIndex.from_arrays(list(zip(*left_part)), names=["subject", "professor", "unit"])
+    return pd.MultiIndex.from_arrays(list(zip(*left_part)), names=["subject", "professor", "unit", "type"])
 
 def get_clean_data_frame(data_frame: pd.DataFrame) -> pd.DataFrame:
     subject_names, professor_names, units_per_subject, max_units = get_grades_statistics(data_frame.columns)
@@ -73,6 +73,8 @@ def get_clean_data_frame(data_frame: pd.DataFrame) -> pd.DataFrame:
     data_frame.columns = clean_index
 
     data_frame = data_frame.T
+    data_frame = data_frame.xs(key="Número", level="type")
+    data_frame = data_frame.map(func=lambda value: abs(value))
 
     return data_frame
 

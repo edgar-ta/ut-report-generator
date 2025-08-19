@@ -7,6 +7,7 @@ from routes.export_report import export_report
 from routes.recent_reports import recent_reports
 from routes.get_report import get_report
 from routes.import_report import import_report
+from routes.start_pivot_table import start_pivot_table
 
 from flask import Flask, request, jsonify
 
@@ -24,6 +25,7 @@ export_report(app)
 recent_reports(app)
 get_report(app)
 import_report(app)
+start_pivot_table(app)
 
 if __name__ == '__main__':
     logging.basicConfig(filename='logs.log')
