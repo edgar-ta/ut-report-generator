@@ -18,7 +18,9 @@ Future<Process> startPython() {
 
 void main() async {
   if (IS_DEVELOPMENT_MODE) {
-    debugPaintPointersEnabled = true;
+    if (IS_TESTING_MODE) {
+      debugPaintPointersEnabled = true;
+    }
     runApp(MainApp());
   } else {
     var process = await startPython();

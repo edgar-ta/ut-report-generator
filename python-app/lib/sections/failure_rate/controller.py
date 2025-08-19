@@ -50,7 +50,7 @@ class FailureRate_Controller(SlideController):
         data_frame = get_clean_data_frame(data_frame)
 
         unit = arguments["unit"]
-        grades = data_frame.xs(create_unit_name(unit, "Número"), level="unit").map(lambda value: abs(value))
+        grades = data_frame.xs(create_unit_name(unit), level="unit").map(lambda value: abs(value))
 
         subjects_without_grades = grades[(grades == 0).all(axis=1)]
         subjects_with_grades = grades[(grades != 0).any(axis=1)]
