@@ -1,8 +1,9 @@
 from models.pivot_table.cross_section import cross_section
+from models.pivot_table.custom_indexer import CustomIndexer
 
 import pandas
 
-def get_data_of_frame(frame: pandas.DataFrame, indexers: list, filter_function, aggregate_function, error_value: float):
+def get_data_of_frame(frame: pandas.DataFrame, indexers: list[CustomIndexer], filter_function, aggregate_function, error_value: float):
     match indexers:
         case []:
             try:
@@ -15,15 +16,14 @@ def get_data_of_frame(frame: pandas.DataFrame, indexers: list, filter_function, 
                 return error_value
         case [indexer, *other_indexers]:
             indexer, *other_indexers = indexers
-            level, values = indexer
 
             return {
                 value: get_data_of_frame(
-                    frame=cross_section(data_frame=frame, key=value, level=level), 
+                    frame=cross_section(data_frame=frame, key=value, level=indexer.level), 
                     indexers=other_indexers, 
                     filter_function=filter_function,
                     aggregate_function=aggregate_function,
                     error_value=error_value
                     )
-                for value in values
+                for value in indexer.values
             }

@@ -1,9 +1,9 @@
 import pandas
 
-def cross_section(data_frame: pandas.DataFrame, key: list[str] | None, level: str) -> pandas.DataFrame:
-    if key is None:
-        return data_frame
+def cross_section(data_frame: pandas.DataFrame, key: list[str], level: str) -> pandas.DataFrame:
     match key:
+        case []:
+            return data_frame
         case [key]:
             return data_frame.xs(key=key, level=level)
         case _:

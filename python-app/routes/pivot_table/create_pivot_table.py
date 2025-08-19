@@ -2,49 +2,119 @@ from lib.sections.failure_rate.source import get_clean_data_frame, read_excel, g
 from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
 from lib.unique_list import unique_list
+from lib.file_extension import has_extension, get_file_extension
+from lib.descriptive_error import DescriptiveError
+from lib.is_valid_career_name import is_valid_career_name
+from lib.directory_definitions import data_file_of_slide
 
+from models.pivot_table.self import PivotTable
+from models.pivot_table.aggregate_function_type import AggregateFunctionType
+from models.pivot_table.filter_function_type import FilterFunctionType
 from models.pivot_table.custom_indexer import CustomIndexer
 from models.pivot_table.get_parameters_of_frame import get_parameters_of_frame
 from models.pivot_table.get_data_of_frame import get_data_of_frame
+from models.pivot_table.data_source import DataSource
+from models.report.self import Report
+
+from flask import request
+from uuid import uuid4
 
 import pandas as pd
 
-from flask import request
+import os
 
-@with_app("/create", methods=["POST"])
-def create_pivot_table():
-    data_files = get_or_panic(request.json, "data_files", "Se necesitan archivos de datos para empezar una tabla dinámica")
-    
-    data_frames = [ read_excel(filename=filename) for filename in data_files ]
+def validate_files(data_files: list[str]) -> None:
+    for data_file in data_files:
+        extension = get_file_extension(filename=data_file)
+        if extension is None:
+            raise DescriptiveError(http_error_code=400, message="El archivo no tiene una extensión válida")
+        
+        if extension not in ["xls", "csv", "hdf5"]:
+            raise DescriptiveError(http_error_code=400, message="El archivo es de una extensión no válida")
+        # # This feature is disabled in the meantime
+        # if not is_valid_career_name(data_file):
+        #     raise DescriptiveError(http_error_code=400, message="El archivo no cuenta con el nombre de un grupo válido")
+        if not os.path.exists(path=data_file):
+            raise DescriptiveError(http_error_code=400, message="El archivo seleccionado no existe")
+
+def get_data_frame_from_files(data_files: list[str]) -> pd.DataFrame:
+    data_frames = []
+    for data_file in data_files:
+        match get_file_extension(filename=data_file):
+            case "xls" | "xlsx":
+                data_frames.append(pd.read_excel(data_file))
+            case "csv":
+                data_frames.append(pd.read_csv(data_file))
+
     data_frames = [ get_clean_data_frame(data_frame=data_frame) for data_frame in data_frames ]
     main_frame = pd.concat(data_frames)
     main_frame.sort_index(inplace=True)
+    return main_frame
+
+@with_app("/create", methods=["POST"])
+def create_pivot_table():
+    report = get_or_panic(request.json, "report", "La id del reporte no fue incluida en la petición")
+    data_files = get_or_panic(request.json, "data_files", "Se necesitan archivos de datos para empezar una tabla dinámica")
+    index = request.json.get('index')
+
+    report = Report.from_identifier(identifier=report)
+
+    validate_files(data_files=data_files)
+
+    slide_identifier = str(uuid4())
+    main_frame = get_data_frame_from_files(data_files=data_files)
+    data_file = data_file_of_slide(root_directory=report.root_directory, slide_id=slide_identifier)
+    main_frame.to_hdf(path_or_buf=data_file, key=slide_identifier, format='table', mode='w')
+
+    data_source = DataSource(files=data_files, merged_file=data_file)
 
     main_frame_names = main_frame.index.names
     first_main_frame_name = main_frame_names[0]
-    first_level_value = unique_list(main_frame.index.get_level_values(level=first_main_frame_name))[0]
+    first_level_value = main_frame.index.get_level_values(level=first_main_frame_name)[0]
 
-    params_indexers = [
+    arguments = [
         CustomIndexer(level=first_main_frame_name, values=[first_level_value]),
-        *[ CustomIndexer(level=name, values=None) for name in main_frame_names[1:] ]
+        *[ CustomIndexer(level=name, values=[]) for name in main_frame_names[1:] ]
     ]
 
-    params = get_parameters_of_frame(frame=main_frame, indexers=params_indexers)
+    parameters = get_parameters_of_frame(frame=main_frame, indexers=arguments)
 
-    data_indexers = [ 
-        (first_main_frame_name, [ first_level_value ]), 
-        *[ (name, params[name]) for name in main_frame.index.names[1:] ] 
+    # Though it seems I just assigned the `arguments` variable the same value it
+    # had before, that's not the case. I am changing the `values` kwarg to include
+    # all of the options found in the parameters object of the corresponding name
+    # this way, the second value of arguments doesn't have an empty array
+    arguments = [ 
+        CustomIndexer(level=first_main_frame_name, values=[ first_level_value ]), 
+        *[ CustomIndexer(level=name, values=parameters[name]) for name in main_frame.index.names[1:] ] 
     ]
 
     data = get_data_of_frame(
         frame=main_frame, 
-        indexers=data_indexers, 
+        indexers=arguments, 
         filter_function=lambda x: x >= 7, 
         aggregate_function=lambda values: len(values), 
         error_value=0
         )
+    
+    pivot_table = PivotTable(
+        aggregate_function=AggregateFunctionType.COUNT,
+        arguments=arguments,
+        creation_date=pd.Timestamp.now(),
+        data=data,
+        filter_function=FilterFunctionType.FAILED_STUDENTS,
+        identifier=slide_identifier,
+        last_edit=pd.Timestamp.now(),
+        name="Mi tabla dinámica",
+        parameters=parameters,
+        preview=None,
+        source=data_source,
+    )
+
+    if index is None:
+        report.slides.append(pivot_table)
+    else:
+        report.slides.insert(index, pivot_table)
 
     return {
-        "params": params,
-        "data": data,
+        "pivot_table": pivot_table.to_dict(),
     }, 200

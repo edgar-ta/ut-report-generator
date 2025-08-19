@@ -38,4 +38,22 @@ def edit_pivot_table():
     data_frame = read_data_source(file_path=data_frame)
 
     parameters = get_parameters_of_frame(frame=data_frame, indexers=arguments)
-    data = get_data_of_frame(frame=data_frame, indexers=arguments)
+    data = get_data_of_frame(
+        frame=data_frame, 
+        indexers=arguments,
+        aggregate_function=pivot_table.aggregate_function,
+        filter_function=pivot_table.filter_function,
+        error_value=0
+        )
+
+    pivot_table.arguments = arguments
+    pivot_table.parameters = parameters
+    pivot_table.data = data
+    pivot_table.last_edit = pandas.Timestamp.now()
+
+    report.save()
+
+    return {
+        "parameters": parameters,
+        "data": data
+    }, 200
