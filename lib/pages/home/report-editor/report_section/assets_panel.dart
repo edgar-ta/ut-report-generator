@@ -20,69 +20,47 @@ class _AssetsPanelState extends State<AssetsPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: 400),
-      child: Stack(
-        children: [
-          Column(
+    return Stack(
+      alignment: Alignment.centerLeft,
+      children: [
+        Container(
+          color: Colors.white,
+          width: double.maxFinite,
+          height: double.maxFinite,
+          child: Image.file(File(widget.images[selectedImageIndex].value)),
+        ),
+        Positioned(
+          left: 16,
+          child: Column(
             spacing: 16,
             children: [
-              Expanded(
-                child: Container(
-                  color: Colors.white,
-                  width: double.maxFinite,
-                  child: Image.file(
-                    File(widget.images[selectedImageIndex].value),
-                  ),
-                ),
-              ),
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: 256),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    children:
+                        widget.images.indexed.map((tuple) {
+                          var index = tuple.$1;
+                          var asset = tuple.$2;
 
-              SizedBox(
-                height: 64,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 64,
-                      child: IconButton(
-                        onPressed: () {
-                          // Save logic
-                        },
-                        style: IconButton.styleFrom(
-                          padding: EdgeInsets.all(0),
-                          backgroundColor: Colors.grey[300],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        icon: Icon(Icons.save),
-                      ),
-                    ),
-
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children:
-                            widget.images.indexed.map((tuple) {
-                              var index = tuple.$1;
-                              var asset = tuple.$2;
-
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedImageIndex = index;
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(1.0),
-                                  color:
-                                      selectedImageIndex == index
-                                          ? Theme.of(
-                                            context,
-                                          ).colorScheme.outline
-                                          : Colors.transparent,
-                                  child: MouseRegion(
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedImageIndex = index;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(1.0),
+                              color:
+                                  selectedImageIndex == index
+                                      ? Theme.of(context).colorScheme.outline
+                                      : Theme.of(
+                                        context,
+                                      ).colorScheme.outlineVariant,
+                              child: StatefulBuilder(
+                                builder: (context, setInnerState) {
+                                  return MouseRegion(
                                     cursor: SystemMouseCursors.click,
                                     child: Container(
                                       padding: const EdgeInsets.all(4.0),
@@ -91,26 +69,43 @@ class _AssetsPanelState extends State<AssetsPanel> {
                                       height: 64,
                                       child: Image.file(File(asset.value)),
                                     ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                      ),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 64,
+                height: 64,
+                child: IconButton(
+                  onPressed: () {
+                    // Save logic
+                  },
+                  style: IconButton.styleFrom(
+                    padding: EdgeInsets.all(0),
+                    backgroundColor: Colors.grey[300],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ],
+                  ),
+                  icon: Icon(Icons.save),
                 ),
               ),
             ],
           ),
+        ),
 
-          // Loading Overlay
-          if (widget.isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.5),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-        ],
-      ),
+        // Loading Overlay
+        if (widget.isLoading)
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+      ],
     );
   }
 }

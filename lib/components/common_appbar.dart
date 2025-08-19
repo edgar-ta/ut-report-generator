@@ -1,22 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 PreferredSizeWidget Function(BuildContext) commonAppbar({
-  String? title,
+  Widget? title,
   List<Widget>? actions,
   Widget? leading,
 }) {
   return (BuildContext context) => AppBar(
-    title:
-        title == null
-            ? null
-            : Text(
-              title,
-              style: TextStyle(
-                fontSize: 12,
-                color: const Color.fromARGB(45, 0, 0, 0),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+    title: title,
     centerTitle: true,
     actions: actions,
     leading: leading,

@@ -21,9 +21,8 @@ class InputComponent extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-        fillColor: Colors.white,
         filled: true,
+        fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
       ),
       onChanged: onChanged,
     );

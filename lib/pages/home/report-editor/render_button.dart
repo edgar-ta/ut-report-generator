@@ -119,7 +119,8 @@ class _RenderButtonState extends State<RenderButton>
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
+    return SizedBox(
+      height: 64,
       child: Stack(
         alignment: Alignment.bottomRight,
         clipBehavior: Clip.none,
@@ -141,7 +142,10 @@ class _RenderButtonState extends State<RenderButton>
               animation: _expandAnimation,
               child: FadeTransition(
                 opacity: _expandAnimation,
-                child: widget.builder(_close, index),
+                child: IgnorePointer(
+                  ignoring: !_open,
+                  child: widget.builder(_close, index),
+                ),
               ),
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/utils/control_variables.dart';
 
 class SlideFrame extends StatefulWidget {
   final Widget child;
@@ -32,7 +33,8 @@ class _SlideFrameState extends State<SlideFrame> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight =
+        MediaQuery.of(context).size.height - APP_BAR_HEIGHT * 2;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return SizedBox(
@@ -41,7 +43,7 @@ class _SlideFrameState extends State<SlideFrame> {
       child: Stack(
         children: [
           // Contenido principal con scroll
-          SingleChildScrollView(child: widget.child),
+          widget.child,
 
           // Overlay oscuro -> cubre también el FAB de la app
           if (_menuOpen)
