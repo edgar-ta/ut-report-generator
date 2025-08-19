@@ -103,7 +103,11 @@ class _ReportEditorState extends State<ReportEditor> {
       );
       context.read<ScaffoldController>().setAppBarBuilder(
         commonAppbar(
-          title: "Editor de reportes",
+          title: InputComponent(
+            label: "Nombre del reporte",
+            hint: "Ingrese el nombre del reporte",
+            controller: reportNameController,
+          ),
           actions: [
             IconButton(onPressed: () {}, icon: Icon(Icons.threed_rotation)),
           ],
@@ -232,18 +236,9 @@ class _ReportEditorState extends State<ReportEditor> {
       builder:
           (ReportClass report) => SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 128.0,
-                vertical: 64,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 64),
               child: Column(
-                spacing: 32,
                 children: [
-                  InputComponent(
-                    label: "Nombre del reporte",
-                    hint: "Ingrese el nombre del reporte",
-                    controller: reportNameController,
-                  ),
                   ...(report.slides.map((slide) {
                     return buildSlideEditor(
                       slide,

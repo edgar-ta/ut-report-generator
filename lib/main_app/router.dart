@@ -11,7 +11,7 @@ import 'package:ut_report_generator/pages/profile/_main.dart';
 import 'package:ut_report_generator/testing_components/charts_screen.dart';
 import 'package:ut_report_generator/testing_components/chips_tile.dart';
 import 'package:ut_report_generator/testing_components/dropdown_menus_tile.dart';
-import 'package:ut_report_generator/testing_components/slide_frame.dart';
+import 'package:ut_report_generator/pages/home/report-editor/report_section/slide_frame.dart';
 import 'package:ut_report_generator/utils/control_variables.dart';
 
 final router = GoRouter(

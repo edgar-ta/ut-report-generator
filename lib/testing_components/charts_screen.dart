@@ -4,7 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/testing_components/chips_tile.dart';
 import 'package:ut_report_generator/testing_components/dropdown_menus_tile.dart';
-import 'package:ut_report_generator/testing_components/slide_frame.dart';
+import 'package:ut_report_generator/pages/home/report-editor/report_section/slide_frame.dart';
 
 class StudentData {
   final String professor;
