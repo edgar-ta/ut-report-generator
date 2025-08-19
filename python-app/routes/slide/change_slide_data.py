@@ -1,4 +1,4 @@
-from models.report import Report
+from models.report.self import Report
 
 from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic

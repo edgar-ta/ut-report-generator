@@ -2,7 +2,7 @@ from lib.with_app_decorator import with_app
 from lib.directory_definitions import get_reports_directory
 from lib.descriptive_error import DescriptiveError
 
-from models.report import Report
+from models.report.self import Report
 
 from control_variables import REPORTS_CHUNK_SIZE
 

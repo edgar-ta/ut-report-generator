@@ -1,6 +1,6 @@
 from lib.with_app_decorator import with_app
 
-from models.report import Report
+from models.report.self import Report
 from models.slide import Slide
 
 from models.frontend.report_record import ReportRecord
@@ -22,7 +22,7 @@ def create_reports_directory() -> str:
 def start_report():
     data_files = request.json["data_files"]
 
-    report = Report.cold_create()
+    report = Report.from_nothing()
     report.makedirs()
 
     slide = Slide.from_data_files(
