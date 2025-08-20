@@ -2,6 +2,8 @@ from lib.with_app_decorator import with_app
 from lib.directory_definitions import get_reports_directory
 from lib.descriptive_error import DescriptiveError
 
+from lib.report.get_id_of_report import get_id_of_report
+
 from models.report import Report
 
 from control_variables import REPORTS_CHUNK_SIZE
@@ -13,22 +15,26 @@ import os
 
 @with_app("/get_recents", methods=["POST"])
 def get_recent_reports():
-    # This is the root_directory of the last report
+    # This is the id of the last report
     # that the frontend loaded
-    reference_report: str | None = None
-    try:
-        reference_report = request.json['reference_report']
-    except:
-        pass
-
-    reports_directories = [ 
-        full_directory_name for directory_name in os.listdir(get_reports_directory()) 
+    reference_report: str | None = request.json.get('report', None)
+    reports_directories = sorted((
+        full_directory_name 
+        for directory_name in os.listdir(get_reports_directory()) 
         if os.path.isdir((full_directory_name := os.path.join(get_reports_directory(), directory_name))) 
-    ]
+    ), key=os.path.getatime)
+
+    if reference_report is not None:
+        reports_directories = list(dropwhile(
+            lambda report: get_id_of_report(report) != reference_report, 
+            reports_directories
+            ))[1:]
 
     reports: list[Report] = []
     for directory in reports_directories:
         try:
+            if len(reports) >= REPORTS_CHUNK_SIZE:
+                break
             # @todo This might be insanely time-consuming in the future. Since I only use the
             # preview field of the first slide I don't think it is necessary for me to parse 
             # the whole report JSON file
@@ -37,22 +43,14 @@ def get_recent_reports():
         except Exception as e:
             print(f"Couldn't generate report")
             print(e)
-    reports.sort(key=lambda report: report.last_edit, reverse=True)
-
-    if reference_report is not None:
-        reports = list(dropwhile(lambda report: report.root_directory != reference_report, reports))
-        if len(reports) == 0:
-            raise DescriptiveError(message=f"El reporte usado de referencia no existe: {reference_report}", http_error_code=400)
-        reports = reports[1:]
     
     has_more = len(reports) > REPORTS_CHUNK_SIZE
-    reports = reports[:REPORTS_CHUNK_SIZE]
     last_report = reports[-1] if len(reports) > 0 else None
 
     return {
         "reports": [
             {
-                "preview": report.slides[0].preview_image,
+                "preview": next((slide.preview for slide in report.slides if slide.preview is not None), None),
                 "name": report.report_name,
                 "root_directory": report.root_directory,
             }

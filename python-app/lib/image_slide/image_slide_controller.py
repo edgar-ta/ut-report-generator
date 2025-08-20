@@ -2,13 +2,12 @@ import abc
 
 from pptx import Presentation
 
-from models.slide.slide_type import SlideType
-from models.asset import Asset
+from models.image_slide.image_slide_kind import ImageSlideKind
 
-class SlideController():
+class ImageSlideController():
     @staticmethod
     @abc.abstractmethod
-    def slide_type() -> SlideType:
+    def kind() -> ImageSlideKind:
         '''
         Returns a unique string to identify the type of section this controller handles. 
         Commonly, it is a descriptive name that matches the class's name
@@ -24,22 +23,10 @@ class SlideController():
         checked against this class's `validate_arguments` method. 
         '''
         pass
-
-    @staticmethod
-    @abc.abstractmethod
-    def build_assets(data_files: list[str], base_directory: str, arguments: dict[str, str]) -> list[Asset]:
-        '''
-        Returns a dict of the assets needed to render this section's slide in a PowerPoint presentation.
-        The assets are entries of the form (name, value, type), where `name` is a local name that's used later 
-        in `render_slide`
-
-        :param base_directory The directory where the image assets are going to be placed
-        '''
-        pass
     
     @staticmethod
     @abc.abstractmethod
-    def validate_arguments(arguments: dict[str, any], assets: dict[str, str]) -> None:
+    def validate_arguments(arguments: dict[str, any]) -> None:
         '''
         Validates the arguments required to render the slide. Raises DescriptiveError if the arguments are wrong
         '''
@@ -47,7 +34,7 @@ class SlideController():
 
     @staticmethod
     @abc.abstractmethod
-    def render_slide(presentation: Presentation, arguments: dict[str, any], assets: list[dict[str, str]]) -> None:
+    def render_slide(presentation: Presentation, arguments: dict[str, any]) -> None:
         '''
         Renders the slide.
         '''

@@ -61,7 +61,6 @@ class _ReportCardState extends State<ReportCard> {
                         : Image.network(
                           "https://canvasjs.com/wp-content/uploads/images/gallery/javascript-charts/overview/javascript-charts-graphs-index-data-label.png",
                         ),
-
                     Positioned(
                       left: 0,
                       right: 0,

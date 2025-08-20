@@ -34,7 +34,7 @@ def delayed_teachers_legend(subjects_without_grades: DataFrame, unit: int) -> st
 
 class FailureRate_Controller(SlideController):
     @staticmethod
-    def slide_type() -> SlideType:
+    def slide_kind() -> SlideType:
         return SlideType.FAILURE_RATE
 
     @staticmethod

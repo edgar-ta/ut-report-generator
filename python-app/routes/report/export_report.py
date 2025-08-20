@@ -1,6 +1,6 @@
 from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
-from lib.file_extension import get_extension_or_panic, with_extension
+from lib.file_extension import get_extension_or_panic, get_file_extension
 from lib.random_message import random_message, RandomMessageType
 
 from control_variables import ZIP_COMPRESSION_LEVEL
@@ -16,17 +16,19 @@ import zipfile
 
 @with_app("/export", methods=["POST"])
 def export_report():
-    root_directory = get_or_panic(request.json, "report_directory", "El directorio del reporte debe estar presente")
-
-    report = Report.from_root_directory(root_directory=root_directory)
+    report = get_or_panic(request.json, "report", "El identificador del reporte no fue incluido en la solicitud")
+    report = Report.from_identifier(root_directory=report)
 
     if os.path.exists(report.export_directory) and os.path.isdir(report.export_directory):
         shutil.rmtree(report.export_directory, ignore_errors=True)
     os.makedirs(report.export_directory, exist_ok=True)
 
-    for item in os.listdir(root_directory):
-        source = os.path.join(root_directory, item)
+    for item in os.listdir(report.root_directory):
+        source = os.path.join(report.root_directory, item)
         destination = os.path.join(report.export_directory, item)
+
+        if get_file_extension(source) in [ "zip" ]:
+            continue
 
         if os.path.abspath(source) == os.path.abspath(report.export_directory):
             continue
@@ -45,9 +47,6 @@ def export_report():
         for i, data_file in enumerate(unique_data_files)
     }
 
-    print(f'{files_equivalence = }')
-    print()
-
     for source, destination in files_equivalence.items():
         shutil.copy(src=source, dst=destination)
     
@@ -56,7 +55,6 @@ def export_report():
             os.path.relpath(path=files_equivalence[data_file], start=exported_report.data_directory) 
             for data_file in slide._data_files 
         ]
-        print(f'{slide._data_files = }')
 
     exported_report.save()
 
@@ -70,8 +68,6 @@ def export_report():
                 archive_name = os.path.relpath(file_path, report.export_directory)
                 zip_file.write(file_path, archive_name)
     
-    # shutil.rmtree(report.export_directory)
-
     return {
         "message": random_message(_type=RandomMessageType.EXPORT_SUCCESFUL),
         "output_file": report.export_file

@@ -9,9 +9,9 @@ from flask import request
 
 @with_app("/report", methods=["POST"])
 def render_report():
-    root_directory = get_or_panic(request.json, "report_directory", "El directorio del reporte debe estar presente")
+    report = get_or_panic(request.json, "report", "El directorio del reporte debe estar presente")
+    report = Report.from_identifier(identifier=report)
 
-    report = Report.from_root_directory(root_directory=root_directory)
     report.new_render()
     report.save()
 

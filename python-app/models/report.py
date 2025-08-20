@@ -1,8 +1,10 @@
 from lib.get_metadata import get_metadata
-
-from models.slide.self import Slide
 from lib.descriptive_error import DescriptiveError
 from lib.directory_definitions import metadata_file_of_report, slides_directory_of_report, root_directory_of_report, rendered_file_of_report, export_file_of_report, export_directory_of_report, data_directory_of_report, get_reports_directory
+
+from models.image_slide.self import ImageSlide
+from models.pivot_table.self import PivotTable
+from models.slide_category import SlideCategory
 
 from control_variables import CURRENT_DIRECTORY_PATH, CURRENT_PROJECT_VERSION
 
@@ -14,6 +16,8 @@ import os
 import uuid
 import json
 
+Slide = ImageSlide | PivotTable
+
 class Report:
     def __init__(
             self, 
@@ -23,7 +27,7 @@ class Report:
             creation_date: Timestamp, 
             last_edit: Timestamp,
             last_open: Timestamp,
-            slides: list[Slide],
+            slides: list[ImageSlide | PivotTable],
             version: str
             ) -> None:
         # Data that goes to the serialization dict
@@ -68,7 +72,10 @@ class Report:
             last_edit=Timestamp(metadata["last_edit"]),
             last_open=Timestamp(metadata["last_open"]),
             slides=[
-                Slide.from_json(json_data=slide, root_directory=root_directory) for slide in metadata.get("slides", [])
+                    ImageSlide.from_json(json_data=slide) 
+                    if SlideCategory(slide["category"]) == SlideCategory.IMAGE_SLIDE
+                    else PivotTable.from_json(json_data=slide)
+                for slide in metadata.get("slides", [])
             ],
             version=version
         )

@@ -2,9 +2,9 @@ from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
 from lib.file_extension import check_file_extension
 from lib.directory_definitions import root_directory_of_report
+from lib.format_for_create import format_for_create
 
 from models.report import Report
-from models.frontend.report_record import ReportRecord
 
 from control_variables import ZIP_COMPRESSION_LEVEL
 
@@ -27,4 +27,4 @@ def import_report():
         slide._data_files = [ os.path.join(report.data_directory, file) for file in slide._data_files ]
     report.save()
 
-    return ReportRecord.from_report(report=report).to_dict(), 200
+    return format_for_create(response=report), 200

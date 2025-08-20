@@ -1,7 +1,7 @@
+from lib.format_for_create import format_for_create
 from lib.with_app_decorator import with_app
 
-from lib.format_for_frontend import format_for_frontend
-from lib.add_pivot_table_to_report import add_pivot_table_to_report
+from lib.pivot_table.add_pivot_table_to_report import add_pivot_table_to_report
 
 from models.report import Report
 
@@ -15,6 +15,4 @@ def start_report_with_pivot_table():
     add_pivot_table_to_report(report=report, local_request=request, index=None)
 
     report.save()
-    response = format_for_frontend(response=report)
-
-    return response, 200
+    return format_for_create(response=report), 200

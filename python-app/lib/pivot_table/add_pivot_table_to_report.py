@@ -14,7 +14,6 @@ from models.pivot_table.custom_indexer import CustomIndexer
 from lib.get_parameters_of_frame import get_parameters_of_frame
 from lib.get_data_of_frame import get_data_of_frame
 from models.pivot_table.data_source import DataSource
-from models.pivot_table.slide_category import SlideCategory
 from models.report import Report
 
 from flask import request
@@ -47,15 +46,7 @@ def get_data_frame_from_files(data_files: list[str]) -> pd.DataFrame:
             case "csv":
                 data_frames.append(pd.read_csv(data_file, header=[0, 1, 2, 3, 4]))
 
-    print(__file__)
-    print("@get_data_frame_from_files")
-    print("Hello 0")
-
     data_frames = [ get_clean_data_frame(data_frame=data_frame) for data_frame in data_frames ]
-
-    print(__file__)
-    print("@get_data_frame_from_files")
-    print("Hello 1")
 
     main_frame = pd.concat(data_frames)
     main_frame.sort_index(inplace=True)
@@ -69,17 +60,10 @@ def add_pivot_table_to_report(report: Report, local_request, index: int | None) 
     slide_identifier = str(uuid4())
     main_frame = get_data_frame_from_files(data_files=data_files)
 
-    print(__file__)
-    print("@add_pivot_table_to_report")
-    print("Hello 0")
-    print(f'{main_frame = }')
-
     data_file = data_file_of_slide(root_directory=report.root_directory, slide_id=slide_identifier)
     os.makedirs(os.path.dirname(data_file), exist_ok=True)
 
-    print("Hello 0.0")
     main_frame.to_hdf(path_or_buf=data_file, key=slide_identifier, format='table', mode='w')
-    print("Hello 0.1")
 
     data_source = DataSource(files=data_files, merged_file=data_file)
 
@@ -91,11 +75,6 @@ def add_pivot_table_to_report(report: Report, local_request, index: int | None) 
         CustomIndexer(level=first_main_frame_name, values=[first_level_value]),
         *[ CustomIndexer(level=name, values=[]) for name in main_frame_names[1:] ]
     ]
-
-    print(__file__)
-    print("@add_pivot_table_to_report")
-    print("Hello 1")
-    print(f'{arguments = }')
 
     parameters = get_parameters_of_frame(frame=main_frame, indexers=arguments)
 
@@ -130,10 +109,6 @@ def add_pivot_table_to_report(report: Report, local_request, index: int | None) 
         source=data_source,
         mode=SlideCategory.PIVOT_TABLE
     )
-
-    print(__file__)
-    print("@add_pivot_table_to_report")
-    print("Hello 2")
 
     if index is None:
         report.slides.append(pivot_table)

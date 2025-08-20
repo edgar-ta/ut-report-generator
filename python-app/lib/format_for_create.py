@@ -1,8 +1,8 @@
 from models.report import Report
-from models.slide.self import Slide
+from models.image_slide.self import ImageSlide
 from models.pivot_table.self import PivotTable
 
-def format_for_frontend(response: Report | Slide | PivotTable) -> dict:
+def format_for_create(response: Report | ImageSlide | PivotTable) -> dict:
     if type(response) == Report:
         return {
             "identifier": response.identifier,
@@ -10,13 +10,11 @@ def format_for_frontend(response: Report | Slide | PivotTable) -> dict:
             "creation_date": response.creation_date,
             "last_edit": response.last_edit,
             "last_open": response.last_open,
-            "slides": [ format_for_frontend(response=slide) for slide in response.slides ]
+            "slides": [ format_for_create(response=slide) for slide in response.slides ]
         }
-    if type(response) == Slide:
-        return {
-            "identifier": response.identifier,
-            "name": response.name
-        }
+    
+    if type(response) == ImageSlide:
+        return response.to_dict()
+    
     if type(response) == PivotTable:
-        print(f"pivot_table = {response}")
         return response.to_dict()

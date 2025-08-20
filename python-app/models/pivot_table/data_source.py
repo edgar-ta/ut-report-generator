@@ -10,3 +10,10 @@ class DataSource(SimpleNamespace):
             "files": self.files,
             "merged_file": self.merged_file
         }
+
+    @classmethod
+    def from_json(cls, json_data: dict[str, any]) -> "DataSource":
+        return cls(
+            files=json_data.get("files", []),
+            merged_file=json_data.get("merged_file")
+        )
