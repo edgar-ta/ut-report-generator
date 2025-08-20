@@ -2,7 +2,7 @@ from lib.with_app_decorator import with_app
 from lib.directory_definitions import get_reports_directory
 from lib.descriptive_error import DescriptiveError
 
-from models.report.self import Report
+from models.report import Report
 
 from control_variables import REPORTS_CHUNK_SIZE
 
@@ -11,8 +11,8 @@ from itertools import dropwhile
 
 import os
 
-@with_app("/recent_reports", methods=["POST"])
-def recent_reports():
+@with_app("/get_recents", methods=["POST"])
+def get_recent_reports():
     # This is the root_directory of the last report
     # that the frontend loaded
     reference_report: str | None = None

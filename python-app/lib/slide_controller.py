@@ -2,7 +2,7 @@ import abc
 
 from pptx import Presentation
 
-from models.slide_type import SlideType
+from models.slide.slide_type import SlideType
 from models.asset import Asset
 
 class SlideController():

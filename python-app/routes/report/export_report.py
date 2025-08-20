@@ -5,7 +5,7 @@ from lib.random_message import random_message, RandomMessageType
 
 from control_variables import ZIP_COMPRESSION_LEVEL
 
-from models.report.self import Report
+from models.report import Report
 
 from flask import request
 
@@ -14,7 +14,7 @@ import shutil
 import zipfile
 
 
-@with_app("/export_report", methods=["POST"])
+@with_app("/export", methods=["POST"])
 def export_report():
     root_directory = get_or_panic(request.json, "report_directory", "El directorio del reporte debe estar presente")
 

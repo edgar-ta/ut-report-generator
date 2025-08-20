@@ -4,7 +4,7 @@ from lib.sections.failure_rate.source import read_excel, get_clean_data_frame, c
 from lib.get_asset import get_string_asset, get_image_asset
 from lib.get_or_panic import get_or_panic
 
-from models.slide_type import SlideType
+from models.slide.slide_type import SlideType
 from models.asset import Asset
 
 from pandas import DataFrame

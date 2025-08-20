@@ -1,6 +1,6 @@
-from models.report.get_metadata import get_metadata
+from lib.get_metadata import get_metadata
 
-from models.slide import Slide
+from models.slide.self import Slide
 from lib.descriptive_error import DescriptiveError
 from lib.directory_definitions import metadata_file_of_report, slides_directory_of_report, root_directory_of_report, rendered_file_of_report, export_file_of_report, export_directory_of_report, data_directory_of_report, get_reports_directory
 

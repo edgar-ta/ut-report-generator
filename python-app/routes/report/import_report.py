@@ -3,7 +3,7 @@ from lib.get_or_panic import get_or_panic
 from lib.file_extension import check_file_extension
 from lib.directory_definitions import root_directory_of_report
 
-from models.report.self import Report
+from models.report import Report
 from models.frontend.report_record import ReportRecord
 
 from control_variables import ZIP_COMPRESSION_LEVEL
@@ -13,7 +13,7 @@ from flask import request
 import os
 import zipfile
 
-@with_app("/import_report", methods=["POST"])
+@with_app("/import", methods=["POST"])
 def import_report():
     report_file = get_or_panic(object=request.json, key='report_file', error_message='Se esperaba el archivo .zip para importar')
     check_file_extension(filename=report_file, valid_extensions=["zip"])

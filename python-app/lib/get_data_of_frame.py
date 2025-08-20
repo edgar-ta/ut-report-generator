@@ -1,4 +1,4 @@
-from models.pivot_table.cross_section import cross_section
+from lib.cross_section import cross_section
 from models.pivot_table.custom_indexer import CustomIndexer
 
 import pandas

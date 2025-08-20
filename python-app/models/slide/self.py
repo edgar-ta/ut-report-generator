@@ -10,7 +10,7 @@ from pptx import Presentation as LibrePresentation
 
 from control_variables import AVAILABLE_SLIDE_CONTROLLERS
 
-from models.slide_type import SlideType
+from models.slide.slide_type import SlideType
 from models.asset import Asset
 from models.asset_type import AssetType
 

@@ -1,13 +1,13 @@
 from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
 
-from models.report.self import Report
+from models.report import Report
 
 from flask import request
 from uuid import uuid4
 
 
-@with_app("/edit_slide", methods=["POST"])
+@with_app("/edit", methods=["POST"])
 def edit_slide():
     root_directory = get_or_panic(request.json, "report_directory", "El directorio del reporte debe estar presente")
     slide_id = get_or_panic(request.json, "slide_id", "La id de la diapositiva debe estar presente")

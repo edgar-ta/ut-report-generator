@@ -4,9 +4,9 @@ from lib.descriptive_error import DescriptiveError
 
 from models.pivot_table.self import PivotTable
 from models.pivot_table.custom_indexer import CustomIndexer
-from models.pivot_table.get_parameters_of_frame import get_parameters_of_frame
-from models.pivot_table.get_data_of_frame import get_data_of_frame
-from models.report.self import Report
+from lib.get_parameters_of_frame import get_parameters_of_frame
+from lib.get_data_of_frame import get_data_of_frame
+from models.report import Report
 
 from flask import request
 

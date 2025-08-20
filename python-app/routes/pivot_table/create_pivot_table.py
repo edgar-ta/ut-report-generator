@@ -1,8 +1,8 @@
 from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
 
-from models.report.self import Report
-from models.pivot_table.add_pivot_table_to_report import add_pivot_table_to_report
+from models.report import Report
+from lib.add_pivot_table_to_report import add_pivot_table_to_report
 
 from flask import request
 
