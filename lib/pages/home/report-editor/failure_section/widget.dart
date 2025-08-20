@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:ut_report_generator/api/types/slide_class.dart';
+import 'package:ut_report_generator/models/slide_class.dart';
 import 'package:ut_report_generator/pages/home/report-editor/failure_section/failure_section_arguments.dart';
 import 'package:ut_report_generator/pages/home/report-editor/report_section/pick_file_button.dart';
 import 'package:ut_report_generator/pages/home/report-editor/report_section/widget.dart';

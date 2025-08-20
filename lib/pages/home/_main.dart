@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/api/import_report.dart';
 import 'package:ut_report_generator/api/start_report.dart';
-import 'package:ut_report_generator/api/types/report_class.dart';
+import 'package:ut_report_generator/models/report_class.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
 import 'package:ut_report_generator/main_app/route_observer.dart';

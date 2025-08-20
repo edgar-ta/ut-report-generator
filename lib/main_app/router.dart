@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ut_report_generator/api/types/profile_record.dart';
-import 'package:ut_report_generator/api/types/report_class.dart';
+import 'package:ut_report_generator/models/profile_record.dart';
+import 'package:ut_report_generator/models/report_class.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/pages/bug-report/_main.dart';
 import 'package:ut_report_generator/pages/home/_main.dart';

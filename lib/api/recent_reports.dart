@@ -10,7 +10,7 @@ Future<RecentReports_Response> recentReports({String? referenceReport}) {
 
 // ignore: camel_case_types
 class RecentReports_ReportPreview {
-  String preview;
+  String? preview;
   String name;
   String rootDirectory;
 
@@ -22,7 +22,7 @@ class RecentReports_ReportPreview {
 
   factory RecentReports_ReportPreview.fromJson(Map<String, dynamic> json) {
     return RecentReports_ReportPreview(
-      preview: json['preview'] as String,
+      preview: json['preview'] as String?,
       name: json['name'] as String,
       rootDirectory: json['root_directory'] as String,
     );
