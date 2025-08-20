@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ut_report_generator/api/types/asset_class.dart';
+import 'package:ut_report_generator/models/asset_class.dart';
 import 'package:ut_report_generator/api/start_report.dart';
-import 'package:ut_report_generator/api/types/report_class.dart';
-import 'package:ut_report_generator/api/types/slide_class.dart';
-import 'package:ut_report_generator/api/types/slide_type.dart';
+import 'package:ut_report_generator/models/report_class.dart';
+import 'package:ut_report_generator/models/slide_class.dart';
+import 'package:ut_report_generator/models/slide_type.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/pages/home/_main.dart';
 import 'package:ut_report_generator/pages/home/report-editor/_main.dart';

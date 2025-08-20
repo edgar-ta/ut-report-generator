@@ -1,5 +1,5 @@
-import 'package:ut_report_generator/api/types/asset_class.dart';
-import 'package:ut_report_generator/api/types/slide_type.dart';
+import 'package:ut_report_generator/models/asset_class.dart';
+import 'package:ut_report_generator/models/slide_type.dart';
 
 class SlideClass {
   String id;

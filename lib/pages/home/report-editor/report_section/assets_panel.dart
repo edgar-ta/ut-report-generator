@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:ut_report_generator/api/types/asset_class.dart';
+import 'package:ut_report_generator/models/asset_class.dart';
 
 class AssetsPanel extends StatefulWidget {
   List<AssetClass> images;

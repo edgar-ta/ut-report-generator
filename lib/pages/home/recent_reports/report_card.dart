@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class ReportCard extends StatefulWidget {
   final String name;
-  final String preview;
+  final String? preview;
   final VoidCallback? onTap;
 
   const ReportCard({
@@ -56,19 +56,11 @@ class _ReportCardState extends State<ReportCard> {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.file(
-                      File(widget.preview),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade300,
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                    ),
+                    widget.preview != null
+                        ? Image.file(File(widget.preview!), fit: BoxFit.cover)
+                        : Image.network(
+                          "https://canvasjs.com/wp-content/uploads/images/gallery/javascript-charts/overview/javascript-charts-graphs-index-data-label.png",
+                        ),
 
                     Positioned(
                       left: 0,

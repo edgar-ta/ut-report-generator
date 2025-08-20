@@ -39,14 +39,7 @@ class PivotTable():
         self.mode = mode
 
     def to_dict(self) -> dict:
-        print(__file__)
-        print("@to_dict")
-        print("Hello 1")
-        print(f'{self.parameters = }')
-        print(f'{self.arguments = }')
-        print(f'{repr(self.source) = }')
-
-        my_dict = {
+        return {
             "name": self.name,
             "identifier": self.identifier,
             "creation_date": self.creation_date.isoformat(),
@@ -61,9 +54,3 @@ class PivotTable():
             "filter_function": self.filter_function.name,
             "mode": self.mode.name
         }
-
-        print(__file__)
-        print("@to_dict")
-        print("Hello 2")
-
-        return my_dict

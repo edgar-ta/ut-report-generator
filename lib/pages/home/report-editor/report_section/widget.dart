@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:ut_report_generator/api/types/asset_class.dart';
-import 'package:ut_report_generator/api/types/slide_class.dart';
+import 'package:ut_report_generator/models/asset_class.dart';
+import 'package:ut_report_generator/models/slide_class.dart';
 import 'package:ut_report_generator/pages/home/report-editor/report_section/pick_file_button.dart';
 import 'package:ut_report_generator/pages/home/report-editor/report_section/assets_panel.dart';
 import 'package:ut_report_generator/pages/home/report-editor/report_section/slide_frame.dart';

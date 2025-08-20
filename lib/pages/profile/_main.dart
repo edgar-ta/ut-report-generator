@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ut_report_generator/api/types/profile_record.dart';
+import 'package:ut_report_generator/models/profile_record.dart';
 
 String labelForUserType(UserType t) => switch (t) {
   UserType.professor => 'Profesor',

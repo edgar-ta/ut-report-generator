@@ -1,4 +1,4 @@
-import 'package:ut_report_generator/api/types/slide_class.dart';
+import 'package:ut_report_generator/models/slide_class.dart';
 
 class ReportClass {
   String reportDirectory;

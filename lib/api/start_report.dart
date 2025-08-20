@@ -1,5 +1,5 @@
 import 'package:ut_report_generator/api/send_request.dart';
-import 'package:ut_report_generator/api/types/report_class.dart';
+import 'package:ut_report_generator/models/report_class.dart';
 
 Future<StartReport_Response> startReport(List<String> dataFiles) {
   return sendRequest(
