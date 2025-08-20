@@ -5,10 +5,7 @@ from models.pivot_table.custom_indexer import CustomIndexer
 from models.pivot_table.aggregate_function_type import AggregateFunctionType
 from models.pivot_table.filter_function_type import FilterFunctionType
 from models.pivot_table.data_source import DataSource
-
-class SlideCategory(Enum):
-    PIVOT_TABLE = 0
-    IMAGE = 1
+from models.pivot_table.slide_category import SlideCategory
 
 class PivotTable():
     def __init__(
@@ -23,7 +20,8 @@ class PivotTable():
             parameters: list[CustomIndexer],
             data: dict,
             aggregate_function: AggregateFunctionType,
-            filter_function: FilterFunctionType
+            filter_function: FilterFunctionType,
+            mode: SlideCategory
             ) -> None:
         self.name = name
         self.identifier = identifier
@@ -38,19 +36,34 @@ class PivotTable():
         self.data = data
         self.aggregate_function = aggregate_function
         self.filter_function = filter_function
+        self.mode = mode
 
     def to_dict(self) -> dict:
-        return {
+        print(__file__)
+        print("@to_dict")
+        print("Hello 1")
+        print(f'{self.parameters = }')
+        print(f'{self.arguments = }')
+        print(f'{repr(self.source) = }')
+
+        my_dict = {
             "name": self.name,
             "identifier": self.identifier,
-            "creation_date": self.creation_date.isoformat() if self.creation_date else None,
-            "last_edit": self.last_edit.isoformat() if self.last_edit else None,
-            "category": self.category.name if hasattr(self.category, "name") else str(self.category),
+            "creation_date": self.creation_date.isoformat(),
+            "last_edit": self.last_edit.isoformat(),
+            "category": self.category.name,
             "preview": self.preview,
-            "source": self.source.to_dict() if hasattr(self.source, "to_dict") else str(self.source),
-            "arguments": [a.to_dict() if hasattr(a, "to_dict") else str(a) for a in self.arguments],
-            "parameters": [p.to_dict() if hasattr(p, "to_dict") else str(p) for p in self.parameters],
+            "source": self.source.to_dict(),
+            "arguments": [argument.to_dict() for argument in self.arguments],
+            "parameters": [parameter.to_dict() for parameter in self.parameters],
             "data": self.data,
-            "aggregate_function": self.aggregate_function.name if hasattr(self.aggregate_function, "name") else str(self.aggregate_function),
-            "filter_function": self.filter_function.name if hasattr(self.filter_function, "name") else str(self.filter_function),
+            "aggregate_function": self.aggregate_function.name,
+            "filter_function": self.filter_function.name,
+            "mode": self.mode.name
         }
+
+        print(__file__)
+        print("@to_dict")
+        print("Hello 2")
+
+        return my_dict

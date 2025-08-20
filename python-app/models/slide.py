@@ -22,7 +22,7 @@ import os
 
 class Slide():
     def __init__(self, 
-                 id: str, 
+                 identifier: str, 
                  _type: SlideType, 
                  assets: list[Asset], 
                  arguments: dict[str, any], 
@@ -31,7 +31,7 @@ class Slide():
                  last_render: Timestamp | None,
                  root_directory: str,
                  ) -> None:
-        self.id = id
+        self.identifier = identifier
         self._type = _type
         self.assets = assets
         self._arguments = arguments
@@ -70,7 +70,7 @@ class Slide():
     
     def to_dict(self) -> dict[str, any]:
         return {
-            "id": self.id,
+            "id": self.identifier,
             "type": self._type.value,
             "assets": [ asset.to_dict() for asset in self.assets ],
             "arguments": self.arguments,
@@ -111,7 +111,7 @@ class Slide():
         slide_id = str(uuid.uuid4())
 
         slide = Slide(
-            id=slide_id,
+            identifier=slide_id,
             _type=controller.slide_type(),
             assets=[],
             arguments=controller.default_arguments(),
@@ -132,11 +132,11 @@ class Slide():
 
     @cached_property
     def assets_directory(self) -> str:
-        return assets_directory_of_slide(root_directory=self.root_directory, slide_id=self.id)
+        return assets_directory_of_slide(root_directory=self.root_directory, slide_id=self.identifier)
     
     @cached_property
     def base_directory(self) -> str:
-        return base_directory_of_slide(root_directory=self.root_directory, slide_id=self.id)
+        return base_directory_of_slide(root_directory=self.root_directory, slide_id=self.identifier)
     
     @property
     def preview_image(self) -> str | None:
@@ -183,7 +183,7 @@ class Slide():
         spire_presentation = SpirePresentation()
         spire_presentation.LoadFromFile(pptx_preview_path)
 
-        preview_name = preview_image_of_slide(root_directory=self.root_directory, slide_id=self.id)
+        preview_name = preview_image_of_slide(root_directory=self.root_directory, slide_id=self.identifier)
         if os.path.exists(preview_name):
             os.remove(preview_name)
         

@@ -143,7 +143,7 @@ class Report:
             json.dump(self.to_dict(), json_file, indent=4)
 
     def __getitem__(self, key: str) -> Slide:
-        slide = next((slide for slide in self.slides if slide.id == key), None)
+        slide = next((slide for slide in self.slides if slide.identifier == key), None)
         if slide is None:
             raise DescriptiveError(400, f"La diapositiva con id {key} no existe. Tal vez sea un error de dedo")
         return slide
