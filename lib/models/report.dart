@@ -1,10 +1,13 @@
-import 'package:ut_report_generator/models/slide_class.dart';
+import 'package:ut_report_generator/models/image_slide/self.dart';
+import 'package:ut_report_generator/models/pivot_table/self.dart';
+import 'package:ut_report_generator/models/slide/self.dart';
+import 'package:ut_report_generator/models/slide_category.dart';
 
 class ReportClass {
   String reportDirectory;
   String reportName;
   DateTime creationDate;
-  List<SlideClass> slides;
+  List<Slide> slides;
   String renderedFile;
 
   ReportClass({
@@ -22,7 +25,13 @@ class ReportClass {
       creationDate: DateTime.parse(json['creation_date']),
       slides:
           (json['slides'] as List)
-              .map((slide) => SlideClass.fromJson(slide))
+              .map(
+                (slide) =>
+                    SlideCategory.values.byName(slide['category']) ==
+                            SlideCategory.image
+                        ? PivotTable.fromJson(slide)
+                        : PivotTable.fromJson(slide),
+              )
               .toList(),
       renderedFile: json['rendered_file'] as String,
     );
@@ -32,7 +41,7 @@ class ReportClass {
     String? reportName,
     String? reportDirectory,
     DateTime? creationDate,
-    List<SlideClass>? slides,
+    List<Slide>? slides,
     String? renderedFile,
   }) {
     return ReportClass(

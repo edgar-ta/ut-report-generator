@@ -13,7 +13,6 @@ def format_for_edit(response: Report | ImageSlide | PivotTable):
     if type(response) == ImageSlide:
         return {
             "preview": response.preview,
-            "key": str(uuid4())
         }
     
     if type(response) == PivotTable:

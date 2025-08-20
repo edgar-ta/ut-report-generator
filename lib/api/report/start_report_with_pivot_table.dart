@@ -1,9 +1,12 @@
 import 'package:ut_report_generator/api/send_request.dart';
-import 'package:ut_report_generator/models/report_class.dart';
+import 'package:ut_report_generator/models/report.dart';
 
-Future<StartReport_Response> startReport(List<String> dataFiles) {
+// ignore: non_constant_identifier_names
+Future<StartReport_Response> startReport_withPivotTable(
+  List<String> dataFiles,
+) {
   return sendRequest(
-    route: "start_report",
+    route: "report/start_with_pivot_table",
     body: {"data_files": dataFiles},
     callback: StartReport_Response.fromJson,
   );

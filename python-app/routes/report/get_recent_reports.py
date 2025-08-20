@@ -1,6 +1,5 @@
 from lib.with_app_decorator import with_app
 from lib.directory_definitions import get_reports_directory
-from lib.descriptive_error import DescriptiveError
 
 from lib.report.get_id_of_report import get_id_of_report
 
@@ -52,7 +51,7 @@ def get_recent_reports():
             {
                 "preview": next((slide.preview for slide in report.slides if slide.preview is not None), None),
                 "name": report.report_name,
-                "root_directory": report.root_directory,
+                "identifier": report.identifier,
             }
             for report in reports
         ],
