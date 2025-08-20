@@ -1,5 +1,5 @@
 from models.frontend.slide_record import SlideRecord
-from models.report import Report
+from models.report.self import Report
 
 from dataclasses import dataclass
 from pandas import Timestamp

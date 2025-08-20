@@ -20,7 +20,7 @@ class SlideRecord:
     @classmethod
     def from_slide(cls, slide: Slide) -> "SlideRecord":
         return SlideRecord(
-            slide.id,
+            slide.identifier,
             uuid4(),
             slide._type,
             slide.assets,

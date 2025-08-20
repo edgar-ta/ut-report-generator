@@ -51,3 +51,7 @@ def preview_image_of_slide(root_directory: str, slide_id: str) -> str:
     The file with said name is not guaranteed to actually exist
     '''
     return os.path.join(root_directory, "slides", slide_id, f"preview-{str(uuid4())}.png")
+
+def data_file_of_slide(root_directory: str, slide_id: str) -> str:
+    return os.path.join(root_directory, "slides", slide_id, "data.hdf5")
+

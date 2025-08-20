@@ -3,7 +3,7 @@ from lib.get_or_panic import get_or_panic
 from lib.file_extension import check_file_extension
 from lib.directory_definitions import root_directory_of_report
 
-from models.report import Report
+from models.report.self import Report
 from models.frontend.report_record import ReportRecord
 
 from control_variables import ZIP_COMPRESSION_LEVEL

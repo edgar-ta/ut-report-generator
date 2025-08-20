@@ -29,8 +29,18 @@ def create_unit_name(index: int) -> str:
     return f"Unidad {index + 1}"
 
 def get_grades_statistics(index: pd.Index) -> tuple[list[str], list[str], list[int], int]:
+    print(__file__)
+    print("@get_grades_statistics")
+    print("Hello 0")
+
+    print(f'{index = }')
+
     subject_names = unique_list( name for name in index.get_level_values(1) if not re.search(r"Unnamed", name) )
     professor_names = unique_list( name for name in index.get_level_values(3) if not re.search(r"Unnamed", name) )
+
+    print(__file__)
+    print("@get_grades_statistics")
+    print("Hello 1")
 
     units_list = [ name for name in index.get_level_values(4) if re.match(r"U\d", name) ]
     units_per_subject = get_units_per_subject(units_list)
@@ -67,7 +77,14 @@ def create_clean_index(subject_names: list[str], professor_names: list[str], uni
     return pd.MultiIndex.from_arrays(list(zip(*left_part)), names=["subject", "professor", "unit", "type"])
 
 def get_clean_data_frame(data_frame: pd.DataFrame) -> pd.DataFrame:
+    print(__file__)
+    print("@get_clean_data_frame")
+    print(f"{data_frame = }")
+
     subject_names, professor_names, units_per_subject, max_units = get_grades_statistics(data_frame.columns)
+    print(__file__)
+    print("@get_clean_data_frame")
+    print("Hello 1")
 
     clean_index = create_clean_index(subject_names, professor_names, units_per_subject)
     data_frame.columns = clean_index
