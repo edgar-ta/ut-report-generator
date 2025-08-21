@@ -1,9 +1,9 @@
 import 'package:ut_report_generator/api/send_request.dart';
 
-Future<RecentReports_Response> recentReports({String? referenceReport}) {
+Future<RecentReports_Response> recentReports({String? identifier}) {
   return sendRequest(
-    route: "recent_reports",
-    body: {"reference_report": referenceReport},
+    route: "report/get_recents",
+    body: {"report": identifier},
     callback: RecentReports_Response.fromJson,
   );
 }
@@ -12,19 +12,19 @@ Future<RecentReports_Response> recentReports({String? referenceReport}) {
 class RecentReports_ReportPreview {
   String? preview;
   String name;
-  String rootDirectory;
+  String identifier;
 
   RecentReports_ReportPreview({
     required this.preview,
     required this.name,
-    required this.rootDirectory,
+    required this.identifier,
   });
 
   factory RecentReports_ReportPreview.fromJson(Map<String, dynamic> json) {
     return RecentReports_ReportPreview(
       preview: json['preview'] as String?,
       name: json['name'] as String,
-      rootDirectory: json['root_directory'] as String,
+      identifier: json['identifier'] as String,
     );
   }
 }

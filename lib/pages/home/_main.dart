@@ -6,9 +6,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/api/hello_request.dart';
-import 'package:ut_report_generator/api/import_report.dart';
-import 'package:ut_report_generator/api/start_report.dart';
-import 'package:ut_report_generator/models/report_class.dart';
+import 'package:ut_report_generator/api/report/import_report.dart';
+import 'package:ut_report_generator/api/report/start_report_with_pivot_table.dart';
+import 'package:ut_report_generator/models/report.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
 import 'package:ut_report_generator/main_app/route_observer.dart';
@@ -19,7 +19,9 @@ import 'package:provider/provider.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 
 Future<ReportClass> _createNewReport(List<File> files) async {
-  return startReport(files.map((file) => file.absolute.path).toList());
+  return startReport_withPivotTable(
+    files.map((file) => file.absolute.path).toList(),
+  );
 }
 
 Future<ReportClass> _importReportFromZip(List<File> files) async {

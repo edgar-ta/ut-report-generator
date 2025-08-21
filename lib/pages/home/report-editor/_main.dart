@@ -3,41 +3,41 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:ut_report_generator/api/change_slide_data.dart';
-import 'package:ut_report_generator/api/edit_slide.dart';
-import 'package:ut_report_generator/api/export_report.dart';
+import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
+import 'package:ut_report_generator/api/report/export_report.dart';
 import 'package:ut_report_generator/api/file_response.dart';
-import 'package:ut_report_generator/api/render_report.dart';
-import 'package:ut_report_generator/models/asset_class.dart';
-import 'package:ut_report_generator/models/report_class.dart';
-import 'package:ut_report_generator/models/slide_class.dart';
-import 'package:ut_report_generator/models/slide_type.dart';
+import 'package:ut_report_generator/api/report/render_report.dart';
+import 'package:ut_report_generator/models/pivot_table/self.dart';
+import 'package:ut_report_generator/models/report.dart';
+import 'package:ut_report_generator/models/image_slide/self.dart';
+import 'package:ut_report_generator/models/image_slide/image_slide_kind.dart';
 import 'package:ut_report_generator/components/common_appbar.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
 import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/pages/home/report-editor/failure_section/widget.dart';
+import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/widget.dart';
+import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/widget.dart';
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
 import 'package:ut_report_generator/pages/home/report-editor/render_button.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
-import 'package:ut_report_generator/utils/control_variables.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 
 Widget buildSlideEditor(
-  SlideClass slide,
+  PivotTable slide,
   Future<void> Function(String slideId, List<File> dataFiles) changeSlideData,
   Future<void> Function(String slideId, Map<String, dynamic> arguments)
   editSlide,
 ) {
-  switch (slide.type) {
-    case SlideType.failureRate:
+  switch (slide.kind) {
+    case ImageSlideKind.failureRate:
       return FailureSection(
         slideData: slide,
         editSlide: editSlide,
         changeSlideData: changeSlideData,
       );
-    case SlideType.average:
+    case ImageSlideKind.average:
       return Center(child: Text("Tipo de diapositiva no soportado"));
     default:
       return Center(child: Text("Tipo de diapositiva no soportado"));
@@ -129,21 +129,14 @@ class _ReportEditorState extends State<ReportEditor> {
 
   void _setSlideData({
     required String slideId,
-    String? key,
-    List<AssetClass>? assets,
     String? preview,
     Map<String, dynamic>? arguments,
   }) {
     setState(() {
       var slides =
           report!.slides.map((slide) {
-            if (slide.id == slideId) {
-              return slide.copyWith(
-                assets: assets,
-                arguments: arguments,
-                preview: preview,
-                key: key,
-              );
+            if (slide.identifier == slideId) {
+              return slide.copyWith(arguments: arguments, preview: preview);
             }
             return slide;
           }).toList();
@@ -158,12 +151,7 @@ class _ReportEditorState extends State<ReportEditor> {
       reportDirectory: report!.reportDirectory,
       slideId: slideId,
     ).then((value) {
-      _setSlideData(
-        slideId: slideId,
-        assets: value.assets,
-        preview: value.preview,
-        key: value.key,
-      );
+      _setSlideData(slideId: slideId, preview: value.preview);
     });
   }
 
@@ -175,10 +163,8 @@ class _ReportEditorState extends State<ReportEditor> {
     ).then((value) {
       _setSlideData(
         slideId: slideId,
-        assets: value.assets,
         preview: value.preview,
         arguments: arguments,
-        key: value.key,
       );
     });
   }
@@ -188,7 +174,7 @@ class _ReportEditorState extends State<ReportEditor> {
   }
 
   Future<ExportReport_Response> _exportReport() {
-    return exportReport(reportDirectory: report!.reportDirectory);
+    return exportReport(identifier: report!.reportDirectory);
   }
 
   Future<FileResponse> _renderReportAsPdf() {
@@ -221,35 +207,29 @@ class _ReportEditorState extends State<ReportEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return FullscreenLoadingOverlay(
-      callback: _loadReport,
-      errorScreen: ErrorPage(),
-      loadingScreen: LoadingPage(
-        messages: [
-          "Abriendo reporte",
-          "Cargando imágenes",
-          "Recordando configuración",
-        ],
-        title: "Cargando reporte",
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 64),
+        child: Column(
+          children: [
+            ...(report!.slides.map((slide) {
+              if (slide is PivotTable) {
+                return PivotTableSection(
+                  initialTable: slide,
+                  editSlide: editSlide,
+                  changeSlideData: changeSlideData,
+                  editionPaneBuilder: editionPaneBuilder,
+                  metadataPane: metadataPane,
+                );
+              }
+              if (slide is ImageSlide) {
+                return ImageSlideSection(initialSlide: slide);
+              }
+              return Text("Tipo de slide inválido");
+            }).toList()),
+          ],
+        ),
       ),
-      state: report,
-      builder:
-          (ReportClass report) => SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 64),
-              child: Column(
-                children: [
-                  ...(report.slides.map((slide) {
-                    return buildSlideEditor(
-                      slide,
-                      _changeSlideData,
-                      _editSlide,
-                    );
-                  }).toList()),
-                ],
-              ),
-            ),
-          ),
     );
   }
 }

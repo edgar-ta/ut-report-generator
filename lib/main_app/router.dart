@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ut_report_generator/models/profile_record.dart';
-import 'package:ut_report_generator/models/report_class.dart';
+import 'package:ut_report_generator/models/profile.dart';
+import 'package:ut_report_generator/models/report.dart';
 import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/pages/bug-report/_main.dart';
 import 'package:ut_report_generator/pages/home/_main.dart';
@@ -11,7 +11,7 @@ import 'package:ut_report_generator/pages/profile/_main.dart';
 import 'package:ut_report_generator/testing_components/charts_screen.dart';
 import 'package:ut_report_generator/testing_components/chips_tile.dart';
 import 'package:ut_report_generator/testing_components/dropdown_menus_tile.dart';
-import 'package:ut_report_generator/pages/home/report-editor/report_section/slide_frame.dart';
+import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/slide_frame.dart';
 import 'package:ut_report_generator/utils/control_variables.dart';
 
 final router = GoRouter(

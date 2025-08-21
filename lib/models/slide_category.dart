@@ -1,0 +1,1 @@
+enum SlideCategory { pivotTable, image }

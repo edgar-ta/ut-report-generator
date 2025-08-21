@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ut_report_generator/api/get_report.dart';
-import 'package:ut_report_generator/api/recent_reports.dart';
+import 'package:ut_report_generator/api/report/get_report.dart';
+import 'package:ut_report_generator/api/report/get_recent_reports.dart';
 import 'package:ut_report_generator/pages/home/recent_reports/report_card.dart';
 import 'package:ut_report_generator/pages/home/recent_reports/report_card_skeleton.dart';
 import 'package:go_router/go_router.dart';
@@ -31,7 +31,7 @@ class _RecentReportsState extends State<RecentReports> {
 
     return await waitAtLeast(
       Duration(seconds: 5),
-      recentReports(referenceReport: null)
+      recentReports(identifier: null)
           .then((value) {
             setState(() {
               response = value;
@@ -97,7 +97,7 @@ class _RecentReportsState extends State<RecentReports> {
                                     "/home/report-editor",
                                     extra:
                                         () => getReport(
-                                          reportDirectory: report.rootDirectory,
+                                          identifier: report.identifier,
                                         ),
                                   );
                                 },

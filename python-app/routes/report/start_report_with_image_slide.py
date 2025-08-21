@@ -7,8 +7,8 @@ from models.report import Report
 
 from flask import request
 
-@with_app("/start_with_slide", methods=["POST"])
-def start_report_with_slide():
+@with_app("/start_with_image_slide", methods=["POST"])
+def start_report_with_image_slide():
     report = Report.from_nothing()
     report.makedirs()
 

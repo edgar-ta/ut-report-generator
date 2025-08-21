@@ -1,10 +1,10 @@
 import 'package:ut_report_generator/api/send_request.dart';
-import 'package:ut_report_generator/models/report_class.dart';
+import 'package:ut_report_generator/models/report.dart';
 
-Future<ReportClass> getReport({required String reportDirectory}) async {
+Future<ReportClass> getReport({required String identifier}) async {
   return sendRequest(
-    route: "get_report",
+    route: "report/get",
     callback: ReportClass.fromJson,
-    body: {"report_directory": reportDirectory},
+    body: {"report": identifier},
   );
 }

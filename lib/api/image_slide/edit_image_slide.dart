@@ -1,4 +1,3 @@
-import 'package:ut_report_generator/models/asset_class.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
 Future<EditSlide_Response> editSlide({
@@ -19,24 +18,11 @@ Future<EditSlide_Response> editSlide({
 
 // ignore: camel_case_types
 class EditSlide_Response {
-  List<AssetClass> assets;
   String preview;
-  String key;
 
-  EditSlide_Response({
-    required this.assets,
-    required this.preview,
-    required this.key,
-  });
+  EditSlide_Response({required this.preview});
 
   static EditSlide_Response fromJson(Map<String, dynamic> json) {
-    return EditSlide_Response(
-      assets:
-          (json['assets'] as List<dynamic>)
-              .map((asset) => AssetClass.fromJson(asset))
-              .toList(),
-      preview: json['preview'] as String,
-      key: json['key'] as String,
-    );
+    return EditSlide_Response(preview: json['preview'] as String);
   }
 }

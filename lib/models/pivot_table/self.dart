@@ -1,64 +1,14 @@
-enum AggregateFunctionType { count, average, min, max }
+import 'package:ut_report_generator/models/pivot_table/aggregate_function_type.dart';
+import 'package:ut_report_generator/models/pivot_table/custom_indexer.dart';
+import 'package:ut_report_generator/models/pivot_table/data_source.dart';
+import 'package:ut_report_generator/models/pivot_table/filter_function_type.dart';
+import 'package:ut_report_generator/models/slide/self.dart';
+import 'package:ut_report_generator/models/slide_category.dart';
 
-enum FilterFunctionType { failedStudents, approvedStudents, allStudents }
-
-enum SlideCategory { pivotTable, image }
-
-class CustomIndexer {
-  final String level;
-  final List<String> values;
-
-  CustomIndexer({required this.level, required this.values});
-
-  Map<String, dynamic> toJson() {
-    return {"level": level, "values": values};
-  }
-
-  factory CustomIndexer.fromJson(Map<String, dynamic> json) {
-    return CustomIndexer(
-      level: json["level"],
-      values: List<String>.from(json["values"]),
-    );
-  }
-
-  CustomIndexer copyWith({String? level, List<String>? values}) {
-    return CustomIndexer(
-      level: level ?? this.level,
-      values: values ?? this.values,
-    );
-  }
+class PivotTable implements Slide {
+  final String name;
 
   @override
-  String toString() => "CustomIndexer(level: $level, values: $values)";
-}
-
-class DataSource {
-  final List<String> files;
-  final String? mergedFile;
-
-  DataSource({required this.files, this.mergedFile});
-
-  Map<String, dynamic> toJson() {
-    return {"files": files, "merged_file": mergedFile};
-  }
-
-  factory DataSource.fromJson(Map<String, dynamic> json) {
-    return DataSource(
-      files: List<String>.from(json["files"]),
-      mergedFile: json["merged_file"],
-    );
-  }
-
-  DataSource copyWith({List<String>? files, String? mergedFile}) {
-    return DataSource(
-      files: files ?? this.files,
-      mergedFile: mergedFile ?? this.mergedFile,
-    );
-  }
-}
-
-class PivotTable {
-  final String name;
   final String identifier;
   final DateTime creationDate;
   final DateTime lastEdit;
