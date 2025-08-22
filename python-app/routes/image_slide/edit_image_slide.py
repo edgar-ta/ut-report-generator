@@ -16,7 +16,7 @@ import pandas
 import os
 
 @with_app("/edit", methods=["POST"])
-def edit_slide():
+def edit_image_slide():
     report = get_or_panic(request.json, 'report', 'El identificador del reporte no está presente en la solicitud')
     image_slide = get_or_panic(request.json, 'slide', 'El identificador de la diapositiva no está presente en la solicitud')
     arguments = get_or_panic(request.json, "arguments", "La lista de argumentos no está presente en la solicitud")

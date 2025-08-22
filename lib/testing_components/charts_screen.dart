@@ -112,16 +112,10 @@ class _ChartScreenState extends State<ChartScreen> {
         children: [
           DropdownMenusTile<String>(
             title: "Profesor",
-            primaryItems: ["Profesor"],
-            secondaryItems: professors,
-            selectedPrimary: "Profesor",
-            selectedSecondary: selectedProfessor,
-            primaryItemBuilder: (context, val) => Text(val.toString()),
-            secondaryItemBuilder: (context, val) => Text(val.toString()),
-            onPrimaryChanged: (_) {},
-            onSecondaryChanged:
-                (val) => setState(() => selectedProfessor = val),
-            onDelete: () {},
+            items: professors,
+            selected: selectedProfessor,
+            itemBuilder: (context, val) => Text(val.toString()),
+            onChanged: (val) => setState(() => selectedProfessor = val),
             index: 0,
           ),
           ChipsTile<String>(

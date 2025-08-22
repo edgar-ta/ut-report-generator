@@ -1,11 +1,9 @@
-from lib.slide_controller import SlideController
+from lib.image_slide.image_slide_controller import ImageSlideController
 from lib.descriptive_error import DescriptiveError
 from lib.sections.failure_rate.source import read_excel, get_clean_data_frame, create_unit_name, graph_failure_rate
-from lib.get_asset import get_string_asset, get_image_asset
 from lib.get_or_panic import get_or_panic
 
-from models.slide.slide_type import SlideType
-from models.asset import Asset
+from models.image_slide.image_slide_kind import ImageSlideKind
 
 from pandas import DataFrame
 from pptx import Presentation
@@ -32,10 +30,10 @@ def delayed_teachers_legend(subjects_without_grades: DataFrame, unit: int) -> st
         *rest, last = subjects
         return f"Las materias de {', '.join(rest)}, y {last} no subieron calificaciones en la unidad {unit}"
 
-class FailureRate_Controller(SlideController):
+class FailureRate_Controller(ImageSlideController):
     @staticmethod
-    def slide_kind() -> SlideType:
-        return SlideType.FAILURE_RATE
+    def slide_kind() -> ImageSlideKind:
+        return ImageSlideKind.FAILURE_RATE
 
     @staticmethod
     def default_arguments() -> dict[str, any]:
@@ -44,24 +42,19 @@ class FailureRate_Controller(SlideController):
             "show_delayed_teachers": True
         }
 
-    @staticmethod
-    def build_assets(data_files: list[str], base_directory: str, arguments: dict[str, any]) -> list[Asset]:
-        data_frame = read_excel(data_files[0])
-        data_frame = get_clean_data_frame(data_frame)
+    # @staticmethod
+    # def build_assets(data_files: list[str], base_directory: str, arguments: dict[str, any]) -> list[Asset]:
+    #     data_frame = read_excel(data_files[0])
+    #     data_frame = get_clean_data_frame(data_frame)
 
-        unit = arguments["unit"]
-        grades = data_frame.xs(create_unit_name(unit), level="unit").map(lambda value: abs(value))
+    #     unit = arguments["unit"]
+    #     grades = data_frame.xs(create_unit_name(unit), level="unit").map(lambda value: abs(value))
 
-        subjects_without_grades = grades[(grades == 0).all(axis=1)]
-        subjects_with_grades = grades[(grades != 0).any(axis=1)]
+    #     subjects_without_grades = grades[(grades == 0).all(axis=1)]
+    #     subjects_with_grades = grades[(grades != 0).any(axis=1)]
 
-        main_chart_path = os.path.join(base_directory, str(uuid.uuid4()) + ".png")
-        graph_failure_rate(subjects_with_grades, main_chart_path)
-
-        return Asset.list_from([ 
-            ("main_chart", main_chart_path, "image"), 
-            ("delayed_teachers", delayed_teachers_legend(subjects_without_grades, unit), "text") 
-        ])
+    #     main_chart_path = os.path.join(base_directory, str(uuid.uuid4()) + ".png")
+    #     graph_failure_rate(subjects_with_grades, main_chart_path)
 
 
     @staticmethod
@@ -78,28 +71,29 @@ class FailureRate_Controller(SlideController):
 
 
     @staticmethod
-    def render_slide(presentation: Presentation, arguments: dict[str, any], assets: list[Asset]) -> None:
-        slide = presentation.slides.add_slide(presentation.slide_layouts[5])
+    def render_slide(presentation: Presentation, arguments: dict[str, any]) -> None:
+        pass
+        # slide = presentation.slides.add_slide(presentation.slide_layouts[5])
 
-        main_chart_path = get_image_asset(assets, "main_chart")
+        # main_chart_path = get_image_asset(assets, "main_chart")
 
-        left = Inches(1)
-        top = Inches(1)
-        width = Inches(8)
-        slide.shapes.add_picture(main_chart_path, left, top, width=width)
+        # left = Inches(1)
+        # top = Inches(1)
+        # width = Inches(8)
+        # slide.shapes.add_picture(main_chart_path, left, top, width=width)
 
-        if arguments["show_delayed_teachers"]:
-            delayed_teachers_text = get_string_asset(assets, "delayed_teachers")
+        # if arguments["show_delayed_teachers"]:
+        #     delayed_teachers_text = get_string_asset(assets, "delayed_teachers")
 
-            left = Inches(1)
-            top = Inches(6)
-            width = Inches(8)
-            height = Inches(1)
-            text_box = slide.shapes.add_textbox(left, top, width, height)
-            text_frame = text_box.text_frame
-            text_frame.text = delayed_teachers_text
+        #     left = Inches(1)
+        #     top = Inches(6)
+        #     width = Inches(8)
+        #     height = Inches(1)
+        #     text_box = slide.shapes.add_textbox(left, top, width, height)
+        #     text_frame = text_box.text_frame
+        #     text_frame.text = delayed_teachers_text
 
-            for paragraph in text_frame.paragraphs:
-                paragraph.font.size = Pt(14)
-                paragraph.font.bold = True
-                paragraph.alignment = PP_ALIGN.CENTER
+        #     for paragraph in text_frame.paragraphs:
+        #         paragraph.font.size = Pt(14)
+        #         paragraph.font.bold = True
+        #         paragraph.alignment = PP_ALIGN.CENTER

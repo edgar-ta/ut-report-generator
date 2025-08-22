@@ -2,34 +2,24 @@ import 'package:flutter/material.dart';
 
 class DropdownMenusTile<T> extends StatefulWidget {
   final String title;
-  final List<T> primaryItems;
-  final List<T> secondaryItems;
+  final List<T> items;
 
-  final T? selectedPrimary;
-  final T? selectedSecondary;
+  final T? selected;
 
-  final Widget Function(BuildContext context, T value) primaryItemBuilder;
-  final Widget Function(BuildContext context, T value) secondaryItemBuilder;
+  final Widget Function(BuildContext context, T value) itemBuilder;
 
-  final void Function(T value) onPrimaryChanged;
-  final void Function(T value) onSecondaryChanged;
+  final void Function(T value) onChanged;
 
   final int index;
-  final VoidCallback onDelete;
 
   const DropdownMenusTile({
     super.key,
     required this.title,
-    required this.primaryItems,
-    required this.secondaryItems,
-    required this.selectedPrimary,
-    required this.selectedSecondary,
-    required this.primaryItemBuilder,
-    required this.secondaryItemBuilder,
-    required this.onPrimaryChanged,
-    required this.onSecondaryChanged,
+    required this.items,
+    required this.selected,
+    required this.itemBuilder,
+    required this.onChanged,
     required this.index,
-    required this.onDelete,
   });
 
   @override
@@ -53,24 +43,15 @@ class _DropdownMenusTileState<T> extends State<DropdownMenusTile<T>> {
               AnimatedOpacity(
                 opacity: _hovering ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 200),
-                child: Row(
-                  children: [
-                    ReorderableDragStartListener(
-                      index: widget.index,
-                      child: InkWell(
-                        mouseCursor: SystemMouseCursors.move,
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.drag_handle),
-                        ),
-                      ),
+                child: ReorderableDragStartListener(
+                  index: widget.index,
+                  child: InkWell(
+                    mouseCursor: SystemMouseCursors.move,
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Icon(Icons.drag_handle),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: widget.onDelete,
-                      tooltip: 'Eliminar',
-                    ),
-                  ],
+                  ),
                 ),
               ),
               Expanded(
@@ -98,34 +79,18 @@ class _DropdownMenusTileState<T> extends State<DropdownMenusTile<T>> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
-                  // Dropdown principal (no editable)
-                  DropdownButtonFormField<T>(
-                    value: widget.selectedPrimary,
-                    items:
-                        widget.primaryItems.map((item) {
-                          return DropdownMenuItem<T>(
-                            value: item,
-                            child: widget.primaryItemBuilder(context, item),
-                          );
-                        }).toList(),
-                    onChanged: (value) {
-                      if (value != null) widget.onPrimaryChanged(value);
-                    },
-                    isExpanded: true,
-                  ),
-                  const SizedBox(height: 12),
                   // Dropdown secundario (normal)
                   DropdownButtonFormField<T>(
-                    value: widget.selectedSecondary,
+                    value: widget.selected,
                     items:
-                        widget.secondaryItems.map((item) {
+                        widget.items.map((item) {
                           return DropdownMenuItem<T>(
                             value: item,
-                            child: widget.secondaryItemBuilder(context, item),
+                            child: widget.itemBuilder(context, item),
                           );
                         }).toList(),
                     onChanged: (value) {
-                      if (value != null) widget.onSecondaryChanged(value);
+                      if (value != null) widget.onChanged(value);
                     },
                     isExpanded: true,
                   ),

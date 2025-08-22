@@ -45,15 +45,15 @@ class PivotTable():
             "identifier": self.identifier,
             "creation_date": self.creation_date.isoformat(),
             "last_edit": self.last_edit.isoformat(),
-            "category": self.category.name,
+            "category": self.category.value,
             "preview": self.preview,
             "source": self.source.to_dict(),
             "arguments": [argument.to_dict() for argument in self.arguments],
             "parameters": [parameter.to_dict() for parameter in self.parameters],
             "data": self.data,
-            "aggregate_function": self.aggregate_function.name,
-            "filter_function": self.filter_function.name,
-            "mode": self.mode.name
+            "aggregate_function": self.aggregate_function.value,
+            "filter_function": self.filter_function.value,
+            "mode": self.mode.value
         }
 
     @classmethod

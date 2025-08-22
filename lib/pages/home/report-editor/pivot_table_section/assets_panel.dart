@@ -15,8 +15,6 @@ class AssetsPanel extends StatefulWidget {
 }
 
 class _AssetsPanelState extends State<AssetsPanel> {
-  int selectedImageIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Stack(

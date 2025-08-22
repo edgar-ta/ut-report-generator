@@ -1,10 +1,10 @@
-from lib.slide_controller import SlideController
+from lib.image_slide.image_slide_controller import ImageSlideController
 from lib.sections.failure_rate.controller import FailureRate_Controller
 
 import zipfile
 import os
 
-AVAILABLE_SLIDE_CONTROLLERS: list[type[SlideController]] = [
+AVAILABLE_SLIDE_CONTROLLERS: list[type[ImageSlideController]] = [
     FailureRate_Controller
 ]
 
