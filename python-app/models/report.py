@@ -8,10 +8,10 @@ from models.slide_category import SlideCategory
 
 from control_variables import CURRENT_DIRECTORY_PATH, CURRENT_PROJECT_VERSION
 
-from pandas import Timestamp
 from pptx import Presentation
 from functools import cached_property
 
+import pandas
 import os
 import uuid
 import json
@@ -24,9 +24,9 @@ class Report:
             identifier: str,
             root_directory: str, 
             report_name: str, 
-            creation_date: Timestamp, 
-            last_edit: Timestamp,
-            last_open: Timestamp,
+            creation_date: pandas.Timestamp, 
+            last_edit: pandas.Timestamp,
+            last_open: pandas.Timestamp,
             slides: list[ImageSlide | PivotTable],
             version: str
             ) -> None:
@@ -66,11 +66,12 @@ class Report:
             raise DescriptiveError(message=f"El reporte no se puede abrir porque es de una versión desactualizada. La versión actual es {CURRENT_PROJECT_VERSION} y el reporte tiene {version}", http_error_code=400)
 
         return cls(
+            identifier=metadata['identifier'],
             root_directory=root_directory,
             report_name=metadata["report_name"],
-            creation_date=Timestamp(metadata["creation_date"]),
-            last_edit=Timestamp(metadata["last_edit"]),
-            last_open=Timestamp(metadata["last_open"]),
+            creation_date=pandas.Timestamp(metadata["creation_date"]),
+            last_edit=pandas.Timestamp(metadata["last_edit"]),
+            last_open=pandas.Timestamp(metadata["last_open"]),
             slides=[
                     ImageSlide.from_json(json_data=slide) 
                     if SlideCategory(slide["category"]) == SlideCategory.IMAGE_SLIDE
@@ -83,7 +84,7 @@ class Report:
     @classmethod
     def from_identifier(cls, identifier: str) -> "Report":
         for filename in os.listdir(get_reports_directory()):
-            directory_path = os.path.join(CURRENT_DIRECTORY_PATH, filename)
+            directory_path = os.path.join(get_reports_directory(), filename)
             if os.path.isdir(directory_path) and filename.endswith(identifier):
                 return Report.from_root_directory(root_directory=directory_path)
             
@@ -97,9 +98,9 @@ class Report:
             identifier=report_id,
             root_directory=root_directory_of_report(report_id),
             report_name="Mi reporte",
-            creation_date=Timestamp.now(),
-            last_edit=Timestamp.now(),
-            last_open=Timestamp.now(),
+            creation_date=pandas.Timestamp.now(),
+            last_edit=pandas.Timestamp.now(),
+            last_open=pandas.Timestamp.now(),
             slides=[],
             version=CURRENT_PROJECT_VERSION
         )
@@ -136,7 +137,6 @@ class Report:
             os.remove(self.rendered_file)
         
         presentation.save(self.rendered_file)
-        self.last_render = Timestamp.now()
 
     def add_slide(self, slide: Slide) -> None:
         self.slides.append(slide)

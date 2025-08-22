@@ -27,10 +27,10 @@ class ImageSlide():
         return {
             "name": self.name,
             "identifier": self.identifier,
-            "creation_date": self.creation_date,
+            "creation_date": self.creation_date.isoformat(),
             "last_edit": self.last_edit.isoformat(),
             "preview": self.preview,
-            "category": self.category,
+            "category": self.category.value,
             "arguments": self.arguments,
             "kind": self.kind.value,
         }

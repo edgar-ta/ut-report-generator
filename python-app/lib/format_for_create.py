@@ -7,9 +7,9 @@ def format_for_create(response: Report | ImageSlide | PivotTable) -> dict:
         return {
             "identifier": response.identifier,
             "report_name": response.report_name,
-            "creation_date": response.creation_date,
-            "last_edit": response.last_edit,
-            "last_open": response.last_open,
+            "creation_date": response.creation_date.isoformat(),
+            "last_edit": response.last_edit.isoformat(),
+            "last_open": response.last_open.isoformat(),
             "slides": [ format_for_create(response=slide) for slide in response.slides ]
         }
     

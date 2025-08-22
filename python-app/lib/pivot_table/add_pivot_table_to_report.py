@@ -1,19 +1,17 @@
-from lib.sections.failure_rate.source import get_clean_data_frame, read_excel, get_grades_statistics
-from lib.with_app_decorator import with_app
+from lib.sections.failure_rate.source import get_clean_data_frame
 from lib.get_or_panic import get_or_panic
-from lib.unique_list import unique_list
-from lib.file_extension import has_extension, get_file_extension
+from lib.file_extension import get_file_extension
 from lib.descriptive_error import DescriptiveError
-from lib.is_valid_career_name import is_valid_career_name
 from lib.directory_definitions import data_file_of_slide
+from lib.get_parameters_of_frame import get_parameters_of_frame
+from lib.get_data_of_frame import get_data_of_frame
 
 from models.pivot_table.self import PivotTable
 from models.pivot_table.aggregate_function_type import AggregateFunctionType
 from models.pivot_table.filter_function_type import FilterFunctionType
 from models.pivot_table.custom_indexer import CustomIndexer
-from lib.get_parameters_of_frame import get_parameters_of_frame
-from lib.get_data_of_frame import get_data_of_frame
 from models.pivot_table.data_source import DataSource
+from models.slide_category import SlideCategory
 from models.report import Report
 
 from flask import request
@@ -90,7 +88,7 @@ def add_pivot_table_to_report(report: Report, local_request, index: int | None) 
     data = get_data_of_frame(
         frame=main_frame, 
         indexers=arguments, 
-        filter_function=lambda x: x >= 7, 
+        filter_function=lambda x: x < 7, 
         aggregate_function=lambda values: len(values), 
         error_value=0
         )

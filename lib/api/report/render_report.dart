@@ -1,10 +1,10 @@
 import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
-Future<RenderReport_Response> renderReport({required String reportDirectory}) {
+Future<RenderReport_Response> renderReport({required String identifier}) {
   return sendRequest(
-    route: "render_report",
-    body: {"report_directory": reportDirectory},
+    route: "report/render",
+    body: {"report": identifier},
     callback: RenderReport_Response.fromJson,
   );
 }

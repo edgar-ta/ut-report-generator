@@ -54,6 +54,6 @@ def edit_pivot_table():
     report.save()
 
     return {
-        "parameters": parameters,
+        "parameters": [ parameter.to_dict() for parameter in parameters ],
         "data": data
     }, 200

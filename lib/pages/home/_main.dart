@@ -25,7 +25,7 @@ Future<ReportClass> _createNewReport(List<File> files) async {
 }
 
 Future<ReportClass> _importReportFromZip(List<File> files) async {
-  return importReport(reportFile: files[0].absolute.path);
+  return importReport(identifier: files[0].absolute.path);
 }
 
 enum PossibleOption {

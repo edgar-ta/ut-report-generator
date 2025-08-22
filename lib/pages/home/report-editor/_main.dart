@@ -16,33 +16,14 @@ import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
 import 'package:ut_report_generator/components/input_component.dart';
-import 'package:ut_report_generator/pages/home/report-editor/failure_section/widget.dart';
+import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/widget.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/widget.dart';
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
 import 'package:ut_report_generator/pages/home/report-editor/render_button.dart';
+import 'package:ut_report_generator/pages/home/report-editor/shimmer_slide.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
-
-Widget buildSlideEditor(
-  PivotTable slide,
-  Future<void> Function(String slideId, List<File> dataFiles) changeSlideData,
-  Future<void> Function(String slideId, Map<String, dynamic> arguments)
-  editSlide,
-) {
-  switch (slide.kind) {
-    case ImageSlideKind.failureRate:
-      return FailureSection(
-        slideData: slide,
-        editSlide: editSlide,
-        changeSlideData: changeSlideData,
-      );
-    case ImageSlideKind.average:
-      return Center(child: Text("Tipo de diapositiva no soportado"));
-    default:
-      return Center(child: Text("Tipo de diapositiva no soportado"));
-  }
-}
 
 class ReportEditor extends StatefulWidget {
   final Future<ReportClass> Function() reportCallback;
@@ -56,6 +37,12 @@ class ReportEditor extends StatefulWidget {
 class _ReportEditorState extends State<ReportEditor> {
   late TextEditingController reportNameController;
   ReportClass? report;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReport();
+  }
 
   Future<ReportClass> _loadReport() async {
     return waitAtLeast(Duration(seconds: 2), widget.reportCallback()).then((
@@ -127,54 +114,12 @@ class _ReportEditorState extends State<ReportEditor> {
     });
   }
 
-  void _setSlideData({
-    required String slideId,
-    String? preview,
-    Map<String, dynamic>? arguments,
-  }) {
-    setState(() {
-      var slides =
-          report!.slides.map((slide) {
-            if (slide.identifier == slideId) {
-              return slide.copyWith(arguments: arguments, preview: preview);
-            }
-            return slide;
-          }).toList();
-      var newReport = report!.copyWith(slides: slides);
-      report = newReport;
-    });
-  }
-
-  Future<void> _changeSlideData(String slideId, List<File> files) async {
-    return changeSlideData(
-      dataFiles: files.map((file) => file.absolute.path).toList(),
-      reportDirectory: report!.reportDirectory,
-      slideId: slideId,
-    ).then((value) {
-      _setSlideData(slideId: slideId, preview: value.preview);
-    });
-  }
-
-  Future<void> _editSlide(String slideId, Map<String, dynamic> arguments) {
-    return editSlide(
-      reportDirectory: report!.reportDirectory,
-      slideId: slideId,
-      arguments: arguments,
-    ).then((value) {
-      _setSlideData(
-        slideId: slideId,
-        preview: value.preview,
-        arguments: arguments,
-      );
-    });
-  }
-
   Future<RenderReport_Response> _renderReport() {
-    return renderReport(reportDirectory: report!.reportDirectory);
+    return renderReport(identifier: report!.identifier);
   }
 
   Future<ExportReport_Response> _exportReport() {
-    return exportReport(identifier: report!.reportDirectory);
+    return exportReport(identifier: report!.identifier);
   }
 
   Future<FileResponse> _renderReportAsPdf() {
@@ -211,23 +156,29 @@ class _ReportEditorState extends State<ReportEditor> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 64),
         child: Column(
-          children: [
-            ...(report!.slides.map((slide) {
-              if (slide is PivotTable) {
-                return PivotTableSection(
-                  initialTable: slide,
-                  editSlide: editSlide,
-                  changeSlideData: changeSlideData,
-                  editionPaneBuilder: editionPaneBuilder,
-                  metadataPane: metadataPane,
-                );
-              }
-              if (slide is ImageSlide) {
-                return ImageSlideSection(initialSlide: slide);
-              }
-              return Text("Tipo de slide inválido");
-            }).toList()),
-          ],
+          spacing: 16,
+          children:
+              report != null
+                  ? ([
+                    ...(report!.slides.map((slide) {
+                      if (slide is PivotTable) {
+                        return PivotTableSection(
+                          report: report!.identifier,
+                          initialPivotTable: slide,
+                          updateSlide: (index, slide) {
+                            setState(() {
+                              report!.slides[index] = slide;
+                            });
+                          },
+                        );
+                      }
+                      if (slide is ImageSlide) {
+                        return ImageSlideSection(initialSlide: slide);
+                      }
+                      return Text("Tipo de slide inválido");
+                    }).toList()),
+                  ])
+                  : [ShimmerSlide(), ShimmerSlide()],
         ),
       ),
     );

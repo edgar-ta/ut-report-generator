@@ -1,1 +1,1 @@
-enum SlideCategory { pivotTable, image }
+enum SlideCategory { pivotTable, imageSlide }

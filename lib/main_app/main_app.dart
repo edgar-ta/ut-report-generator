@@ -42,7 +42,7 @@ class MainApp extends StatelessWidget {
       reportCallback:
           () => Future(
             () => StartReport_Response(
-              reportDirectory:
+              identifier:
                   r"D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\python-app\reports\ce4efb78-60bf-4745-8015-ec1dd3aa3d04",
               reportName: "Mi reporte",
               creationDate: DateTime.now(),
@@ -55,8 +55,6 @@ class MainApp extends StatelessWidget {
                       "D:\\college\\cuatrimestre-6\\2025-06-16--estadias\\ut-report-generator\\python-app\\reports\\e706722b-7d8b-4d24-92c8-97f16e3f5470\\slides\\78173aaf-780c-41d7-95cd-bace3038263e\\preview.png",
                 ),
               ],
-              renderedFile:
-                  "D:\\college\\cuatrimestre-6\\2025-06-16--estadias\\ut-report-generator\\python-app\\reports\\e706722b-7d8b-4d24-92c8-97f16e3f5470\\Mi reporte.pptx",
             ),
           ),
     );
