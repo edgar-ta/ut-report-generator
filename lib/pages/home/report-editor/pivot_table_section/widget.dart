@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/api/pivot_table/edit_pivot_table.dart';
 import 'package:ut_report_generator/models/pivot_table/custom_indexer.dart';
+import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/assets_panel.dart';
@@ -12,8 +13,24 @@ import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section
 import 'package:ut_report_generator/testing_components/chips_tile.dart';
 import 'package:ut_report_generator/testing_components/dropdown_menus_tile.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
+import 'package:ut_report_generator/utils/copy_with_replacement.dart';
 import 'package:ut_report_generator/utils/copy_without.dart';
 import 'package:ut_report_generator/utils/reorder_element.dart';
+
+String levelToSpanish(PivotTableLevel level) {
+  switch (level) {
+    case PivotTableLevel.gradeType:
+      return "Número o letra";
+    case PivotTableLevel.group:
+      return "Grupo";
+    case PivotTableLevel.professor:
+      return "Profesor";
+    case PivotTableLevel.subject:
+      return "Materia";
+    case PivotTableLevel.unit:
+      return "Unidad";
+  }
+}
 
 class PivotTableSection extends StatefulWidget {
   String report;
@@ -52,6 +69,10 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       });
   }
 
+  Future<void> reorderFilter(int oldIndex, int newIndex) async {
+    // var indexOfSeparator = editTabComponents;
+  }
+
   Future<void> updatePivotTable() async {
     if (isLoading) return;
     setState(() {
@@ -66,6 +87,16 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       );
 
       setState(() {
+        var indexOfSeparator = editTabComponents.indexOf(-1);
+        for (var i = 0; i < indexOfSeparator; i++) {
+          var identifier = editTabComponents[i];
+          pivotTable.arguments[identifier].values[0] =
+              pivotTable.parameters[identifier].values[0];
+          // filter0, separator, filter1, filter2
+          // filter1, separator, filter0, filter2
+          // pivotTable.arguments[identifier]. = response.parameters[identifier];
+        }
+
         pivotTable = pivotTable.copyWith(
           parameters: response.parameters,
           data: response.data,
@@ -89,8 +120,6 @@ class _PivotTableSectionState extends State<PivotTableSection> {
   @override
   Widget build(BuildContext context) {
     var positionOfSeparator = editTabComponents.indexOf(-1);
-    var allLevels =
-        pivotTable.parameters.map((parameter) => parameter.level).toList();
 
     return SlideFrame(
       menuWidth: 512,
@@ -111,21 +140,30 @@ class _PivotTableSectionState extends State<PivotTableSection> {
               if (index < positionOfSeparator) {
                 return DropdownMenusTile<String>(
                   key: ValueKey(id),
-                  title: parameters.level,
+                  title: levelToSpanish(parameters.level),
                   items: parameters.values,
                   selected: arguments.values[0],
                   itemBuilder: (context, value) {
                     return Text(value);
                   },
-                  onChanged: (value) {
-                    //
+                  onChanged: (value) async {
+                    setState(() {
+                      pivotTable = pivotTable.copyWith(
+                        arguments: copyWithReplacement(
+                          pivotTable.arguments,
+                          id,
+                          (indexer) => indexer.copyWith(values: [value]),
+                        ),
+                      );
+                    });
+                    await updatePivotTable();
                   },
                   index: index,
                 );
               }
               return ChipsTile<String>(
                 key: ValueKey(id),
-                title: parameters.level,
+                title: levelToSpanish(parameters.level),
                 entries:
                     parameters.values.map((parameter) {
                       return ChipsTileEntry(

@@ -1,21 +1,23 @@
+import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
+
 class CustomIndexer {
-  final String level;
+  final PivotTableLevel level;
   final List<String> values;
 
   CustomIndexer({required this.level, required this.values});
 
   Map<String, dynamic> toJson() {
-    return {"level": level, "values": values};
+    return {"level": level.name, "values": values};
   }
 
   factory CustomIndexer.fromJson(Map<String, dynamic> json) {
     return CustomIndexer(
-      level: json["level"],
+      level: PivotTableLevel.values.byName(json["level"]),
       values: List<String>.from(json["values"]),
     );
   }
 
-  CustomIndexer copyWith({String? level, List<String>? values}) {
+  CustomIndexer copyWith({PivotTableLevel? level, List<String>? values}) {
     return CustomIndexer(
       level: level ?? this.level,
       values: values ?? this.values,

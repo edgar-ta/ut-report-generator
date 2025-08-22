@@ -40,7 +40,7 @@ def get_data_of_frame(
 
             return {
                 value: get_data_of_frame(
-                    frame=cross_section(data_frame=frame, key=value, level=indexer.level), 
+                    frame=cross_section(data_frame=frame, key=value, level=indexer.level.value), 
                     indexers=other_indexers, 
                     filter_function=filter_function,
                     aggregate_function=aggregate_function,

@@ -10,11 +10,11 @@ def get_parameters_of_frame(frame: pandas.DataFrame, indexers: list[CustomIndexe
     for indexer in indexers:
         result_indexer = CustomIndexer(
             level=indexer.level,
-            values=unique_list(frame.index.get_level_values(level=indexer.level))
+            values=unique_list(frame.index.get_level_values(level=indexer.level.value))
         )
         result_indexers.append(result_indexer)
 
         if indexer == indexers[-1]: break
-        frame = cross_section(data_frame=frame, key=indexer.values, level=indexer.level)
+        frame = cross_section(data_frame=frame, key=indexer.values, level=indexer.level.value)
     
     return result_indexers

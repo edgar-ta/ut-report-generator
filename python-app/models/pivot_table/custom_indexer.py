@@ -1,5 +1,7 @@
+from models.pivot_table.pivot_table_level import PivotTableLevel
+
 class CustomIndexer:
-    def __init__(self, level: str, values: list[str]):
+    def __init__(self, level: PivotTableLevel, values: list[str]):
         self.level = level
         self.values: list[str] = values
     
@@ -9,13 +11,13 @@ class CustomIndexer:
     def to_dict(self) -> dict:
         """Convierte la instancia en un diccionario serializable a JSON."""
         return {
-            "level": self.level,
+            "level": self.level.value,
             "values": self.values,
         }
     
     @classmethod
     def from_json(cls, data: dict[str, any]) -> "CustomIndexer":
         return cls(
-            level=data["level"],
+            level=PivotTableLevel(data["level"]),
             values=data["values"]
         )
