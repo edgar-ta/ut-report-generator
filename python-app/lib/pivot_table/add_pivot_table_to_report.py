@@ -1,3 +1,5 @@
+from control_variables import DATA_NESTING_LEVEL
+
 from lib.get_or_panic import get_or_panic
 from lib.file_extension import get_file_extension
 from lib.descriptive_error import DescriptiveError
@@ -75,26 +77,22 @@ def add_pivot_table_to_report(report: Report, local_request, index: int | None) 
         *[ CustomIndexer(level=PivotTableLevel(name), values=[]) for name in main_frame_names[1:] ]
     ]
 
-    parameters = get_parameters_of_frame(frame=main_frame, indexers=arguments)
+    parameters, valid_arguments = get_parameters_of_frame(frame=main_frame, arguments=arguments)
 
-    arguments = [ 
-        CustomIndexer(level=PivotTableLevel(first_main_frame_name), values=[ first_level_value ]), 
-        *(parameters[1:])
-    ]
     filter_function = FilterFunctionType.FAILED_STUDENTS
     aggregate_function = AggregateFunctionType.COUNT
 
     data = get_data_of_frame(
         frame=main_frame, 
-        indexers=arguments, 
+        indexers=valid_arguments, 
         filter_function=filter_function, 
         aggregate_function=aggregate_function, 
-        error_value=0
+        nesting_level=DATA_NESTING_LEVEL
         )
     
     pivot_table = PivotTable(
         aggregate_function=aggregate_function,
-        arguments=arguments,
+        arguments=valid_arguments,
         creation_date=pd.Timestamp.now(),
         data=data,
         filter_function=filter_function,

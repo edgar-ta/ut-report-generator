@@ -19,7 +19,7 @@ def get_data_of_frame(
         indexers: list[CustomIndexer], 
         filter_function: FilterFunctionType, 
         aggregate_function: AggregateFunctionType, 
-        error_value: float
+        nesting_level=2
         ):
     match indexers:
         case []:
@@ -34,9 +34,18 @@ def get_data_of_frame(
                 return value
             except Exception as error:
                 print(error)
-                return error_value
+                return 0
         case [indexer, *other_indexers]:
             indexer, *other_indexers = indexers
+
+            if len(other_indexers) >= nesting_level:
+                return get_data_of_frame(
+                    frame=cross_section(data_frame=frame, key=indexer.values[0], level=indexer.level.value), 
+                    indexers=other_indexers, 
+                    filter_function=filter_function,
+                    aggregate_function=aggregate_function,
+                    nesting_level=nesting_level
+                    )
 
             return {
                 value: get_data_of_frame(
@@ -44,7 +53,7 @@ def get_data_of_frame(
                     indexers=other_indexers, 
                     filter_function=filter_function,
                     aggregate_function=aggregate_function,
-                    error_value=error_value
+                    nesting_level=nesting_level
                     )
                 for value in indexer.values
             }

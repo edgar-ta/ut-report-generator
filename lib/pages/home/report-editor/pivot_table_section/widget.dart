@@ -7,13 +7,11 @@ import 'package:ut_report_generator/models/pivot_table/custom_indexer.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
-import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/assets_panel.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/slide_frame.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/tabbed_menu.dart';
 import 'package:ut_report_generator/testing_components/chips_tile.dart';
 import 'package:ut_report_generator/testing_components/dropdown_menus_tile.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
-import 'package:ut_report_generator/utils/copy_with_replacement.dart';
 import 'package:ut_report_generator/utils/copy_without.dart';
 import 'package:ut_report_generator/utils/reorder_element.dart';
 
@@ -33,6 +31,11 @@ String levelToSpanish(PivotTableLevel level) {
 }
 
 class PivotTableSection extends StatefulWidget {
+  // ignore: non_constant_identifier_names
+  static String SHOW_SECTION_KEY = "showValues";
+  // ignore: non_constant_identifier_names
+  static int MANDATORY_SHOW_FILTERS = 2;
+
   String report;
   PivotTable initialPivotTable;
   void Function(int index, Slide slide) updateSlide;
@@ -49,9 +52,10 @@ class PivotTableSection extends StatefulWidget {
 }
 
 class _PivotTableSectionState extends State<PivotTableSection> {
-  late PivotTable pivotTable;
   bool isLoading = false;
-  List<int> editTabComponents = [0, -1, 1, 2];
+
+  late PivotTable pivotTable;
+  late List<String> menuComponents;
 
   int touchedGroupIndex = -1;
   int touchedRodIndex = -1;
@@ -67,10 +71,53 @@ class _PivotTableSectionState extends State<PivotTableSection> {
           pivotTable = pivotTable.copyWith(name: nameController.text);
         });
       });
+
+    menuComponents =
+        pivotTable.arguments.map((argument) => argument.level.name).toList();
+    menuComponents.insert(1, PivotTableSection.SHOW_SECTION_KEY);
   }
 
+  CustomIndexer getIndexer(
+    List<CustomIndexer> indexers,
+    PivotTableLevel level,
+  ) {
+    return indexers.firstWhere((element) => element.level == level);
+  }
+
+  /// Reorders a filter of the pivot table keeping in mind the following
+  /// constraings:
+  /// - The number of filters after the separator is two, as a maximum
+  /// - The number of separators in any side of the separator is always
+  /// at least one
   Future<void> reorderFilter(int oldIndex, int newIndex) async {
-    // var indexOfSeparator = editTabComponents;
+    var indexOfSeparator = menuComponents.indexOf(
+      PivotTableSection.SHOW_SECTION_KEY,
+    );
+
+    var elementsBeforeSeparator = indexOfSeparator;
+    var elementsAfterSeparator = menuComponents.length - indexOfSeparator - 1;
+
+    if (oldIndex < indexOfSeparator &&
+        newIndex > indexOfSeparator &&
+        elementsBeforeSeparator == 1) {
+      return;
+    }
+    if (oldIndex > indexOfSeparator &&
+        newIndex <= indexOfSeparator &&
+        elementsAfterSeparator == 1) {
+      return;
+    }
+
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
+    setState(() {
+      var element = menuComponents.removeAt(oldIndex);
+      menuComponents.insert(newIndex, element);
+    });
+
+    await updatePivotTable();
   }
 
   Future<void> updatePivotTable() async {
@@ -80,25 +127,23 @@ class _PivotTableSectionState extends State<PivotTableSection> {
     });
 
     try {
+      var orderedArguments =
+          menuComponents
+              .where((element) => element != PivotTableSection.SHOW_SECTION_KEY)
+              .map((element) => PivotTableLevel.values.byName(element))
+              .map((level) => getIndexer(pivotTable.arguments, level))
+              .toList();
+
       final response = await editPivotTable(
         report: widget.report,
         pivotTable: pivotTable.identifier,
-        arguments: pivotTable.arguments,
+        arguments: orderedArguments,
       );
 
       setState(() {
-        var indexOfSeparator = editTabComponents.indexOf(-1);
-        for (var i = 0; i < indexOfSeparator; i++) {
-          var identifier = editTabComponents[i];
-          pivotTable.arguments[identifier].values[0] =
-              pivotTable.parameters[identifier].values[0];
-          // filter0, separator, filter1, filter2
-          // filter1, separator, filter0, filter2
-          // pivotTable.arguments[identifier]. = response.parameters[identifier];
-        }
-
         pivotTable = pivotTable.copyWith(
           parameters: response.parameters,
+          arguments: response.arguments,
           data: response.data,
         );
       });
@@ -106,7 +151,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       // Manejo simple de errores
       debugPrint("Error updating pivot table: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to update pivot table")),
+        const SnackBar(content: Text("No se pudo actualizar el gráfico")),
       );
     } finally {
       if (mounted) {
@@ -119,128 +164,142 @@ class _PivotTableSectionState extends State<PivotTableSection> {
 
   @override
   Widget build(BuildContext context) {
-    var positionOfSeparator = editTabComponents.indexOf(-1);
+    var positionOfSeparator = menuComponents.indexOf(
+      PivotTableSection.SHOW_SECTION_KEY,
+    );
 
     return SlideFrame(
       menuWidth: 512,
       menuContent: TabbedMenu(
         editTabBuilder: (_) {
-          return ReorderableListView(
-            buildDefaultDragHandles: false,
-            children: List.generate(editTabComponents.length, (index) {
-              var id = editTabComponents[index];
-              if (id == -1) {
-                return ListTile(key: ValueKey(id), title: Text("Filtrar por"));
-              }
-
-              var parameters = pivotTable.parameters[id];
-              var arguments = pivotTable.arguments[id];
-              var level = parameters.level;
-
-              if (index < positionOfSeparator) {
-                return DropdownMenusTile<String>(
-                  key: ValueKey(id),
-                  title: levelToSpanish(parameters.level),
-                  items: parameters.values,
-                  selected: arguments.values[0],
-                  itemBuilder: (context, value) {
-                    return Text(value);
-                  },
-                  onChanged: (value) async {
-                    setState(() {
-                      pivotTable = pivotTable.copyWith(
-                        arguments: copyWithReplacement(
-                          pivotTable.arguments,
-                          id,
-                          (indexer) => indexer.copyWith(values: [value]),
+          return Column(
+            children: [
+              ListTile(
+                title: Text(
+                  "Filtrar por",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+              ),
+              Expanded(
+                child: ReorderableListView(
+                  buildDefaultDragHandles: false,
+                  onReorder: reorderFilter,
+                  children: List.generate(menuComponents.length, (index) {
+                    var id = menuComponents[index];
+                    if (id == PivotTableSection.SHOW_SECTION_KEY) {
+                      return ListTile(
+                        key: ValueKey(id),
+                        title: Text(
+                          "Mostrar",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       );
-                    });
-                    await updatePivotTable();
-                  },
-                  index: index,
-                );
-              }
-              return ChipsTile<String>(
-                key: ValueKey(id),
-                title: levelToSpanish(parameters.level),
-                entries:
-                    parameters.values.map((parameter) {
-                      return ChipsTileEntry(
-                        key: ValueKey(parameter),
-                        value: parameter,
-                        selected: arguments.values.contains(parameter),
+                    }
+
+                    var level = PivotTableLevel.values.byName(id);
+                    var parameters = getIndexer(pivotTable.parameters, level);
+                    var arguments = getIndexer(pivotTable.arguments, level);
+
+                    if (index < positionOfSeparator) {
+                      return DropdownMenusTile<String>(
+                        key: ValueKey(id),
+                        title: levelToSpanish(parameters.level),
+                        items: parameters.values,
+                        selected: arguments.values[0],
+                        itemBuilder: (context, value) {
+                          return Text(value);
+                        },
+                        onChanged: (value) async {
+                          setState(() {
+                            pivotTable = pivotTable.copyWith(
+                              arguments:
+                                  pivotTable.arguments
+                                      .map(
+                                        (argument) =>
+                                            argument.level == level
+                                                ? argument.copyWith(
+                                                  values: [value],
+                                                )
+                                                : argument,
+                                      )
+                                      .toList(),
+                            );
+                          });
+                          await updatePivotTable();
+                        },
+                        index: index,
                       );
-                    }).toList(),
-                chipBuilder: (context, value, isSelected) {
-                  return FilterChip(
-                    label: Text(value),
-                    onSelected: (innerIsSelected) async {
-                      if (innerIsSelected) {
-                        setState(() {
-                          pivotTable = pivotTable.copyWith(
-                            arguments:
-                                pivotTable.arguments
-                                    .map(
-                                      (argument) =>
-                                          argument.level != level
-                                              ? argument
-                                              : argument.copyWith(
-                                                values: copyWithAdded(
-                                                  argument.values,
-                                                  value,
-                                                ),
-                                              ),
-                                    )
-                                    .toList(),
-                          );
-                        });
-                        await updatePivotTable();
-                      } else {
-                        if (pivotTable.arguments[id].values.length == 1) return;
-                        setState(() {
-                          pivotTable = pivotTable.copyWith(
-                            arguments:
-                                pivotTable.arguments
-                                    .map(
-                                      (argument) =>
-                                          argument.level != level
-                                              ? argument
-                                              : argument.copyWith(
-                                                values: copyWithout(
-                                                  argument.values,
-                                                  value,
-                                                ),
-                                              ),
-                                    )
-                                    .toList(),
-                          );
-                        });
-                        await updatePivotTable();
-                      }
-                    },
-                    selected: isSelected,
-                  );
-                },
-                index: index,
-              );
-            }),
-            onReorder: (oldIndex, newIndex) {
-              setState(() {
-                pivotTable = pivotTable.copyWith(
-                  parameters: reorderElement(
-                    pivotTable.parameters,
-                    oldIndex,
-                    newIndex,
-                  ),
-                  arguments: reorderElement(
-                    pivotTable.arguments,
-                    oldIndex,
-                    newIndex,
-                  ),
-                );
-              });
-            },
+                    }
+                    return ChipsTile<String>(
+                      key: ValueKey(id),
+                      title: levelToSpanish(parameters.level),
+                      entries:
+                          parameters.values.map((parameter) {
+                            return ChipsTileEntry(
+                              key: ValueKey(parameter),
+                              value: parameter,
+                              selected: arguments.values.contains(parameter),
+                            );
+                          }).toList(),
+                      chipBuilder: (context, value, isSelected) {
+                        return FilterChip(
+                          label: Text(value),
+                          onSelected: (innerIsSelected) async {
+                            if (innerIsSelected) {
+                              setState(() {
+                                pivotTable = pivotTable.copyWith(
+                                  arguments:
+                                      pivotTable.arguments
+                                          .map(
+                                            (argument) =>
+                                                argument.level != level
+                                                    ? argument
+                                                    : argument.copyWith(
+                                                      values: copyWithAdded(
+                                                        argument.values,
+                                                        value,
+                                                      ),
+                                                    ),
+                                          )
+                                          .toList(),
+                                );
+                              });
+                              await updatePivotTable();
+                            } else {
+                              if (arguments.values.length == 1) return;
+                              setState(() {
+                                pivotTable = pivotTable.copyWith(
+                                  arguments:
+                                      pivotTable.arguments
+                                          .map(
+                                            (argument) =>
+                                                argument.level != level
+                                                    ? argument
+                                                    : argument.copyWith(
+                                                      values: copyWithout(
+                                                        argument.values,
+                                                        value,
+                                                      ),
+                                                    ),
+                                          )
+                                          .toList(),
+                                );
+                              });
+                              await updatePivotTable();
+                            }
+                          },
+                          selected: isSelected,
+                        );
+                      },
+                      index: index,
+                    );
+                  }),
+                ),
+              ),
+            ],
           );
         },
         metadataTabBuilder: (_) {
@@ -336,16 +395,13 @@ class _PivotTableSectionState extends State<PivotTableSection> {
                         showTitles: true,
                         reservedSize: 30,
                         getTitlesWidget: (value, meta) {
-                          var entry =
-                              (pivotTable.data[pivotTable
-                                          .arguments[editTabComponents[0]]
-                                          .values[0]]
-                                      as Map<String, dynamic>)
-                                  .entries
-                                  .toList()[value.toInt()];
+                          var title =
+                              pivotTable.data.entries
+                                  .toList()[value.toInt()]
+                                  .key;
                           return SideTitleWidget(
                             meta: meta,
-                            child: Text(entry.key),
+                            child: Text(title),
                           );
                         },
                       ),
@@ -363,8 +419,6 @@ class _PivotTableSectionState extends State<PivotTableSection> {
                         });
                         return;
                       }
-                      // barTouchResponse.spot!.touchedBarGroupIndex;
-                      // barTouchResponse.spot!.touchedRodDataIndex;
                       setState(() {
                         touchedGroupIndex =
                             barTouchResponse.spot!.touchedBarGroupIndex;
@@ -379,16 +433,9 @@ class _PivotTableSectionState extends State<PivotTableSection> {
                               Theme.of(context).colorScheme.primaryContainer,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         var groupData =
-                            (pivotTable.data[pivotTable
-                                        .arguments[editTabComponents[0]]
-                                        .values[0]]
-                                    as Map<String, dynamic>)
-                                .entries
-                                .toList()[groupIndex];
+                            pivotTable.data.entries.toList()[groupIndex];
                         var rodTitle =
-                            (groupData.value as Map<String, dynamic>).entries
-                                .toList()[rodIndex]
-                                .key;
+                            groupData.value.entries.toList()[rodIndex].key;
                         return BarTooltipItem(
                           "$rodTitle\n",
                           TextStyle(
@@ -409,54 +456,43 @@ class _PivotTableSectionState extends State<PivotTableSection> {
                     ),
                   ),
                   barGroups:
-                      (pivotTable.data[pivotTable
-                                  .arguments[editTabComponents[0]]
-                                  .values[0]]
-                              as Map<String, dynamic>)
-                          .entries
-                          .toList()
-                          .asMap()
-                          .entries
-                          .map((outerEntry) {
-                            final groupIndex = outerEntry.key;
-                            // final teacherName = outerEntry.value.key;
-                            final units =
-                                outerEntry.value.value as Map<String, dynamic>;
+                      pivotTable.data.entries.indexed.map((outerParameters) {
+                        final (groupIndex, groupEntry) = outerParameters;
+                        final groupData = groupEntry.value;
 
-                            return BarChartGroupData(
-                              x: groupIndex,
-                              barsSpace: 8,
-                              barRods:
-                                  units.entries.indexed.map((parameters) {
-                                    var (rodIndex, unitEntry) = parameters;
-                                    var isTouched =
-                                        rodIndex == touchedRodIndex &&
-                                        groupIndex == touchedGroupIndex;
+                        return BarChartGroupData(
+                          x: groupIndex,
+                          barsSpace: 8,
+                          barRods:
+                              groupData.entries.indexed.map((parameters) {
+                                var (rodIndex, rodEntry) = parameters;
+                                var isTouched =
+                                    rodIndex == touchedRodIndex &&
+                                    groupIndex == touchedGroupIndex;
 
-                                    final value =
-                                        (unitEntry.value as num).toDouble();
-                                    return BarChartRodData(
-                                      toY: value,
-                                      width: 256 / units.entries.length,
-                                      borderRadius: BorderRadius.vertical(
-                                        bottom: Radius.zero,
-                                        top: Radius.circular(8),
-                                      ),
-                                      color: Colors.blue,
-                                      borderSide: BorderSide(
-                                        color: const Color.fromARGB(
-                                          255,
-                                          0,
-                                          247,
-                                          255,
-                                        ),
-                                        width: isTouched ? 8 : 0,
-                                      ),
-                                    );
-                                  }).toList(),
-                            );
-                          })
-                          .toList(),
+                                final value =
+                                    (rodEntry.value as num).toDouble();
+                                return BarChartRodData(
+                                  toY: value,
+                                  width: 256 / groupData.entries.length,
+                                  borderRadius: BorderRadius.vertical(
+                                    bottom: Radius.zero,
+                                    top: Radius.circular(8),
+                                  ),
+                                  color: Colors.blue,
+                                  borderSide: BorderSide(
+                                    color: const Color.fromARGB(
+                                      255,
+                                      0,
+                                      247,
+                                      255,
+                                    ),
+                                    width: isTouched ? 8 : 0,
+                                  ),
+                                );
+                              }).toList(),
+                        );
+                      }).toList(),
                 ),
               ),
             ),

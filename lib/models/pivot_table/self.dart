@@ -17,7 +17,7 @@ class PivotTable implements Slide {
   final DataSource source;
   final List<CustomIndexer> arguments;
   final List<CustomIndexer> parameters;
-  final Map<String, dynamic> data;
+  final Map<String, Map<String, double>> data;
   final AggregateFunctionType aggregateFunction;
   final FilterFunctionType filterFunction;
   final SlideCategory mode;
@@ -71,7 +71,17 @@ class PivotTable implements Slide {
           (json["parameters"] as List)
               .map((e) => CustomIndexer.fromJson(e))
               .toList(),
-      data: Map<String, dynamic>.from(json["data"]),
+      data: (json["data"] as Map<String, dynamic>).map(
+        (key, value) => MapEntry(
+          key,
+          (value as Map<String, dynamic>).map(
+            (innerKey, innerValue) => MapEntry(
+              innerKey,
+              (innerValue as num).toDouble(), // asegura double
+            ),
+          ),
+        ),
+      ),
       aggregateFunction: AggregateFunctionType.values.firstWhere(
         (e) => e.name == json["aggregate_function"],
       ),
@@ -91,7 +101,7 @@ class PivotTable implements Slide {
     DataSource? source,
     List<CustomIndexer>? arguments,
     List<CustomIndexer>? parameters,
-    Map<String, dynamic>? data,
+    Map<String, Map<String, double>>? data,
     AggregateFunctionType? aggregateFunction,
     FilterFunctionType? filterFunction,
     SlideCategory? mode,

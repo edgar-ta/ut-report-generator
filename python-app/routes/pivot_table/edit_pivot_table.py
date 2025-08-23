@@ -1,11 +1,13 @@
+from control_variables import DATA_NESTING_LEVEL
+
 from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
 from lib.descriptive_error import DescriptiveError
+from lib.get_parameters_of_frame import get_parameters_of_frame
+from lib.get_data_of_frame import get_data_of_frame
 
 from models.pivot_table.self import PivotTable
 from models.pivot_table.custom_indexer import CustomIndexer
-from lib.get_parameters_of_frame import get_parameters_of_frame
-from lib.get_data_of_frame import get_data_of_frame
 from models.report import Report
 
 from flask import request
@@ -37,16 +39,17 @@ def edit_pivot_table():
     
     data_frame = read_data_source(file_path=data_frame)
 
-    parameters = get_parameters_of_frame(frame=data_frame, indexers=arguments)
+    parameters, valid_arguments = get_parameters_of_frame(frame=data_frame, arguments=arguments)
+
     data = get_data_of_frame(
         frame=data_frame, 
-        indexers=arguments,
+        indexers=valid_arguments,
         aggregate_function=pivot_table.aggregate_function,
         filter_function=pivot_table.filter_function,
-        error_value=0
+        nesting_level=DATA_NESTING_LEVEL
         )
 
-    pivot_table.arguments = arguments
+    pivot_table.arguments = valid_arguments
     pivot_table.parameters = parameters
     pivot_table.data = data
     pivot_table.last_edit = pandas.Timestamp.now()
@@ -55,5 +58,6 @@ def edit_pivot_table():
 
     return {
         "parameters": [ parameter.to_dict() for parameter in parameters ],
+        "arguments": [ argument.to_dict() for argument in valid_arguments ],
         "data": data
     }, 200
