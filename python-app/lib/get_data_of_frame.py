@@ -14,6 +14,14 @@ def flatten_to_series(obj: pandas.DataFrame | pandas.Series) -> pandas.Series:
     else:
         raise TypeError("Expected a pandas DataFrame or Series")
 
+def lenient_cross_section(data_frame: pandas.DataFrame, key: list[str], level: str) -> pandas.DataFrame:
+    try:
+        return cross_section(data_frame=data_frame, key=key, level=level)
+    except KeyError as e:
+        print(e)
+        new_frame = pandas.DataFrame(index=data_frame.index)
+        return new_frame
+
 def get_data_of_frame(
         frame: pandas.DataFrame, 
         indexers: list[CustomIndexer], 
@@ -40,7 +48,7 @@ def get_data_of_frame(
 
             if len(other_indexers) >= nesting_level:
                 return get_data_of_frame(
-                    frame=cross_section(data_frame=frame, key=indexer.values[0], level=indexer.level.value), 
+                    frame=lenient_cross_section(data_frame=frame, key=indexer.values[0], level=indexer.level.value), 
                     indexers=other_indexers, 
                     filter_function=filter_function,
                     aggregate_function=aggregate_function,
@@ -49,7 +57,7 @@ def get_data_of_frame(
 
             return {
                 value: get_data_of_frame(
-                    frame=cross_section(data_frame=frame, key=value, level=indexer.level.value), 
+                    frame=lenient_cross_section(data_frame=frame, key=value, level=indexer.level.value), 
                     indexers=other_indexers, 
                     filter_function=filter_function,
                     aggregate_function=aggregate_function,

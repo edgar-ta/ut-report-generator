@@ -9,8 +9,8 @@ import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/slide_frame.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/tabbed_menu.dart';
-import 'package:ut_report_generator/testing_components/chips_tile.dart';
-import 'package:ut_report_generator/testing_components/dropdown_menus_tile.dart';
+import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/chips_tile.dart';
+import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/dropdown_menus_tile.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
 import 'package:ut_report_generator/utils/copy_without.dart';
 import 'package:ut_report_generator/utils/reorder_element.dart';
@@ -96,20 +96,26 @@ class _PivotTableSectionState extends State<PivotTableSection> {
 
     var elementsBeforeSeparator = indexOfSeparator;
     var elementsAfterSeparator = menuComponents.length - indexOfSeparator - 1;
-
-    if (oldIndex < indexOfSeparator &&
-        newIndex > indexOfSeparator &&
-        elementsBeforeSeparator == 1) {
-      return;
-    }
-    if (oldIndex > indexOfSeparator &&
-        newIndex <= indexOfSeparator &&
-        elementsAfterSeparator == 1) {
-      return;
-    }
+    var goesForward =
+        oldIndex < indexOfSeparator && newIndex >= indexOfSeparator;
 
     if (newIndex > oldIndex) {
       newIndex -= 1;
+    }
+
+    if ((goesForward && elementsBeforeSeparator <= 1) ||
+        (goesForward && elementsAfterSeparator >= 2)) {
+      if (newIndex == indexOfSeparator) {
+        return;
+      }
+      setState(() {
+        var element = menuComponents.removeAt(oldIndex);
+        var separator = menuComponents.removeAt(indexOfSeparator - 1);
+        menuComponents.insert(indexOfSeparator, separator);
+        menuComponents.insert(newIndex, element);
+      });
+      await updatePivotTable();
+      return;
     }
 
     setState(() {

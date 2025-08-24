@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/utils/control_variables.dart';
+import 'package:ut_report_generator/utils/design_constants.dart';
 
 class SlideFrame extends StatefulWidget {
   final Widget child;
@@ -33,8 +34,7 @@ class _SlideFrameState extends State<SlideFrame> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight =
-        MediaQuery.of(context).size.height - APP_BAR_HEIGHT * 2;
+    final screenHeight = slideHeight(context);
     final screenWidth = MediaQuery.of(context).size.width;
 
     return SizedBox(

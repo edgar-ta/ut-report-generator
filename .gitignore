@@ -9,6 +9,8 @@ etc/
 venv/
 
 python-app/venv/
+python-app/build/
+python-app/dist/
 
 # Miscellaneous
 *.class

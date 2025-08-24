@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/models/profile.dart';
 import 'package:ut_report_generator/models/report.dart';
@@ -8,10 +7,7 @@ import 'package:ut_report_generator/pages/home/_main.dart';
 import 'package:ut_report_generator/pages/home/report-editor/_main.dart';
 import 'package:ut_report_generator/main_app/route_observer.dart';
 import 'package:ut_report_generator/pages/profile/_main.dart';
-import 'package:ut_report_generator/testing_components/charts_screen.dart';
-import 'package:ut_report_generator/testing_components/chips_tile.dart';
-import 'package:ut_report_generator/testing_components/dropdown_menus_tile.dart';
-import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/slide_frame.dart';
+import 'package:ut_report_generator/testing_components/testing_component.dart';
 import 'package:ut_report_generator/utils/control_variables.dart';
 
 final router = GoRouter(
@@ -29,7 +25,7 @@ final router = GoRouter(
               GoRoute(
                 path: '/test',
                 builder: (context, state) {
-                  return ChartScreen();
+                  return TestingComponent();
                 },
               ),
             ],
