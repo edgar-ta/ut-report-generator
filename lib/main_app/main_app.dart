@@ -10,6 +10,7 @@ import 'package:ut_report_generator/pages/home/report-editor/_main.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/main_app/router.dart';
+import 'package:ut_report_generator/utils/control_variables.dart';
 
 class MainApp extends StatelessWidget {
   MainApp({super.key});
@@ -20,6 +21,7 @@ class MainApp extends StatelessWidget {
       create: (_) => ScaffoldController(),
       child: MaterialApp.router(
         title: "Generador de Reportes de la UTSJR",
+        showSemanticsDebugger: IS_TESTING_MODE,
         routerConfig: router,
         // theme: ThemeData(
         //   colorScheme: ColorScheme.fromSeed(

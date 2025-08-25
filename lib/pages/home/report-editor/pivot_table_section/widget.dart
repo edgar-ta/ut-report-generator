@@ -7,6 +7,7 @@ import 'package:ut_report_generator/models/pivot_table/custom_indexer.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
+import 'package:ut_report_generator/models/slide_category.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/slide_frame.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/tabbed_menu.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/chips_tile.dart';
@@ -315,6 +316,30 @@ class _PivotTableSectionState extends State<PivotTableSection> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 16,
               children: [
+                Column(
+                  children: [
+                    Text(
+                      "Modo de visualización",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Switch(
+                      value: pivotTable.mode == SlideCategory.pivotTable,
+                      onChanged: (value) {
+                        setState(() {
+                          pivotTable = pivotTable.copyWith(
+                            mode:
+                                value
+                                    ? SlideCategory.pivotTable
+                                    : SlideCategory.imageSlide,
+                          );
+                        });
+                      },
+                    ),
+                  ],
+                ),
                 Column(
                   spacing: 8,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
