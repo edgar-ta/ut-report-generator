@@ -32,7 +32,7 @@ class _RecentReportsState extends State<RecentReports> {
     });
 
     return await waitAtLeast(
-      Duration(seconds: 5),
+      Duration(seconds: 10),
       recentReports(identifier: null)
           .then((value) {
             setState(() {

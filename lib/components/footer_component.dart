@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ut_report_generator/utils/control_variables.dart';
+import 'package:ut_report_generator/utils/design_constants.dart';
 
 class FooterComponent extends StatelessWidget {
   const FooterComponent({super.key});
