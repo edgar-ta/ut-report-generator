@@ -21,44 +21,9 @@ class MainApp extends StatelessWidget {
       create: (_) => ScaffoldController(),
       child: MaterialApp.router(
         title: "Generador de Reportes de la UTSJR",
-        showSemanticsDebugger: IS_TESTING_MODE,
+        // showSemanticsDebugger: IS_TESTING_MODE,
         routerConfig: router,
-        // theme: ThemeData(
-        //   colorScheme: ColorScheme.fromSeed(
-        //     seedColor: Color(0xFF002855),
-        //     primaryContainer: Color(0xFF009966),
-        //     onPrimaryContainer: Colors.white,
-        //     tertiaryContainer: Color.fromARGB(255, 170, 250, 223),
-        //     onTertiaryContainer: const Color.fromARGB(255, 0, 0, 0),
-        //     surface: Color.fromARGB(255, 250, 250, 250),
-        //     onSurface: const Color.fromARGB(255, 78, 78, 78),
-        //     surfaceContainer: const Color.fromARGB(255, 245, 245, 245),
-        //     surfaceContainerHigh: const Color.fromARGB(255, 195, 211, 226),
-        //     outline: const Color.fromARGB(255, 33, 137, 255),
-        //   ),
-        // ),
       ),
-    );
-
-    return ReportEditor(
-      reportCallback:
-          () => Future(
-            () => StartReport_Response(
-              identifier:
-                  r"D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\python-app\reports\ce4efb78-60bf-4745-8015-ec1dd3aa3d04",
-              reportName: "Mi reporte",
-              creationDate: DateTime.now(),
-              slides: [
-                ImageSlide(
-                  identifier: "5601ae90-7b60-4ff0-ae71-5855408a3427",
-                  kind: ImageSlideKind.coverPage,
-                  arguments: {"unit": 1, "show_delayed_teachers": true},
-                  preview:
-                      "D:\\college\\cuatrimestre-6\\2025-06-16--estadias\\ut-report-generator\\python-app\\reports\\e706722b-7d8b-4d24-92c8-97f16e3f5470\\slides\\78173aaf-780c-41d7-95cd-bace3038263e\\preview.png",
-                ),
-              ],
-            ),
-          ),
     );
   }
 }

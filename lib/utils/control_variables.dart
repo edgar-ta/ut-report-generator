@@ -1,5 +1,5 @@
 String LOCAL_PYTHON =
     r"D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\venv\Scripts\python.exe";
 bool IS_DEVELOPMENT_MODE = true;
-bool IS_TESTING_MODE = false;
+bool IS_TESTING_MODE = true;
 int SERVER_PORT = 55001;
