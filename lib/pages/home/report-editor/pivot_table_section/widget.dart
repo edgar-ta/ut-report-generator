@@ -19,8 +19,6 @@ import 'package:ut_report_generator/api/pivot_table/change_visualization_mode.da
 
 String levelToSpanish(PivotTableLevel level) {
   switch (level) {
-    case PivotTableLevel.gradeType:
-      return "Número o letra";
     case PivotTableLevel.group:
       return "Grupo";
     case PivotTableLevel.professor:
