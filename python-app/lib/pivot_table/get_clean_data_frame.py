@@ -15,7 +15,6 @@ import textwrap
 
 matplotlib.use("Agg")
 
-
 NUMBER_HEADER = "NO."
 EXPEDIENTE_HEADER = "EXPEDIENTE"
 NAME_HEADER = "NOMBRE"
@@ -23,25 +22,22 @@ NAME_HEADER = "NOMBRE"
 LEFT_COLUMN_HEADERS = [ NUMBER_HEADER, EXPEDIENTE_HEADER, NAME_HEADER ]
 UNIT_TYPES = [  "Letra", "Número" ]
 
-def read_excel(filename: str) -> pd.DataFrame:
-    try:
-        data_frame = pd.read_excel(filename, header=[0, 1, 2, 3, 4])
-        return data_frame
-    except FileNotFoundError as error:
-        raise DescriptiveError(404, f"Couldn't get the data frame with the following path {filename}") from error
-
 def create_unit_name(index: int) -> str:
     return f"Unidad {index + 1}"
 
-def get_grades_statistics(index: pd.Index) -> tuple[list[str], list[str], list[int], int]:
-    subject_names = unique_list( name for name in index.get_level_values(1) if not re.search(r"Unnamed", name) )
-    professor_names = unique_list( name for name in index.get_level_values(3) if not re.search(r"Unnamed", name) )
+def get_grades_statistics(
+    dirty_subjects: list,
+    dirty_professors: list,
+    dirty_units: list    
+    ) -> tuple[list[str], list[str], list[int], int]:
 
-    units_list = [ name for name in index.get_level_values(4) if re.match(r"U\d", name) ]
+    subject_names = [ subject for subject in dirty_subjects if type(subject) == str ]
+    professor_names = [ professor for professor in dirty_professors if type(professor) == str ]
+    units_list = [ unit for unit in dirty_units if type(unit) == str ]
+
     units_per_subject = get_units_per_subject(units_list)
-
     max_units = max(units_per_subject)
-
+    
     return (subject_names, professor_names, units_per_subject, max_units)
 
 def get_units_per_subject(units_list: list[str]) -> list[int]:
@@ -55,33 +51,50 @@ def get_units_per_subject(units_list: list[str]) -> list[int]:
         elif unit_index < current_index:
             units_per_subject.append(current_index)
             current_index = 1
+    
     units_per_subject.append(current_index)
     return units_per_subject
 
-def create_clean_index(subject_names: list[str], professor_names: list[str], units_per_subject: list[int]) -> pd.MultiIndex:
-    units_part = [ 
-        (subject, professor, f"Unidad {index + 1}", grade_type) 
+def create_clean_index(group_name: str, subject_names: list[str], professor_names: list[str], units_per_subject: list[int]) -> pd.MultiIndex:
+    year = 2000 + (int(re.search(pattern=r'(\d\d)$', string=group_name).group(1)))
+    grades_header = [ 
+        (group_name, str(year), subject, professor, f"Unidad {index + 1}", grade_type) 
         for subject, professor, units_count in zip(subject_names, professor_names, units_per_subject)
             for index in range(units_count)
                 for grade_type in UNIT_TYPES
     ]
-
-    left_part = [ tuple([header] * 4) for header in LEFT_COLUMN_HEADERS ]
-    left_part.extend(units_part)
-
-    PivotTableLevel._generate_next_value_
-
-    return pd.MultiIndex.from_arrays(list(zip(*left_part)), names=[ 
+    header_levels = len(grades_header[0])
+    header_names = [ 
+        PivotTableLevel.GROUP.value,
+        PivotTableLevel.YEAR.value,
         PivotTableLevel.SUBJECT.value,
         PivotTableLevel.PROFESSOR.value,
         PivotTableLevel.UNIT.value,
         PivotTableLevel.GRADE_TYPE.value,
-        ])
+        ]
+    if len(header_names) != header_levels:
+        raise DescriptiveError(http_error_code=500, message=f"El arreglo de nombres para los niveles del data frame no tiene el número de valores necesarios. Se esperaba {header_levels}, pero se obtuvieron {len(header_names)}")
+    return pd.MultiIndex.from_arrays(list(zip(*grades_header)), names=header_names)
 
-def get_clean_data_frame(data_frame: pd.DataFrame) -> pd.DataFrame:
-    subject_names, professor_names, units_per_subject, max_units = get_grades_statistics(data_frame.columns)
+def get_clean_data_frame(data_frame: pd.DataFrame, group_name: str) -> pd.DataFrame:
+    dirty_subjects = data_frame.iloc[0].to_list()
+    dirty_professors = data_frame.iloc[2].to_list()
+    dirty_units = data_frame.iloc[3].to_list()
 
-    clean_index = create_clean_index(subject_names, professor_names, units_per_subject)
+    subject_names, professor_names, units_per_subject, max_units = get_grades_statistics(
+        dirty_subjects=dirty_subjects,
+        dirty_professors=dirty_professors,
+        dirty_units=dirty_units
+        )
+
+    clean_index = create_clean_index(
+        group_name=group_name, 
+        subject_names=subject_names, 
+        professor_names=professor_names, 
+        units_per_subject=units_per_subject
+        )
+    
+    data_frame = data_frame.iloc[4:]
     data_frame.columns = clean_index
 
     data_frame = data_frame.T

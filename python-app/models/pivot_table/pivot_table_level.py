@@ -1,8 +1,9 @@
 from enum import Enum
 
 class PivotTableLevel(Enum):
-    PROFESSOR = "professor"
+    GROUP = "group"
+    YEAR = "year"
     SUBJECT = "subject"
+    PROFESSOR = "professor"
     UNIT = "unit"
     GRADE_TYPE = "gradeType"
-    GROUP = "group"

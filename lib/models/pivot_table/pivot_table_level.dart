@@ -1,1 +1,1 @@
-enum PivotTableLevel { professor, subject, unit, group }
+enum PivotTableLevel { group, year, subject, professor, unit }
