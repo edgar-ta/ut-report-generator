@@ -27,6 +27,8 @@ String levelToSpanish(PivotTableLevel level) {
       return "Materia";
     case PivotTableLevel.unit:
       return "Unidad";
+    case PivotTableLevel.year:
+      return "Año";
   }
 }
 

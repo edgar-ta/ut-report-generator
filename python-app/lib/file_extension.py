@@ -22,7 +22,11 @@ def check_file_extension(filename: str, valid_extensions = [ "xls", "xlsx", "csv
 
 def with_extension(filename: str, extension: str) -> str:
     return re.sub(r"\.([^\.]+)$", f".{extension}", filename)
-    
+
+def without_extension(filename: str) -> str:
+    return re.sub(r"\.([^\.]+)$", "", filename)
+
+
 def has_extension(filename: str, extension: str) -> bool:
     '''
     :param extension | The file extension (without the leading period)

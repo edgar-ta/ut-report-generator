@@ -13,7 +13,6 @@ def start_report_with_pivot_table():
     report.makedirs()
 
     add_pivot_table_to_report(report=report, local_request=request, index=None)
-    print(__file__)
 
     report.save()
     return format_for_create(response=report), 200

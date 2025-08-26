@@ -1,12 +1,14 @@
 from control_variables import DATA_NESTING_LEVEL
 
 from lib.get_or_panic import get_or_panic
-from lib.file_extension import get_file_extension
+from lib.file_extension import get_file_extension, without_extension
 from lib.descriptive_error import DescriptiveError
 from lib.directory_definitions import data_file_of_slide
 from lib.get_parameters_of_frame import get_parameters_of_frame
 from lib.get_data_of_frame import get_data_of_frame
 from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
+from lib.pivot_table.is_valid_career_name import is_valid_career_name
+from lib.pivot_table.read_excel import read_excel
 
 from models.pivot_table.self import PivotTable
 from models.pivot_table.aggregate_function_type import AggregateFunctionType
@@ -32,22 +34,21 @@ def validate_files(data_files: list[str]) -> None:
         
         if extension not in ["xls", "csv", "hdf5"]:
             raise DescriptiveError(http_error_code=400, message="El archivo es de una extensión no válida")
-        # # This feature is disabled in the meantime
-        # if not is_valid_career_name(data_file):
-        #     raise DescriptiveError(http_error_code=400, message="El archivo no cuenta con el nombre de un grupo válido")
+        
+        filename = os.path.split(data_file)[-1]
+        if not is_valid_career_name(without_extension(filename=filename)):
+            raise DescriptiveError(http_error_code=400, message=f"El archivo no cuenta con el nombre de un grupo válido ({filename})")
+        
         if not os.path.exists(data_file):
             raise DescriptiveError(http_error_code=400, message="El archivo seleccionado no existe")
 
 def get_data_frame_from_files(data_files: list[str]) -> pd.DataFrame:
-    data_frames = []
-    for data_file in data_files:
-        match get_file_extension(filename=data_file):
-            case "xls" | "xlsx":
-                data_frames.append(pd.read_excel(data_file, header=[0, 1, 2, 3, 4]))
-            case "csv":
-                data_frames.append(pd.read_csv(data_file, header=[0, 1, 2, 3, 4]))
+    data_frames: list[pd.DataFrame] = [ read_excel(filename=data_file) for data_file in data_files ]
 
-    data_frames = [ get_clean_data_frame(data_frame=data_frame) for data_frame in data_frames ]
+    data_frames = [ 
+        get_clean_data_frame(data_frame=data_frame, group_name=without_extension(filename=os.path.split(data_file)[-1])) 
+        for data_frame, data_file in zip(data_frames, data_files)
+        ]
 
     main_frame = pd.concat(data_frames)
     main_frame.sort_index(inplace=True)
