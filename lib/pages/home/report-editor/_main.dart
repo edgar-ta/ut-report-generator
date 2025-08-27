@@ -21,7 +21,7 @@ import 'package:ut_report_generator/pages/home/report-editor/image_slide_section
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/widget.dart';
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
 import 'package:ut_report_generator/pages/home/report-editor/render_button.dart';
-import 'package:ut_report_generator/pages/home/report-editor/shimmer_slide.dart';
+import 'package:ut_report_generator/pages/home/report-editor/slide/shimmer_slide.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 
