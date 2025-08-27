@@ -1,7 +1,8 @@
 import 'package:ut_report_generator/models/pivot_table/aggregate_function_type.dart';
-import 'package:ut_report_generator/models/pivot_table/custom_indexer.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
 import 'package:ut_report_generator/models/pivot_table/data_source.dart';
 import 'package:ut_report_generator/models/pivot_table/filter_function_type.dart';
+import 'package:ut_report_generator/models/pivot_table/pivot_data.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
 
@@ -15,9 +16,8 @@ class PivotTable implements Slide {
   final SlideCategory category;
   final String? preview;
   final DataSource source;
-  final List<CustomIndexer> arguments;
-  final List<CustomIndexer> parameters;
-  final Map<String, Map<String, double>> data;
+  final List<DataFilter> filters;
+  final PivotData data;
   final AggregateFunctionType aggregateFunction;
   final FilterFunctionType filterFunction;
   final SlideCategory mode;
@@ -29,8 +29,7 @@ class PivotTable implements Slide {
     required this.lastEdit,
     this.preview,
     required this.source,
-    required this.arguments,
-    required this.parameters,
+    required this.filters,
     required this.data,
     required this.aggregateFunction,
     required this.filterFunction,
@@ -46,8 +45,7 @@ class PivotTable implements Slide {
       "category": category.name,
       "preview": preview,
       "source": source.toJson(),
-      "arguments": arguments.map((a) => a.toJson()).toList(),
-      "parameters": parameters.map((p) => p.toJson()).toList(),
+      "filters": filters.map((f) => f.toJson()).toList(),
       "data": data,
       "aggregate_function": aggregateFunction.name,
       "filter_function": filterFunction.name,
@@ -63,32 +61,14 @@ class PivotTable implements Slide {
       lastEdit: DateTime.parse(json["last_edit"]),
       preview: json["preview"],
       source: DataSource.fromJson(json["source"]),
-      arguments:
-          (json["arguments"] as List)
-              .map((e) => CustomIndexer.fromJson(e))
-              .toList(),
-      parameters:
-          (json["parameters"] as List)
-              .map((e) => CustomIndexer.fromJson(e))
-              .toList(),
-      data: (json["data"] as Map<String, dynamic>).map(
-        (key, value) => MapEntry(
-          key,
-          (value as Map<String, dynamic>).map(
-            (innerKey, innerValue) => MapEntry(
-              innerKey,
-              (innerValue as num).toDouble(), // asegura double
-            ),
-          ),
-        ),
+      filters:
+          (json["filters"] as List).map((e) => DataFilter.fromJson(e)).toList(),
+      data: PivotData.fromJson(json["data"]),
+      aggregateFunction: AggregateFunctionType.values.byName(
+        json["aggregate_function"],
       ),
-      aggregateFunction: AggregateFunctionType.values.firstWhere(
-        (e) => e.name == json["aggregate_function"],
-      ),
-      filterFunction: FilterFunctionType.values.firstWhere(
-        (e) => e.name == json["filter_function"],
-      ),
-      mode: SlideCategory.values.firstWhere((e) => e.name == json["mode"]),
+      filterFunction: FilterFunctionType.values.byName(json["filter_function"]),
+      mode: SlideCategory.values.byName(json["mode"]),
     );
   }
 
@@ -99,9 +79,8 @@ class PivotTable implements Slide {
     DateTime? lastEdit,
     String? preview,
     DataSource? source,
-    List<CustomIndexer>? arguments,
-    List<CustomIndexer>? parameters,
-    Map<String, Map<String, double>>? data,
+    List<DataFilter>? filters,
+    PivotData? data,
     AggregateFunctionType? aggregateFunction,
     FilterFunctionType? filterFunction,
     SlideCategory? mode,
@@ -113,8 +92,7 @@ class PivotTable implements Slide {
       lastEdit: lastEdit ?? this.lastEdit,
       preview: preview ?? this.preview,
       source: source ?? this.source,
-      arguments: arguments ?? this.arguments,
-      parameters: parameters ?? this.parameters,
+      filters: filters ?? this.filters,
       data: data ?? this.data,
       aggregateFunction: aggregateFunction ?? this.aggregateFunction,
       filterFunction: filterFunction ?? this.filterFunction,

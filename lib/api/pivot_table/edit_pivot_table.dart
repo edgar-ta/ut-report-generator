@@ -1,17 +1,18 @@
 import 'package:ut_report_generator/api/send_request.dart';
-import 'package:ut_report_generator/models/pivot_table/custom_indexer.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
+import 'package:ut_report_generator/models/pivot_table/pivot_data.dart';
 
 Future<EditPivotTable_Response> editPivotTable({
   required String report,
   required String pivotTable,
-  required List<CustomIndexer> arguments,
+  required List<DataFilter> filters,
 }) {
   return sendRequest(
     route: "pivot_table/edit",
     body: {
       "report": report,
       "pivot_table": pivotTable,
-      "arguments": arguments.map((a) => a.toJson()).toList(),
+      "filters": filters.map((filter) => filter.toJson()).toList(),
     },
     callback: EditPivotTable_Response.fromJson,
   );
@@ -19,37 +20,18 @@ Future<EditPivotTable_Response> editPivotTable({
 
 // ignore: camel_case_types
 class EditPivotTable_Response {
-  final List<CustomIndexer> parameters;
-  final List<CustomIndexer> arguments;
-  final Map<String, Map<String, double>> data;
+  final List<DataFilter> filters;
+  final PivotData data;
 
-  EditPivotTable_Response({
-    required this.parameters,
-    required this.arguments,
-    required this.data,
-  });
+  EditPivotTable_Response({required this.filters, required this.data});
 
   factory EditPivotTable_Response.fromJson(Map<String, dynamic> json) {
     return EditPivotTable_Response(
-      parameters:
-          (json['parameters'] as List<dynamic>)
-              .map((e) => CustomIndexer.fromJson(e as Map<String, dynamic>))
+      filters:
+          (json['filters'] as List<dynamic>)
+              .map((e) => DataFilter.fromJson(e as Map<String, dynamic>))
               .toList(),
-      arguments:
-          (json['arguments'] as List<dynamic>)
-              .map((e) => CustomIndexer.fromJson(e as Map<String, dynamic>))
-              .toList(),
-      data: (json["data"] as Map<String, dynamic>).map(
-        (key, value) => MapEntry(
-          key,
-          (value as Map<String, dynamic>).map(
-            (innerKey, innerValue) => MapEntry(
-              innerKey,
-              (innerValue as num).toDouble(), // asegura double
-            ),
-          ),
-        ),
-      ),
+      data: PivotData.fromJson(json['data']),
     );
   }
 }

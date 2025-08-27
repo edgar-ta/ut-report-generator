@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/slide_frame.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/tabbed_menu.dart';
-import 'package:ut_report_generator/pages/home/report-editor/shimmer_slide.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/filter_component.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
@@ -17,22 +18,22 @@ class TestingComponent extends StatefulWidget {
 }
 
 class _TestingComponentState extends State<TestingComponent> {
-  List<FilterRecord> filters = [
-    FilterRecord(
+  List<DataFilter> filters = [
+    DataFilter(
       level: PivotTableLevel.group,
       selectedValues: ["Primero", "Segundo"],
       possibleValues: ["Primero", "Segundo", "Tercero"],
       selectionMode: SelectionMode.one,
       chartingMode: ChartingMode.none,
     ),
-    FilterRecord(
+    DataFilter(
       level: PivotTableLevel.professor,
       selectedValues: ["Profesor A"],
       possibleValues: ["Profesor A", "Profesor B", "Profesor C"],
       selectionMode: SelectionMode.one,
       chartingMode: ChartingMode.chart,
     ),
-    FilterRecord(
+    DataFilter(
       level: PivotTableLevel.subject,
       selectedValues: ["Matemáticas", "Historia"],
       possibleValues: ["Matemáticas", "Historia", "Biología"],

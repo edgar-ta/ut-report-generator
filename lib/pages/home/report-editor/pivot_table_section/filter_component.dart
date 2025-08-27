@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
 
@@ -12,7 +14,7 @@ class FilterComponent extends StatefulWidget {
   final Future<void> Function() onDelete;
 
   final int index;
-  final FilterRecord filterRecord;
+  final DataFilter filterRecord;
 
   const FilterComponent({
     super.key,
