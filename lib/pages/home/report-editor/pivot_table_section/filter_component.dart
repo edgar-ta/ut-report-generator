@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
-import 'package:ut_report_generator/testing_components/filter_record.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
 
 class FilterComponent extends StatefulWidget {
   final void Function() changeChartingMode;
