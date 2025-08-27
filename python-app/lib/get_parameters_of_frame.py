@@ -1,7 +1,7 @@
 from lib.unique_list import unique_list
 
 from models.pivot_table.custom_indexer import CustomIndexer
-from lib.cross_section import cross_section
+from lib.data_frame.cross_section import cross_section
 
 import pandas
 

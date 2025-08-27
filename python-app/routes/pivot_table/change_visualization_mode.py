@@ -3,7 +3,7 @@ from lib.get_or_panic import get_or_panic
 from lib.directory_definitions import preview_image_of_slide, base_directory_of_slide
 
 from models.report import Report
-from models.slide_category import SlideCategory
+from models.slide.slide_category import SlideCategory
 
 from flask import request
 from uuid import uuid4
