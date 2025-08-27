@@ -17,7 +17,7 @@ import zipfile
 @with_app("/export", methods=["POST"])
 def export_report():
     report = get_or_panic(request.json, "report", "El identificador del reporte no fue incluido en la solicitud")
-    report = Report.from_identifier(root_directory=report)
+    report = Report.from_identifier(identifier=report)
 
     if os.path.exists(report.export_directory) and os.path.isdir(report.export_directory):
         shutil.rmtree(report.export_directory, ignore_errors=True)

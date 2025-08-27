@@ -22,11 +22,11 @@ class DataFilter:
         Serializa la instancia a un diccionario (listo para JSON).
         """
         return {
-            "level": self.level.name,
+            "level": self.level.value,
             "selected_values": self.selected_values,
             "possible_values": self.possible_values,
-            "selection_mode": self.selection_mode.name,
-            "charting_mode": self.charting_mode.name,
+            "selection_mode": self.selection_mode.value,
+            "charting_mode": self.charting_mode.value,
         }
 
     @classmethod
@@ -35,9 +35,9 @@ class DataFilter:
         Crea una instancia de DataFilter desde un diccionario JSON.
         """
         return cls(
-            level=PivotTableLevel[json["level"]],
+            level=PivotTableLevel(json["level"]),
             selected_values=list(json.get("selected_values", [])),
             possible_values=list(json.get("possible_values", [])),
-            selection_mode=SelectionMode[json["selection_mode"]],
-            charting_mode=ChartingMode[json["charting_mode"]],
+            selection_mode=SelectionMode(json["selection_mode"]),
+            charting_mode=ChartingMode(json["charting_mode"]),
         )

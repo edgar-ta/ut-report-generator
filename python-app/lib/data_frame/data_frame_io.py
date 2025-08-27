@@ -1,4 +1,5 @@
 import pandas
+import os
 
 def import_data_frame(file_path: str, key: str) -> pandas.DataFrame:
     return pandas.read_hdf(path_or_buf=file_path, key=key)

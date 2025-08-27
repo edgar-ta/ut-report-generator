@@ -4,7 +4,7 @@ from lib.directory_definitions import metadata_file_of_report, slides_directory_
 
 from models.image_slide.self import ImageSlide
 from models.pivot_table.self import PivotTable
-from models.slide_category import SlideCategory
+from models.slide.slide_category import SlideCategory
 
 from control_variables import CURRENT_DIRECTORY_PATH, CURRENT_PROJECT_VERSION
 

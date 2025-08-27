@@ -1,5 +1,5 @@
 from models.image_slide.image_slide_kind import ImageSlideKind
-from models.slide_category import SlideCategory
+from models.slide.slide_category import SlideCategory
 
 from pandas import Timestamp
 
@@ -46,34 +46,3 @@ class ImageSlide():
             arguments=json_data["arguments"],
             kind=ImageSlideKind(json_data["kind"])
         )
-
-    # @property
-    # def arguments(self) -> dict[str, any]:
-    #     '''
-    #     Arguments are validated when using dot syntax. I. e., `slide.arguments = new_arguments`
-    #     calls a setter function under the hood
-    #     '''
-    #     return self._arguments
-    
-    # @arguments.setter
-    # def arguments(self, new_arguments: dict[str, any]) -> None:
-    #     merged_arguments = { **self.arguments, **new_arguments }
-    #     if merged_arguments != self.arguments:
-    #         self.controller.validate_arguments(merged_arguments)
-    #         self._arguments = merged_arguments
-    #         self.last_edit = Timestamp.now()
-    
-    # @property
-    # def preview_image(self) -> str | None:
-    #     filename = next((
-    #         file for file in os.listdir(self.base_directory)
-    #         if has_extension(filename=file, extension="png")
-    #     ), None)
-
-    #     if filename is None:
-    #         return None        
-    #     return os.path.join(self.base_directory, filename)
-
-    # @property
-    # def is_up2date(self) -> bool:
-    #     return self.last_render is not None and self.last_render >= self.last_edit

@@ -2,6 +2,7 @@ from lib.with_app_decorator import with_app
 from lib.get_or_panic import get_or_panic
 from lib.descriptive_error import DescriptiveError
 from lib.pivot_table.get_data_of_frame import get_data_of_frame
+from lib.pivot_table.get_valid_filters import get_valid_filters
 from lib.data_frame.data_frame_io import import_data_frame
 
 from models.pivot_table.self import PivotTable
@@ -36,9 +37,14 @@ def edit_pivot_table():
     
     data_frame = import_data_frame(file_path=data_frame, key=pivot_table.identifier)
 
-    data, valid_filters = get_data_of_frame(
-        frame=data_frame, 
-        filters=filters,
+    valid_filters = get_valid_filters(
+        data_frame=data_frame,
+        filters=filters
+        )
+    
+    data = get_data_of_frame(
+        data_frame=data_frame, 
+        filters=valid_filters,
         aggregate_function=pivot_table.aggregate_function,
         filter_function=pivot_table.filter_function,
         )

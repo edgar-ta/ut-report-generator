@@ -7,16 +7,12 @@ from lib.pivot_table.get_data_of_frame import get_data_of_frame
 from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
 from lib.pivot_table.is_valid_career_name import is_valid_career_name
 from lib.pivot_table.read_excel import read_excel
-from lib.pivot_table.get_possible_values_for_level import get_possible_values_for_level
+from lib.pivot_table.create_default_filters import create_default_filters
 
 from models.pivot_table.self import PivotTable
 from models.pivot_table.aggregate_function_type import AggregateFunctionType
 from models.pivot_table.filter_function_type import FilterFunctionType
 from models.pivot_table.data_source import DataSource
-from models.pivot_table.pivot_table_level import PivotTableLevel
-from models.pivot_table.data_filter.self import DataFilter
-from models.pivot_table.data_filter.charting_mode import ChartingMode
-from models.pivot_table.data_filter.selection_mode import SelectionMode
 from models.slide.slide_category import SlideCategory
 from models.report import Report
 
@@ -55,40 +51,6 @@ def get_data_frame_from_files(data_files: list[str]) -> pd.DataFrame:
     main_frame.sort_index(inplace=True)
     return main_frame
 
-# @todo I could definitely engineer something prettier than this
-def create_default_filters(data_frame: pd.DataFrame) -> list[DataFilter]:
-    '''
-    Creates a list of valid default filters for the frame. It uses
-    professor, subject and unit
-    '''
-    first_filter_possible_values = data_frame.index.get_level_values(level=PivotTableLevel.PROFESSOR)
-    first_filter = DataFilter(
-        level=PivotTableLevel.PROFESSOR,
-        selected_values=first_filter_possible_values[0],
-        possible_values=first_filter_possible_values,
-        selection_mode=SelectionMode.ONE,
-        charting_mode=ChartingMode.NONE,
-        )
-
-    second_filter_possible_values = get_possible_values_for_level(data_frame=data_frame, filters=[first_filter], level=PivotTableLevel.SUBJECT)
-    second_filter = DataFilter(
-        level=PivotTableLevel.SUBJECT,
-        selected_values=second_filter_possible_values[0],
-        possible_values=second_filter_possible_values,
-        selection_mode=SelectionMode.ONE,
-        charting_mode=ChartingMode.CHART
-        )
-    
-    third_filter_possible_values = get_possible_values_for_level(data_frame=data_frame, filters=[first_filter, second_filter], level=PivotTableLevel.UNIT)
-    third_filter = DataFilter(
-        level=PivotTableLevel.UNIT,
-        selected_values=[],
-        possible_values=third_filter_possible_values,
-        selection_mode=SelectionMode.MANY,
-        charting_mode=ChartingMode.NONE
-        )
-    
-    return [ first_filter, second_filter, third_filter ]
 
 def add_pivot_table_to_report(report: Report, local_request, index: int | None) -> PivotTable:
     data_files = get_or_panic(local_request.json, "data_files", "Se necesitan archivos de datos para empezar una tabla dinámica")
@@ -108,8 +70,8 @@ def add_pivot_table_to_report(report: Report, local_request, index: int | None) 
     aggregate_function = AggregateFunctionType.COUNT
     filters = create_default_filters(data_frame=main_frame)
 
-    data, _ = get_data_of_frame(
-        frame=main_frame, 
+    data = get_data_of_frame(
+        data_frame=main_frame, 
         filters=filters, 
         filter_function=filter_function, 
         aggregate_function=aggregate_function, 
@@ -135,3 +97,4 @@ def add_pivot_table_to_report(report: Report, local_request, index: int | None) 
         report.slides.insert(index, pivot_table)
     
     return pivot_table
+
