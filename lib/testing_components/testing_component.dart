@@ -56,8 +56,8 @@ class _TestingComponentState extends State<TestingComponent> {
                 FilterComponent(
                   key: ValueKey(filters[index].level),
                   index: index,
-                  filterRecord: filters[index],
-                  changeChartingMode: () {
+                  filter: filters[index],
+                  onChartingModeClicked: () {
                     setState(() {
                       filters =
                           filters.indexed.map((data) {

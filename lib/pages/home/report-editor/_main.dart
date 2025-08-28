@@ -166,14 +166,15 @@ class _ReportEditorState extends State<ReportEditor> {
                   ? Column(
                     key: ValueKey('content_loaded'),
                     children:
-                        report!.slides.map((slide) {
+                        report!.slides.indexed.map((data) {
+                          final (index, slide) = data;
                           if (slide is PivotTable) {
                             return PivotTableSection(
                               report: report!.identifier,
-                              initialPivotTable: slide,
-                              updateSlide: (index, slide) {
+                              pivotTable: slide,
+                              updatePivotTable: (pivotTable) {
                                 setState(() {
-                                  report!.slides[index] = slide;
+                                  report!.slides[index] = pivotTable;
                                 });
                               },
                             );

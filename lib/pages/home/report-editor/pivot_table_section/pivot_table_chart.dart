@@ -27,7 +27,7 @@ class _PivotTableChartState extends State<PivotTableChart> {
       child: Column(
         spacing: 16,
         children: [
-          Text(widget.chartName, style: TextStyle(fontSize: 24)),
+          Text(widget.chartName, style: const TextStyle(fontSize: 24)),
           Expanded(
             child: BarChart(
               BarChartData(
@@ -43,13 +43,13 @@ class _PivotTableChartState extends State<PivotTableChart> {
                 ),
                 titlesData: FlTitlesData(
                   show: true,
-                  topTitles: AxisTitles(
+                  topTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
-                  rightTitles: AxisTitles(
+                  rightTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
-                  leftTitles: AxisTitles(
+                  leftTitles: const AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 48,
@@ -61,12 +61,15 @@ class _PivotTableChartState extends State<PivotTableChart> {
                       showTitles: true,
                       reservedSize: 30,
                       getTitlesWidget: (value, meta) {
-                        var title =
-                            widget.data
-                                .toJson()
-                                .entries
-                                .toList()[value.toInt()]
-                                .key;
+                        String title;
+                        switch (widget.data) {
+                          case FlatData(data: final flatData):
+                            title =
+                                flatData.entries.toList()[value.toInt()].key;
+                          case GroupedData(data: final groupedData):
+                            title =
+                                groupedData.entries.toList()[value.toInt()].key;
+                        }
                         return SideTitleWidget(meta: meta, child: Text(title));
                       },
                     ),
@@ -96,26 +99,7 @@ class _PivotTableChartState extends State<PivotTableChart> {
                     getTooltipColor:
                         (group) =>
                             Theme.of(context).colorScheme.primaryContainer,
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      var groupData =
-                          pivotTable.data.entries.toList()[groupIndex];
-                      var rodTitle =
-                          groupData.value.entries.toList()[rodIndex].key;
-                      return BarTooltipItem(
-                        "$rodTitle\n",
-                        TextStyle(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: rod.toY.toString(),
-                            style: TextStyle(fontWeight: FontWeight.normal),
-                          ),
-                        ],
-                      );
-                    },
+                    getTooltipItem: createTooltipItem,
                   ),
                 ),
                 barGroups: createBarGroups(),
@@ -127,10 +111,78 @@ class _PivotTableChartState extends State<PivotTableChart> {
     );
   }
 
+  BarTooltipItem createTooltipItem(
+    BarChartGroupData group,
+    int groupIndex,
+    BarChartRodData rod,
+    int rodIndex,
+  ) {
+    String rodTitle;
+    switch (widget.data) {
+      case FlatData(data: final flatData):
+        final entry = flatData.entries.toList()[groupIndex];
+        rodTitle = entry.key;
+        return BarTooltipItem(
+          "$rodTitle\n",
+          TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.bold,
+          ),
+          children: [
+            TextSpan(
+              text: rod.toY.toString(),
+              style: const TextStyle(fontWeight: FontWeight.normal),
+            ),
+          ],
+        );
+
+      case GroupedData(data: final groupedData):
+        final groupData = groupedData.entries.toList()[groupIndex];
+        rodTitle = groupData.value.entries.toList()[rodIndex].key;
+        return BarTooltipItem(
+          "$rodTitle\n",
+          TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.bold,
+          ),
+          children: [
+            TextSpan(
+              text: rod.toY.toString(),
+              style: const TextStyle(fontWeight: FontWeight.normal),
+            ),
+          ],
+        );
+    }
+  }
+
   List<BarChartGroupData> createBarGroups() {
     switch (widget.data) {
       case FlatData(data: final flatData):
-        return flatData;
+        return flatData.entries.indexed.map((parameters) {
+          final (index, entry) = parameters;
+          final value = (entry.value as num).toDouble();
+          final isTouched = index == touchedGroupIndex;
+
+          return BarChartGroupData(
+            x: index,
+            barRods: [
+              BarChartRodData(
+                toY: value,
+                width: 32,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.zero,
+                  top: Radius.circular(8),
+                ),
+                color: Colors.blue,
+                borderSide: BorderSide(
+                  color: const Color.fromARGB(255, 0, 247, 255),
+                  width: isTouched ? 8 : 0,
+                ),
+              ),
+            ],
+          );
+        }).toList();
+
       case GroupedData(data: final groupedData):
         return groupedData.entries.indexed.map((outerParameters) {
           final (groupIndex, groupEntry) = outerParameters;
@@ -150,7 +202,7 @@ class _PivotTableChartState extends State<PivotTableChart> {
                   return BarChartRodData(
                     toY: value,
                     width: 256 / groupData.entries.length,
-                    borderRadius: BorderRadius.vertical(
+                    borderRadius: const BorderRadius.vertical(
                       bottom: Radius.zero,
                       top: Radius.circular(8),
                     ),
