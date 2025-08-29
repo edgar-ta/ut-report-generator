@@ -21,7 +21,7 @@ import 'package:ut_report_generator/pages/home/report-editor/image_slide_section
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/widget.dart';
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
 import 'package:ut_report_generator/pages/home/report-editor/render_button.dart';
-import 'package:ut_report_generator/pages/home/report-editor/shimmer_slide.dart';
+import 'package:ut_report_generator/pages/home/report-editor/slide/shimmer_slide.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 
@@ -166,14 +166,15 @@ class _ReportEditorState extends State<ReportEditor> {
                   ? Column(
                     key: ValueKey('content_loaded'),
                     children:
-                        report!.slides.map((slide) {
+                        report!.slides.indexed.map((data) {
+                          final (index, slide) = data;
                           if (slide is PivotTable) {
                             return PivotTableSection(
                               report: report!.identifier,
-                              initialPivotTable: slide,
-                              updateSlide: (index, slide) {
+                              pivotTable: slide,
+                              updatePivotTable: (callback) {
                                 setState(() {
-                                  report!.slides[index] = slide;
+                                  report!.slides[index] = callback(slide);
                                 });
                               },
                             );

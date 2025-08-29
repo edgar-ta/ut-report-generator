@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
 
 class FilterComponent extends StatefulWidget {
-  final void Function() changeChartingMode;
+  final void Function() onChartingModeClicked;
   final void Function() toggleSelectionMode;
   final Future<void> Function(String) selectAsOne;
   final Future<void> Function(String) selectAsMany;
@@ -12,13 +14,13 @@ class FilterComponent extends StatefulWidget {
   final Future<void> Function() onDelete;
 
   final int index;
-  final FilterRecord filterRecord;
+  final DataFilter filter;
 
   const FilterComponent({
     super.key,
     required this.index,
-    required this.filterRecord,
-    required this.changeChartingMode,
+    required this.filter,
+    required this.onChartingModeClicked,
     required this.toggleSelectionMode,
     required this.selectAsOne,
     required this.selectAsMany,
@@ -64,13 +66,13 @@ class _FilterComponentState extends State<FilterComponent> {
                       AnimatedOpacity(
                         opacity:
                             (_isHovered ||
-                                    widget.filterRecord.chartingMode !=
+                                    widget.filter.chartingMode !=
                                         ChartingMode.none)
                                 ? 1
                                 : 0,
                         duration: Duration(milliseconds: 200),
                         child: IconButton(
-                          onPressed: widget.changeChartingMode,
+                          onPressed: widget.onChartingModeClicked,
                           icon: _visualizationModeIcon(),
                         ),
                       ),
@@ -84,29 +86,26 @@ class _FilterComponentState extends State<FilterComponent> {
                       VerticalDivider(width: 1),
                       IconButton(
                         tooltip:
-                            widget.filterRecord.selectionMode ==
-                                    SelectionMode.one
+                            widget.filter.selectionMode == SelectionMode.one
                                 ? "Seleccionar uno"
                                 : "Seleccionar muchos",
                         onPressed: widget.toggleSelectionMode,
                         icon:
-                            widget.filterRecord.selectionMode ==
-                                    SelectionMode.one
+                            widget.filter.selectionMode == SelectionMode.one
                                 ? Icon(Icons.filter_1)
                                 : Icon(Icons.view_module),
                       ),
                       Expanded(
                         child:
-                            widget.filterRecord.selectionMode ==
-                                    SelectionMode.one
+                            widget.filter.selectionMode == SelectionMode.one
                                 ? (DropdownMenu(
                                   inputDecorationTheme: InputDecorationTheme(
                                     border: InputBorder.none,
                                   ),
                                   initialSelection:
-                                      widget.filterRecord.selectedValues[0],
+                                      widget.filter.selectedValues[0],
                                   dropdownMenuEntries:
-                                      widget.filterRecord.possibleValues
+                                      widget.filter.possibleValues
                                           .map(
                                             (value) => DropdownMenuEntry(
                                               value: value,
@@ -142,12 +141,12 @@ class _FilterComponentState extends State<FilterComponent> {
                 AnimatedSwitcher(
                   duration: Duration(milliseconds: 250),
                   child:
-                      widget.filterRecord.selectionMode == SelectionMode.many
+                      widget.filter.selectionMode == SelectionMode.many
                           ? Wrap(
                             spacing: 8,
                             runSpacing: 8,
                             children:
-                                widget.filterRecord.possibleValues
+                                widget.filter.possibleValues
                                     .map(
                                       (value) => FilterChip(
                                         label: Text(value),
@@ -158,9 +157,7 @@ class _FilterComponentState extends State<FilterComponent> {
                                             await widget.deselectAsMany(value);
                                           }
                                         },
-                                        selected: widget
-                                            .filterRecord
-                                            .selectedValues
+                                        selected: widget.filter.selectedValues
                                             .contains(value),
                                       ),
                                     )
@@ -177,7 +174,7 @@ class _FilterComponentState extends State<FilterComponent> {
   }
 
   Widget _visualizationModeIcon() {
-    switch (widget.filterRecord.chartingMode) {
+    switch (widget.filter.chartingMode) {
       case ChartingMode.none:
         return Icon(Icons.visibility_off);
       case ChartingMode.chart:
@@ -188,7 +185,7 @@ class _FilterComponentState extends State<FilterComponent> {
   }
 
   String _labelOfLevel() {
-    switch (widget.filterRecord.level) {
+    switch (widget.filter.level) {
       case PivotTableLevel.group:
         return "Grupo";
       case PivotTableLevel.professor:
@@ -203,7 +200,7 @@ class _FilterComponentState extends State<FilterComponent> {
   }
 
   String _labelOfSelectedValues() {
-    final values = widget.filterRecord.selectedValues;
+    final values = widget.filter.selectedValues;
 
     if (values.isEmpty) return "";
     if (values.length == 1) return values.first;
