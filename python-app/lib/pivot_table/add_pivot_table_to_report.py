@@ -16,12 +16,12 @@ from models.pivot_table.data_source import DataSource
 from models.slide.slide_category import SlideCategory
 from models.report import Report
 
-from flask import request
 from uuid import uuid4
 
 import pandas as pd
 
 import os
+import flask
 
 def validate_files(data_files: list[str]) -> None:
     for data_file in data_files:
@@ -52,7 +52,7 @@ def get_data_frame_from_files(data_files: list[str]) -> pd.DataFrame:
     return main_frame
 
 
-def add_pivot_table_to_report(report: Report, local_request, index: int | None) -> PivotTable:
+def add_pivot_table_to_report(report: Report, local_request: flask.Request, index: int | None) -> PivotTable:
     data_files = get_or_panic(local_request.json, "data_files", "Se necesitan archivos de datos para empezar una tabla dinámica")
 
     validate_files(data_files=data_files)
@@ -86,6 +86,7 @@ def add_pivot_table_to_report(report: Report, local_request, index: int | None) 
         last_edit=pd.Timestamp.now(),
         name="Mi tabla dinámica",
         filters=filters,
+        filters_order=[ _filter.level for _filter in filters ],
         preview=None,
         source=data_source,
         mode=SlideCategory.PIVOT_TABLE

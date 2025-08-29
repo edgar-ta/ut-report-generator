@@ -2,6 +2,7 @@ import pandas as pd
 
 from models.pivot_table.aggregate_function_type import AggregateFunctionType
 from models.pivot_table.filter_function_type import FilterFunctionType
+from models.pivot_table.pivot_table_level import PivotTableLevel
 from models.pivot_table.data_source import DataSource
 from models.pivot_table.data_filter.self import DataFilter
 from models.slide.slide_category import SlideCategory
@@ -15,6 +16,7 @@ class PivotTable():
             last_edit: pd.Timestamp,
             preview: str | None,
             filters: list[DataFilter],
+            filters_order: list[PivotTableLevel],
             source: DataSource,
             data: dict[str, dict[str, float]] | dict[str, float],
             aggregate_function: AggregateFunctionType,
@@ -30,6 +32,7 @@ class PivotTable():
         self.category = SlideCategory.PIVOT_TABLE
 
         self.filters = filters
+        self.filters_order = filters_order
         self.source = source
         self.data = data
         self.aggregate_function = aggregate_function
@@ -44,7 +47,9 @@ class PivotTable():
             "last_edit": self.last_edit.isoformat(),
             "preview": self.preview,
             "category": self.category.value,
+
             "filters": [f.to_dict() for f in self.filters],
+            "filters_order": [ level.value for level in self.filters_order ],
             "source": self.source.to_dict(),
             "data": self.data,
             "aggregate_function": self.aggregate_function.value,
@@ -79,7 +84,9 @@ class PivotTable():
             creation_date=pd.Timestamp(json_data["creation_date"]),
             last_edit=pd.Timestamp(json_data["last_edit"]),
             preview=json_data.get("preview"),
+
             filters=filters,
+            filters_order=[ PivotTableLevel(level) for level in json_data.get("filters_order", []) ],
             source=DataSource.from_json(json_data["source"]),
             data=data,
             aggregate_function=AggregateFunctionType(json_data["aggregate_function"]),

@@ -172,9 +172,9 @@ class _ReportEditorState extends State<ReportEditor> {
                             return PivotTableSection(
                               report: report!.identifier,
                               pivotTable: slide,
-                              updatePivotTable: (pivotTable) {
+                              updatePivotTable: (callback) {
                                 setState(() {
-                                  report!.slides[index] = pivotTable;
+                                  report!.slides[index] = callback(slide);
                                 });
                               },
                             );
