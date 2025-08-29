@@ -2,15 +2,14 @@ import 'package:ut_report_generator/api/send_request.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
 
-Future<ChangeVisualizationMode_Response> changeVisualizationMode({
+Future<ChangeVisualizationMode_Response> toggleVisualizationMode({
   required String report,
   required String pivotTable,
-  required SlideCategory mode,
 }) {
   return sendRequest(
-    route: "pivot_table/change_visualization_mode",
+    route: "pivot_table/toggle_visualization_mode",
     callback: ChangeVisualizationMode_Response.fromJson,
-    body: {"report": report, "pivot_table": pivotTable, "mode": mode.name},
+    body: {"report": report, "pivot_table": pivotTable},
   );
 }
 
