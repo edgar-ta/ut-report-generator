@@ -1,11 +1,11 @@
 from lib.get_or_panic import get_or_panic
 from lib.file_extension import get_file_extension, without_extension
-from lib.descriptive_error import DescriptiveError
 from lib.directory_definitions import data_file_of_slide
+from lib.group_name import group_name_from_path
 from lib.data_frame.data_frame_io import export_data_frame
+from lib.data_frame.validate_file import validate_file
 from lib.pivot_table.get_data_of_frame import get_data_of_frame
 from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
-from lib.pivot_table.is_valid_career_name import is_valid_career_name
 from lib.pivot_table.read_excel import read_excel
 from lib.pivot_table.create_default_filters import create_default_filters
 
@@ -23,27 +23,11 @@ import pandas as pd
 import os
 import flask
 
-def validate_files(data_files: list[str]) -> None:
-    for data_file in data_files:
-        extension = get_file_extension(filename=data_file)
-        if extension is None:
-            raise DescriptiveError(http_error_code=400, message="El archivo no tiene una extensión válida")
-        
-        if extension not in ["xls", "csv", "hdf5"]:
-            raise DescriptiveError(http_error_code=400, message="El archivo es de una extensión no válida")
-        
-        filename = os.path.split(data_file)[-1]
-        if not is_valid_career_name(without_extension(filename=filename)):
-            raise DescriptiveError(http_error_code=400, message=f"El archivo no cuenta con el nombre de un grupo válido ({filename})")
-        
-        if not os.path.exists(data_file):
-            raise DescriptiveError(http_error_code=400, message="El archivo seleccionado no existe")
-
 def get_data_frame_from_files(data_files: list[str]) -> pd.DataFrame:
     data_frames: list[pd.DataFrame] = [ read_excel(filename=data_file) for data_file in data_files ]
 
     data_frames = [ 
-        get_clean_data_frame(data_frame=data_frame, group_name=without_extension(filename=os.path.split(data_file)[-1])) 
+        get_clean_data_frame(data_frame=data_frame, group_name=group_name_from_path(file_path=data_file)) 
         for data_frame, data_file in zip(data_frames, data_files)
         ]
 
@@ -55,7 +39,8 @@ def get_data_frame_from_files(data_files: list[str]) -> pd.DataFrame:
 def add_pivot_table_to_report(report: Report, local_request: flask.Request, index: int | None) -> PivotTable:
     data_files = get_or_panic(local_request.json, "data_files", "Se necesitan archivos de datos para empezar una tabla dinámica")
 
-    validate_files(data_files=data_files)
+    for data_file in data_files:
+        validate_file(data_file=data_file)
 
     slide_identifier = str(uuid4())
     main_frame = get_data_frame_from_files(data_files=data_files)

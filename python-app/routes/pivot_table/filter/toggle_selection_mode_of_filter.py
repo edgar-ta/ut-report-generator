@@ -10,7 +10,7 @@ from flask import request
 import pandas
 
 @with_app("/toggle_selection_mode", methods=["POST"])
-def toggle_selection_mode():
+def toggle_selection_mode_of_filter():
     report, pivot_table, _filter, _ = entities_for_editing_filter(request=request, get_option=False)
 
     do_recalculation = False

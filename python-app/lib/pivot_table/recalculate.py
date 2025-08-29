@@ -6,8 +6,13 @@ from lib.data_frame.data_frame_io import import_data_frame
 from models.pivot_table.self import PivotTable
 from models.pivot_table.data_filter.self import DataFilter
 
-def recalculate(pivot_table: PivotTable) -> tuple[dict[str, dict[str, float]] | dict[str, float], list[DataFilter]]:
-    data_frame = import_data_frame(file_path=pivot_table.source.merged_file, key=pivot_table.identifier)
+import pandas
+
+def recalculate(pivot_table: PivotTable, preloaded_data_frame: pandas.DataFrame | None) -> tuple[dict[str, dict[str, float]] | dict[str, float], list[DataFilter]]:
+    data_frame = preloaded_data_frame
+    if data_frame is None:
+        data_frame = import_data_frame(file_path=pivot_table.source.merged_file, key=pivot_table.identifier)
+    
     new_filters = get_valid_filters(data_frame=data_frame, filters=pivot_table.filters)
     pivot_table.filters = new_filters
 
