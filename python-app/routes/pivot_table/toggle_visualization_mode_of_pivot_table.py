@@ -22,3 +22,4 @@ def toggle_visualization_mode_of_pivot_table():
             pass
         case SlideCategory.PIVOT_TABLE:
             # should render the pivot table
+            pass
