@@ -49,72 +49,77 @@ class PivotEditPane extends StatefulWidget {
 class _PivotEditPaneState extends State<PivotEditPane> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InvisibleTextField(controller: widget.nameController),
-        SegmentedButton(
-          segments: [
-            ButtonSegment(value: "a", icon: Icon(Icons.bar_chart)),
-            ButtonSegment(value: "b", icon: Icon(Icons.image)),
-          ],
-          selected: {"a"},
-        ),
-        ReorderableListView(
-          shrinkWrap: true,
-          onReorder: (oldIndex, newIndex) {
-            widget.onFiltersReordered(oldIndex, newIndex);
-          },
-          children:
-              widget.filters.indexed.map((data) {
-                final (index, filter) = data;
-                return FilterComponent(
-                  index: index,
-                  filter: filter,
-                  onChartingModeClicked: () async {
-                    // There must always be a chart mode filter
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          InvisibleTextField(controller: widget.nameController),
+          SegmentedButton(
+            segments: [
+              ButtonSegment(value: "a", icon: Icon(Icons.bar_chart)),
+              ButtonSegment(value: "b", icon: Icon(Icons.image)),
+            ],
+            selected: {"a"},
+          ),
+          ReorderableListView(
+            shrinkWrap: true,
+            buildDefaultDragHandles: false,
+            onReorder: (oldIndex, newIndex) {
+              widget.onFiltersReordered(oldIndex, newIndex);
+            },
+            children:
+                widget.filters.indexed.map((data) {
+                  final (index, filter) = data;
+                  return FilterComponent(
+                    key: ValueKey(filter.level),
+                    index: index,
+                    filter: filter,
+                    onChartingModeClicked: () async {
+                      // There must always be a chart mode filter
 
-                    if (HardwareKeyboard.instance.isControlPressed) {
-                      if (filter.chartingMode == ChartingMode.superChart) {
-                        widget.unsetSuperChart();
-                        return;
-                      }
-                      if (filter.chartingMode == ChartingMode.none) {
-                        widget.setSuperChart(index);
-                        return;
-                      }
+                      if (HardwareKeyboard.instance.isControlPressed) {
+                        if (filter.chartingMode == ChartingMode.superChart) {
+                          widget.unsetSuperChart();
+                          return;
+                        }
+                        if (filter.chartingMode == ChartingMode.none) {
+                          widget.setSuperChart(index);
+                          return;
+                        }
 
-                      final superChartFilterIndex = widget.filters.indexWhere(
-                        (element) =>
-                            element.chartingMode == ChartingMode.superChart,
-                      );
-                      widget.swapChartingModes(index, superChartFilterIndex);
-                      return;
-                    } else {
-                      if (filter.chartingMode == ChartingMode.none) {
-                        widget.setChart(index);
+                        final superChartFilterIndex = widget.filters.indexWhere(
+                          (element) =>
+                              element.chartingMode == ChartingMode.superChart,
+                        );
+                        widget.swapChartingModes(index, superChartFilterIndex);
                         return;
+                      } else {
+                        if (filter.chartingMode == ChartingMode.none) {
+                          widget.setChart(index);
+                          return;
+                        }
                       }
-                    }
-                  },
-                  toggleSelectionMode: () async {
-                    widget.toggleSelectionMode(index);
-                  },
-                  selectAsOne: (value) async {
-                    widget.onOptionSwitched(value, index);
-                  },
-                  selectAsMany: (value) async {
-                    widget.onOptionAdded(value, index);
-                  },
-                  deselectAsMany: (value) async {
-                    widget.onOptionRemoved(value, index);
-                  },
-                  onDelete: () async {
-                    widget.onFilterDeleted(index);
-                  },
-                );
-              }).toList(),
-        ),
-      ],
+                    },
+                    toggleSelectionMode: () async {
+                      widget.toggleSelectionMode(index);
+                    },
+                    selectAsOne: (value) async {
+                      widget.onOptionSwitched(value, index);
+                    },
+                    selectAsMany: (value) async {
+                      widget.onOptionAdded(value, index);
+                    },
+                    deselectAsMany: (value) async {
+                      widget.onOptionRemoved(value, index);
+                    },
+                    onDelete: () async {
+                      widget.onFilterDeleted(index);
+                    },
+                  );
+                }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }

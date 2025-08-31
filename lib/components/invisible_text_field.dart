@@ -50,8 +50,11 @@ class _InvisibleTextFieldState extends State<InvisibleTextField> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
         decoration: BoxDecoration(
-          border: Border.all(color: _borderColor(context), width: 2),
-          borderRadius: BorderRadius.circular(8),
+          // border: Border.all(color: _borderColor(context), width: 2),
+          border: Border(
+            bottom: BorderSide(color: _borderColor(context), width: 2),
+          ),
+          // borderRadius: BorderRadius.circular(8),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: TextField(

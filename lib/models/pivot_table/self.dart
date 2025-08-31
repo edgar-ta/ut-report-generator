@@ -68,7 +68,7 @@ class PivotTable implements Slide {
       filters:
           (json["filters"] as List).map((e) => DataFilter.fromJson(e)).toList(),
       filtersOrder:
-          (json["filtersOrder"] as List)
+          (json["filters_order"] as List)
               .map((e) => PivotTableLevel.values.byName(e))
               .toList(),
       data: PivotData.fromJson(json["data"]),

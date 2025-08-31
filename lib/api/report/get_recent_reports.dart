@@ -2,7 +2,7 @@ import 'package:ut_report_generator/api/send_request.dart';
 
 Future<RecentReports_Response> recentReports({String? identifier}) {
   return sendRequest(
-    route: "report/get_recents",
+    route: "report/get_recent",
     body: {"report": identifier},
     callback: RecentReports_Response.fromJson,
   );

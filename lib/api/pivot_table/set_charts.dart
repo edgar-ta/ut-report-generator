@@ -10,10 +10,10 @@ Future<PivotData> setCharts({
   return sendRequest(
     route: "pivot_table/set_charts",
     body: {
-      report: report,
-      pivotTable: pivotTable,
-      chart: chart,
-      superChart: superChart,
+      "report": report,
+      "pivot_table": pivotTable,
+      "chart": chart,
+      "super_chart": superChart,
     },
     callback: PivotData.fromJson,
   );

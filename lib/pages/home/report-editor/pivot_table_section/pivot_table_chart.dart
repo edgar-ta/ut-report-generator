@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_data.dart';
+import 'package:ut_report_generator/utils/roud_up.dart';
 
 class PivotTableChart extends StatefulWidget {
   final PivotData data;
@@ -31,7 +32,7 @@ class _PivotTableChartState extends State<PivotTableChart> {
           Expanded(
             child: BarChart(
               BarChartData(
-                maxY: 75,
+                maxY: getMaximumValueOfChart(),
                 gridData: FlGridData(
                   drawVerticalLine: false,
                   checkToShowHorizontalLine: (value) => value % 10 == 0,
@@ -109,6 +110,26 @@ class _PivotTableChartState extends State<PivotTableChart> {
         ],
       ),
     );
+  }
+
+  double getMaximumValueOfChart() {
+    switch (widget.data) {
+      case FlatData(data: final flatData):
+        if (flatData.isEmpty) return 0;
+
+        final maxValue = flatData.values.reduce((a, b) => a > b ? a : b);
+        return roundUp(maxValue);
+
+      case GroupedData(data: final groupedData):
+        if (groupedData.isEmpty) return 0;
+
+        // Tomamos los valores máximos de cada grupo
+        final maxValue = groupedData.values
+            .expand((group) => group.values)
+            .reduce((a, b) => a > b ? a : b);
+
+        return roundUp(maxValue);
+    }
   }
 
   BarTooltipItem createTooltipItem(
