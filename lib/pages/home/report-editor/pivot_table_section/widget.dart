@@ -17,21 +17,6 @@ import 'package:ut_report_generator/utils/copy_with_added.dart';
 import 'package:ut_report_generator/utils/copy_with_replacement.dart';
 import 'package:ut_report_generator/utils/copy_without.dart';
 
-String levelToSpanish(PivotTableLevel level) {
-  switch (level) {
-    case PivotTableLevel.group:
-      return "Grupo";
-    case PivotTableLevel.professor:
-      return "Profesor";
-    case PivotTableLevel.subject:
-      return "Materia";
-    case PivotTableLevel.unit:
-      return "Unidad";
-    case PivotTableLevel.year:
-      return "Año";
-  }
-}
-
 class PivotTableSection extends StatefulWidget {
   String report;
   PivotTable pivotTable;
@@ -478,10 +463,11 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       menuContent: TabbedMenu(
         editTabBuilder: (_) {
           return PivotEditPane(
+            report: widget.report,
+            pivotTable: widget.pivotTable.identifier,
+            setPivotTable: widget.updatePivotTable,
             nameController: nameController,
             filters: widget.pivotTable.filters,
-            onFileRemoved: _onFileRemoved,
-            onFileAdded: _onFileAdded,
             onOptionAdded: _onOptionAdded,
             onOptionRemoved: _onOptionRemoved,
             onOptionSwitched: _onOptionSwitched,

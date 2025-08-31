@@ -40,21 +40,17 @@ def recalculate(pivot_table: PivotTable, preloaded_data_frame: pandas.DataFrame 
     if data_frame is None:
         data_frame = import_data_frame(file_path=pivot_table.source.merged_file, key=pivot_table.identifier)
     
-    print("Hello 1")
     combinable_filters = get_combinable_filters(data_frame=data_frame, filters=pivot_table.filters)
-    print("Hello 2")
     fix_charts(filters=combinable_filters, filters_order=pivot_table.filters_order)
     pivot_table.filters = combinable_filters
 
     _ordered_filters = ordered_filters(filters_order=pivot_table.filters_order, filters=pivot_table.filters)
-    print("Hello 3")
     new_data = get_data_of_frame(
         data_frame=data_frame, 
         filters=_ordered_filters, 
         filter_function=pivot_table.filter_function, 
         aggregate_function=pivot_table.aggregate_function
         )
-    print("Hello 4")
     pivot_table.data = new_data
 
     return (new_data, combinable_filters)
