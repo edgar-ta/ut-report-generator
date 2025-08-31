@@ -1,4 +1,4 @@
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_pivot_table
 from lib.descriptive_error import DescriptiveError
 from lib.pivot_table.recalculate import recalculate
@@ -10,7 +10,7 @@ from flask import request
 import os
 import pandas
 
-@with_app("/set_charts", methods=["POST"])
+@with_flask("/set_charts", methods=["POST"])
 def set_charts_of_pivot_table():
     report, pivot_table = entities_for_editing_pivot_table(request=request)
     chart_index = request.json['chart']

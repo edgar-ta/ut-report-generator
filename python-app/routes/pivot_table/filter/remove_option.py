@@ -1,16 +1,16 @@
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 from lib.descriptive_error import DescriptiveError
 from lib.get_entities_from_request import entities_for_editing_filter
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.bring_filter_up import bring_filter_up
 
-from models.responses.edit_pivot_table_response import EditPivotTable_Response
+from models.response.edit_pivot_table_response import EditPivotTable_Response
 
 from flask import request
 
 import pandas
 
-@with_app("/remove", methods=["POST"])
+@with_flask("/remove", methods=["POST"])
 def remove_option_from_filter():
     report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
     

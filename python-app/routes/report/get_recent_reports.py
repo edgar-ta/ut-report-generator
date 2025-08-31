@@ -1,4 +1,4 @@
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 from lib.directory_definitions import get_reports_directory
 
 from lib.report.get_id_of_report import get_id_of_report
@@ -12,7 +12,7 @@ from itertools import dropwhile
 
 import os
 
-@with_app("/get_recent", methods=["POST"])
+@with_flask("/get_recent", methods=["POST"])
 def get_recent_reports():
     # This is the id of the last report
     # that the frontend loaded

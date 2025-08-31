@@ -1,13 +1,14 @@
 from lib.descriptive_error import DescriptiveError
 
 from functools import wraps
+from flask import Flask, Blueprint
 
-def with_app(*flask_args, **flask_kwargs):
+def with_flask(*flask_args, **flask_kwargs):
     def decorator(function):
         @wraps(function)
-        def needs_app(app):
+        def needs_flask(_flask: Flask | Blueprint):
             print(f"Hooking up the app to the '{function.__name__}' route")
-            @app.route(*flask_args, **flask_kwargs)
+            @_flask.route(*flask_args, **flask_kwargs)
             @wraps(function)
             def inner():
                 try:
@@ -21,5 +22,5 @@ def with_app(*flask_args, **flask_kwargs):
                     else:
                         return {"error": str(e)}, 500
             return inner
-        return needs_app
+        return needs_flask
     return decorator

@@ -1,4 +1,4 @@
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_pivot_table
 from lib.get_or_panic import get_or_panic
 from lib.descriptive_error import DescriptiveError
@@ -10,14 +10,14 @@ from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
 from lib.pivot_table.recalculate import recalculate
 from lib.directory_definitions import data_file_of_slide
 
-from models.responses.edit_pivot_table_response import EditPivotTable_Response
+from models.response.edit_pivot_table_response import EditPivotTable_Response
 
 from flask import request
 
 import os
 import pandas
 
-@with_app("/remove_file", methods=["POST"])
+@with_flask("/remove_file", methods=["POST"])
 def remove_file_from_pivot_table():
     report, pivot_table = entities_for_editing_pivot_table(request=request)
     _file = get_or_panic(request.json, "file", "El archivo no a eliminar no se incluyó en la solicitud")

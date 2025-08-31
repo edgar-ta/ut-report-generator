@@ -1,17 +1,17 @@
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_filter
 from lib.descriptive_error import DescriptiveError
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.bring_filter_up import bring_filter_up
 
-from models.responses.edit_pivot_table_response import EditPivotTable_Response
+from models.response.edit_pivot_table_response import EditPivotTable_Response
 from models.pivot_table.data_filter.selection_mode import SelectionMode
 
 from flask import request
 
 import pandas
 
-@with_app("/add", methods=["POST"])
+@with_flask("/add", methods=["POST"])
 def add_option_to_filter():
     report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
 

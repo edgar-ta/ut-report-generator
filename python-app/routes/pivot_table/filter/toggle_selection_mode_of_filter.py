@@ -3,7 +3,7 @@ from lib.descriptive_error import DescriptiveError
 from lib.get_entities_from_request import entities_for_editing_filter
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.bring_filter_up import bring_filter_up
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 
 from models.pivot_table.data_filter.selection_mode import SelectionMode
 
@@ -11,7 +11,7 @@ from flask import request
 
 import pandas
 
-@with_app("/toggle_selection_mode", methods=["POST"])
+@with_flask("/toggle_selection_mode", methods=["POST"])
 def toggle_selection_mode_of_filter():
     report, pivot_table, _filter, _ = entities_for_editing_filter(request=request, get_option=False)
 

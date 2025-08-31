@@ -1,4 +1,4 @@
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 from lib.get_or_panic import get_or_panic
 from lib.directory_definitions import base_directory_of_slide
 from lib.format_for_edit import format_for_edit
@@ -15,7 +15,7 @@ import re
 import pandas
 import os
 
-@with_app("/edit", methods=["POST"])
+@with_flask("/edit", methods=["POST"])
 def edit_image_slide():
     report = get_or_panic(request.json, 'report', 'El identificador del reporte no está presente en la solicitud')
     image_slide = get_or_panic(request.json, 'slide', 'El identificador de la diapositiva no está presente en la solicitud')
