@@ -22,7 +22,7 @@ def toggle_selection_mode_of_filter():
 
     if _filter.selection_mode == SelectionMode.MANY:
         _filter.selection_mode = SelectionMode.ONE
-        _filter.selected_values = [ _filter.selected_values[0] ]
+        _filter.selected_values = [ _filter.selected_values[0] ] if _filter.selected_values.__len__() > 0 else []
     else:
         _filter.selection_mode = SelectionMode.MANY
     

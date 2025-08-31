@@ -46,10 +46,21 @@ class DataFilter {
   factory DataFilter.fromJson(Map<String, dynamic> json) {
     return DataFilter(
       level: PivotTableLevel.values.byName(json["level"]),
-      selectedValues: List<String>.from(json["selectedValues"] ?? []),
-      possibleValues: List<String>.from(json["possibleValues"] ?? []),
-      selectionMode: SelectionMode.values.byName(json["selectionMode"]),
-      chartingMode: ChartingMode.values.byName(json["chartingMode"]),
+      selectedValues: List<String>.from(json["selected_values"] ?? []),
+      possibleValues: List<String>.from(json["possible_values"] ?? []),
+      selectionMode: SelectionMode.values.byName(json["selection_mode"]),
+      chartingMode: ChartingMode.values.byName(json["charting_mode"]),
     );
+  }
+
+  bool isValid() {
+    return possibleValues.isNotEmpty || selectedValues.isNotEmpty;
+  }
+
+  List<String> validValues() {
+    if (selectedValues.isEmpty) {
+      return possibleValues;
+    }
+    return selectedValues;
   }
 }

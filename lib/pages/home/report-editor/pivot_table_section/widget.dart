@@ -295,7 +295,9 @@ class _PivotTableSectionState extends State<PivotTableSection> {
                     : SelectionMode.many,
             selectedValues:
                 filter.selectionMode == SelectionMode.many
-                    ? [filter.selectedValues[0]]
+                    ? filter.selectedValues.isNotEmpty
+                        ? [filter.selectedValues[0]]
+                        : []
                     : filter.selectedValues,
           ),
         ),
@@ -349,11 +351,18 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       return widget.pivotTable.copyWith(filters: filters);
     });
 
-    pivot_table.setCharts(chart: chartIndex, superChart: superChartIndex).then((
-      data,
-    ) {
-      widget.updatePivotTable((pivotTable) => pivotTable.copyWith(data: data));
-    });
+    pivot_table
+        .setCharts(
+          report: widget.report,
+          pivotTable: widget.pivotTable.identifier,
+          chart: chartIndex,
+          superChart: superChartIndex,
+        )
+        .then((data) {
+          widget.updatePivotTable(
+            (pivotTable) => pivotTable.copyWith(data: data),
+          );
+        });
   }
 
   // Makes the filter at `filterIndex` be of charting mode `chart`; the super chart,
@@ -376,9 +385,17 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       ),
     );
 
-    await pivot_table.setCharts(chart: filterIndex).then((data) {
-      widget.updatePivotTable((pivotTable) => pivotTable.copyWith(data: data));
-    });
+    await pivot_table
+        .setCharts(
+          report: widget.report,
+          pivotTable: widget.pivotTable.identifier,
+          chart: filterIndex,
+        )
+        .then((data) {
+          widget.updatePivotTable(
+            (pivotTable) => pivotTable.copyWith(data: data),
+          );
+        });
   }
 
   Future<void> _setSuperChart(int filterIndex) async {
@@ -398,9 +415,17 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       ),
     );
 
-    await pivot_table.setCharts(superChart: filterIndex).then((data) {
-      widget.updatePivotTable((pivotTable) => pivotTable.copyWith(data: data));
-    });
+    await pivot_table
+        .setCharts(
+          report: widget.report,
+          pivotTable: widget.pivotTable.identifier,
+          superChart: filterIndex,
+        )
+        .then((data) {
+          widget.updatePivotTable(
+            (pivotTable) => pivotTable.copyWith(data: data),
+          );
+        });
   }
 
   Future<void> _unsetSuperChart() async {
@@ -417,9 +442,17 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       ),
     );
 
-    await pivot_table.setCharts(superChart: -1).then((data) {
-      widget.updatePivotTable((pivotTable) => pivotTable.copyWith(data: data));
-    });
+    await pivot_table
+        .setCharts(
+          report: widget.report,
+          pivotTable: widget.pivotTable.identifier,
+          superChart: -1,
+        )
+        .then((data) {
+          widget.updatePivotTable(
+            (pivotTable) => pivotTable.copyWith(data: data),
+          );
+        });
   }
 
   Future<void> _toggleVisualizationMode() async {
