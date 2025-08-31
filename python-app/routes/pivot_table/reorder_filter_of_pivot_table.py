@@ -1,4 +1,4 @@
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_pivot_table
 from lib.get_or_panic import get_or_panic
 
@@ -6,7 +6,7 @@ from flask import request
 
 import pandas
 
-@with_app("/reorder_filter", methods=["POST"])
+@with_flask("/reorder_filter", methods=["POST"])
 def reorder_filter_of_pivot_table():
     report, pivot_table = entities_for_editing_pivot_table(request=request)
     old_index = get_or_panic(request.json, 'old_index', 'No se incluyó el antiguo índice del filtro a reordenar')
@@ -23,6 +23,7 @@ def reorder_filter_of_pivot_table():
     report.save()
 
     return {
-        "message": "Se reordenó el filtro correctamente"
+        "message": "Se reordenó el filtro correctamente",
+        "filters": [ _filter.level.value for _filter in pivot_table.filters ]
     }, 200
 

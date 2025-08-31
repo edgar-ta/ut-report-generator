@@ -1,5 +1,6 @@
 from lib.data_frame.cross_section import cross_section
 from lib.data_frame.flatten_to_series import flatten_to_series
+from lib.data_filter.get_valid_values import get_valid_values
 from lib.descriptive_error import DescriptiveError
 
 from models.pivot_table.data_filter.self import DataFilter
@@ -15,9 +16,7 @@ def get_dict_of_frame(data_frame: pandas.DataFrame, filters: list[DataFilter], f
     '''
     Gets the data asked for by the filters in the form of a dict
 
-    :Preconditions:
-    None of the filters must be empty and their selected values shouldn't throw key errors
-    when combined (aka, they must be "valid filters")
+    The filters should all be valid and combinable with respect to the data_frame
     '''
     match filters:
         case []:
@@ -33,7 +32,7 @@ def get_dict_of_frame(data_frame: pandas.DataFrame, filters: list[DataFilter], f
                     filter_function=filter_function,
                     aggregate_function=aggregate_function
                     )
-                for value in _filter.selected_values
+                for value in get_valid_values(_filter=_filter)
             }
 
 
@@ -43,6 +42,13 @@ def get_data_of_frame(
         filter_function: FilterFunctionType, 
         aggregate_function: AggregateFunctionType, 
         ) -> dict[str, dict[str, float]] | dict[str, float]:
+    '''
+    Gets the dict that represents with the data that the filters
+    intend to create a chart of
+
+    Chart and (if existent) super chart filters should be
+    valid and mutually combinable with respect to the data frame
+    '''
     
     super_chart_filter: DataFilter | None = None
     chart_filter: DataFilter = ...

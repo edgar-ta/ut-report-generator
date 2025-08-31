@@ -1,13 +1,15 @@
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 from lib.descriptive_error import DescriptiveError
 from lib.get_entities_from_request import entities_for_editing_filter
 from lib.pivot_table.recalculate import recalculate
+
+from models.response.edit_pivot_table_response import EditPivotTable_Response
 
 from flask import request
 
 import pandas
 
-@with_app("/delete", methods=["POST"])
+@with_flask("/delete", methods=["POST"])
 def delete_filter():
     report, pivot_table, _filter, _ = entities_for_editing_filter(request=request, get_option=False)
 
@@ -22,7 +24,7 @@ def delete_filter():
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()
 
-    return {
-        "data": new_data,
-        "filters": new_filters
-    }, 200
+    return EditPivotTable_Response(
+        data=new_data,
+        filters=new_filters
+    ).to_dict(), 200

@@ -1,4 +1,4 @@
-from lib.with_app_decorator import with_app
+from lib.with_flask import with_flask
 from lib.get_or_panic import get_or_panic
 from lib.file_extension import get_extension_or_panic, get_file_extension
 from lib.random_message import random_message, RandomMessageType
@@ -14,7 +14,7 @@ import shutil
 import zipfile
 
 
-@with_app("/export", methods=["POST"])
+@with_flask("/export", methods=["POST"])
 def export_report():
     report = get_or_panic(request.json, "report", "El identificador del reporte no fue incluido en la solicitud")
     report = Report.from_identifier(identifier=report)
