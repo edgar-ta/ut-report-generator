@@ -1,5 +1,5 @@
 from lib.descriptive_error import DescriptiveError
-from lib.unique_list import unique_list
+from lib.group_name import inscription_year_of_group
 
 from models.pivot_table.pivot_table_level import PivotTableLevel
 
@@ -56,7 +56,7 @@ def get_units_per_subject(units_list: list[str]) -> list[int]:
     return units_per_subject
 
 def create_clean_index(group_name: str, subject_names: list[str], professor_names: list[str], units_per_subject: list[int]) -> pd.MultiIndex:
-    year = 2000 + (int(re.search(pattern=r'(\d\d)$', string=group_name).group(1)))
+    year = inscription_year_of_group(group_name=group_name)
     grades_header = [ 
         (group_name, str(year), subject, professor, f"Unidad {index + 1}", grade_type) 
         for subject, professor, units_count in zip(subject_names, professor_names, units_per_subject)

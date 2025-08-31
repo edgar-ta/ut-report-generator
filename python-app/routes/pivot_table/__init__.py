@@ -1,9 +1,23 @@
 from routes.pivot_table.create_pivot_table import create_pivot_table
+from routes.pivot_table.add_file_to_pivot_table import add_file_to_pivot_table
+from routes.pivot_table.remove_file_from_pivot_table import remove_file_from_pivot_table
+from routes.pivot_table.reorder_filter_of_pivot_table import reorder_filter_of_pivot_table
+from routes.pivot_table.set_charts_of_pivot_table import set_charts_of_pivot_table
+from routes.pivot_table.toggle_visualization_mode_of_pivot_table import toggle_visualization_mode_of_pivot_table
+from routes.pivot_table.get_pivot_table import get_pivot_table
+
 from routes.pivot_table.filter import blueprint as filter_blueprint
+
 from flask import Blueprint
 
 blueprint = Blueprint("pivot_table", __name__, url_prefix="/pivot_table")
 
 create_pivot_table(blueprint)
+add_file_to_pivot_table(blueprint)
+remove_file_from_pivot_table(blueprint)
+reorder_filter_of_pivot_table(blueprint)
+set_charts_of_pivot_table(blueprint)
+toggle_visualization_mode_of_pivot_table(blueprint)
+get_pivot_table(blueprint)
 
 blueprint.register_blueprint(filter_blueprint)

@@ -1,15 +1,16 @@
-from control_variables import VALID_CAREER_INITIALS, VALID_CAREER_INSCRIPTION_MONTHS, VALID_CAREER_SHIFTS
 from lib.file_extension import without_extension
 
 import re
 import os
 
-def is_valid_career_name(name: str) -> bool:
+def is_valid_group_name(name: str) -> bool:
     return re.match(
-        pattern=f'({"|".join(VALID_CAREER_INITIALS)})\\d\\d({"|".join(VALID_CAREER_INSCRIPTION_MONTHS)})({"|".join(VALID_CAREER_SHIFTS)})-\\d\\d',
-        flags=re.IGNORECASE,
+        pattern=r'^\w{2}\d{2}\w{2}-\d{2}$',
         string=name
         ) is not None
 
 def group_name_from_path(file_path: str) -> str:
     return without_extension(filename=os.path.split(file_path)[-1])
+
+def inscription_year_of_group(group_name: str):
+    return 2000 + int(re.search(pattern=r'(\d{2})$', string=group_name).group(1))

@@ -10,6 +10,8 @@ from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
 from lib.pivot_table.recalculate import recalculate
 from lib.directory_definitions import data_file_of_slide
 
+from models.responses.edit_pivot_table_response import EditPivotTable_Response
+
 from flask import request
 
 import os
@@ -59,7 +61,7 @@ def remove_file_from_pivot_table():
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()
 
-    return {
-        "data": pivot_table.data,
-        "filters": pivot_table.filters,
-    }, 200
+    return EditPivotTable_Response(
+        data=pivot_table.data,
+        filters=pivot_table.filters,
+        ).to_dict(), 200

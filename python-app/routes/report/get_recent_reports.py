@@ -12,11 +12,11 @@ from itertools import dropwhile
 
 import os
 
-@with_app("/get_recents", methods=["POST"])
+@with_app("/get_recent", methods=["POST"])
 def get_recent_reports():
     # This is the id of the last report
     # that the frontend loaded
-    reference_report: str | None = request.json.get('report', None)
+    reference_report: str | None = getattr(request.json, 'report', None)
     reports_directories = sorted((
         full_directory_name 
         for directory_name in os.listdir(get_reports_directory()) 

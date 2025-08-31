@@ -23,6 +23,7 @@ def reorder_filter_of_pivot_table():
     report.save()
 
     return {
-        "message": "Se reordenó el filtro correctamente"
+        "message": "Se reordenó el filtro correctamente",
+        "filters": [ _filter.level.value for _filter in pivot_table.filters ]
     }, 200
 

@@ -19,7 +19,14 @@ def toggle_visualization_mode_of_pivot_table():
     match pivot_table.mode:
         case SlideCategory.IMAGE_SLIDE:
             # should render the image slide
-            pass
+            return { 
+                "new_mode": SlideCategory.PIVOT_TABLE.value, 
+                "current_mode": pivot_table.mode.value, 
+                "message": "The route is not implemented yet" 
+            }, 500
         case SlideCategory.PIVOT_TABLE:
-            # should render the pivot table
-            pass
+            return { 
+                "new_mode": SlideCategory.IMAGE_SLIDE.value, 
+                "current_mode": pivot_table.mode.value, 
+                "message": "The route is not implemented yet" 
+            }, 500

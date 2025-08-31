@@ -1,0 +1,1 @@
+PivotData = dict[str, dict[str, float]] | dict[str, float]
