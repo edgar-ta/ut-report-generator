@@ -2,16 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ut_report_generator/components/invisible_text_field.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
+import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/filter_component.dart';
+import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/filter_selector.dart';
+import 'package:ut_report_generator/api/pivot_table/filter/self.dart'
+    as filter_api;
+import 'package:ut_report_generator/utils/copy_with_added.dart';
 
 class PivotEditPane extends StatefulWidget {
+  final String report;
+  final String pivotTable;
+  final void Function(PivotTable Function(PivotTable)) setPivotTable;
+
   final TextEditingController nameController;
   final List<DataFilter> filters;
-
-  final Future<void> Function(String file) onFileRemoved;
-  final Future<void> Function(String file) onFileAdded;
 
   final Future<void> Function(String option, int filterIndex) onOptionAdded;
   final Future<void> Function(String option, int filterIndex) onOptionSwitched;
@@ -24,12 +31,14 @@ class PivotEditPane extends StatefulWidget {
   final Future<void> Function(int filterIndex) setSuperChart;
   final Future<void> Function() unsetSuperChart;
   final Future<void> Function(int newIndex, int oldIndex) onFiltersReordered;
+
   PivotEditPane({
     super.key,
+    required this.report,
+    required this.pivotTable,
+    required this.setPivotTable,
     required this.nameController,
     required this.filters,
-    required this.onFileRemoved,
-    required this.onFileAdded,
     required this.onOptionAdded,
     required this.onOptionRemoved,
     required this.onOptionSwitched,
@@ -52,6 +61,7 @@ class _PivotEditPaneState extends State<PivotEditPane> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           InvisibleTextField(controller: widget.nameController),
           SegmentedButton(
@@ -60,6 +70,57 @@ class _PivotEditPaneState extends State<PivotEditPane> {
               ButtonSegment(value: "b", icon: Icon(Icons.image)),
             ],
             selected: {"a"},
+          ),
+          FilterSelector(
+            title: "Filtros",
+            availableFilters:
+                PivotTableLevel.values
+                    .where(
+                      (level) =>
+                          !widget.filters
+                              .map((filter) => filter.level)
+                              .contains(level),
+                    )
+                    .toList(),
+            onFilterSelected: (level) {
+              widget.setPivotTable(
+                (pivotTable) => pivotTable.copyWith(
+                  filters: copyWithAdded(
+                    pivotTable.filters,
+                    DataFilter(
+                      level: level,
+                      selectedValues: [],
+                      possibleValues: [],
+                      // This has to match the default mode in the backend
+                      // in order to improve UI consistency
+                      selectionMode: SelectionMode.many,
+                      chartingMode: ChartingMode.none,
+                    ),
+                  ),
+                ),
+              );
+              filter_api
+                  .createDataFilter(
+                    report: widget.report,
+                    pivotTable: widget.pivotTable,
+                    level: level,
+                  )
+                  .then((newFilter) {
+                    widget.setPivotTable(
+                      (pivotTable) => pivotTable.copyWith(
+                        filters:
+                            pivotTable.filters
+                                .map(
+                                  (filter) =>
+                                      filter.level == level
+                                          ? newFilter
+                                          : filter,
+                                )
+                                .toList(),
+                      ),
+                    );
+                  });
+            },
           ),
           ReorderableListView(
             shrinkWrap: true,

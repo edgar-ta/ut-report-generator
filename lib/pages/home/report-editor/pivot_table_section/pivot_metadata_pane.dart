@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class PivotMetadataPane extends StatelessWidget {
@@ -22,7 +23,6 @@ class PivotMetadataPane extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 16,
         children: [
-          Text("Algo de texto"),
           Column(
             spacing: 8,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -40,11 +40,27 @@ class PivotMetadataPane extends StatelessWidget {
                           File(path).path.split(Platform.pathSeparator).last;
                       return InputChip(
                         label: Text(filename),
+                        deleteButtonTooltipMessage: "Eliminar",
                         onDeleted: () async {
                           await onFileRemoved(path);
                         },
                       );
                     }).toList(),
+              ),
+              TextButton.icon(
+                onPressed: () async {
+                  FilePickerResult? result = await FilePicker.platform
+                      .pickFiles(
+                        allowMultiple: false,
+                        allowedExtensions: [".xls"],
+                      );
+                  if (result != null) {
+                    var file = result.files[0].path!;
+                    await onFileAdded(file);
+                  }
+                },
+                label: Text("Añadir archivo"),
+                icon: Icon(Icons.add),
               ),
             ],
           ),
