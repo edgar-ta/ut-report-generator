@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/utils/control_variables.dart';
 
 class ErrorPage extends StatelessWidget {
   ErrorPage({super.key});
@@ -14,7 +15,7 @@ class ErrorPage extends StatelessWidget {
             children: [
               Text("(×_×)", style: TextStyle(color: Colors.red, fontSize: 128)),
               Text(
-                "Error al conectar con el servidor.",
+                "Error al conectar con el servidor. ${serverExecutable()}",
                 style: TextStyle(color: Colors.red),
               ),
             ],

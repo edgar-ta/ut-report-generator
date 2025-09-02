@@ -5,6 +5,7 @@ Future<HelloRequest_Response> helloRequest() {
     route: "hello",
     body: {"message": "Hello"},
     callback: HelloRequest_Response.fromJson,
+    timeLimit: Duration(seconds: 15),
   );
 }
 

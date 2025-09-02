@@ -23,7 +23,10 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ScaffoldController(),
-      child: MaterialApp.router(title: appTitle(), routerConfig: router),
+      child: MaterialApp.router(
+        title: "UT Report Generator",
+        routerConfig: router,
+      ),
     );
   }
 }

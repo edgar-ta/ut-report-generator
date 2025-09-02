@@ -7,6 +7,7 @@ Future<K> sendRequest<K>({
   required String route,
   required K Function(Map<String, dynamic>) callback,
   Object? body,
+  Duration? timeLimit,
 }) {
   print("@send_request.dart");
   print("Sending data to route: $route");
@@ -14,12 +15,11 @@ Future<K> sendRequest<K>({
 
   return http
       .post(
-        isDevelopmentMode()
-            ? Uri.parse("http://localhost:5000/$route")
-            : Uri.parse("http://localhost:$serverPort/$route"),
+        Uri.parse("http://localhost:${serverPort()}/$route"),
         body: jsonEncode(body),
         headers: {'Content-Type': 'application/json'},
       )
+      .timeout(timeLimit ?? Duration(seconds: 5))
       .then((response) {
         if (response.statusCode == 200) {
           print("@send_request.dart");
