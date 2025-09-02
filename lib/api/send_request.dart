@@ -14,9 +14,9 @@ Future<K> sendRequest<K>({
 
   return http
       .post(
-        IS_DEVELOPMENT_MODE
+        isDevelopmentMode()
             ? Uri.parse("http://localhost:5000/$route")
-            : Uri.parse("http://localhost:$SERVER_PORT/$route"),
+            : Uri.parse("http://localhost:$serverPort/$route"),
         body: jsonEncode(body),
         headers: {'Content-Type': 'application/json'},
       )

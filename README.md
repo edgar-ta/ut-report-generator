@@ -9,8 +9,17 @@ Se trata de un proyecto desarrollado en conjunto por Edgar Trejo Avila y el prof
 
 ## Tecnologías Utilizadas
 
-* **Flet** para el desarrollo de la UI
-* **Matplotlib** y **Seaborn** para la generación de gráficos
+* **Dart** para el desarrollo de la UI
+* **Matplotlib** y **Pandas** para la generación de gráficos
 * **python-pptx** para la generación automática de presentaciones
+* **flask** para ejecutar el código del backend
 
 ![Imagen de pie de página que muestra los logos de las instituciones con las que está asociada la UTSJR](readme-assets/footer.png)
+
+## Compilación
+
+### Windows
+
+1. Compilar el programa de Python usando PyInstaller
+2. Compilar el programa de Flutter usando flutter build windows --release
+3. Compilar el script de InnoSetup (el que sí funciona)

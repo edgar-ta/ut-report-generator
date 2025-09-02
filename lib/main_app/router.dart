@@ -11,7 +11,7 @@ import 'package:ut_report_generator/testing_components/testing_component.dart';
 import 'package:ut_report_generator/utils/control_variables.dart';
 
 final router = GoRouter(
-  initialLocation: IS_DEVELOPMENT_MODE && IS_TESTING_MODE ? "/test" : "/home",
+  initialLocation: isDevelopmentMode() && isTestingMode() ? "/test" : "/home",
   observers: [routeObserver],
   routes: [
     StatefulShellRoute.indexedStack(
@@ -19,7 +19,7 @@ final router = GoRouter(
         return AppScaffold(child: navigationShell);
       },
       branches: [
-        if (IS_DEVELOPMENT_MODE && IS_TESTING_MODE)
+        if (isDevelopmentMode() && isTestingMode())
           (StatefulShellBranch(
             routes: [
               GoRoute(
