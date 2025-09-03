@@ -39,5 +39,8 @@ Future<K> sendRequest<K>({
     print("Request failed with status ${response.statusCode}");
   }
 
+  print("Successful request");
+  print(response.body);
+
   return callback(jsonDecode(response.body));
 }

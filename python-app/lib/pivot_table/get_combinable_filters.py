@@ -45,12 +45,16 @@ def get_combinable_filters(data_frame: pandas.DataFrame, filters: list[DataFilte
             )
         combinable_filters.append(combinable_filter)
 
-        if _filter == filters[-1]:
-            # No need to create more data frames at the end; 
-            # they won't be used in the future
-            continue
-        
-        if is_valid_filter(_filter=combinable_filter):
+        if combinable_filter.possible_values.__len__() > 0:
+            if combinable_filter.selected_values.__len__() == 0:
+                print(f"Empty filter. {combinable_filter.level = }")
+                combinable_filter.selected_values.append(combinable_filter.possible_values[0])
+
+            if _filter == filters[-1]:
+                # No need to create more data frames at the end; 
+                # they won't be used in the future
+                continue
+
             data_frames = [ 
                 cross_section(data_frame=_data_frame, key=[value], level=combinable_filter.level.value) 
                 for _data_frame in data_frames 
