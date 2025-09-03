@@ -1,6 +1,10 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/api/report/start_report_with_pivot_table.dart';
+import 'package:ut_report_generator/main.dart';
 import 'package:ut_report_generator/models/report.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
 import 'package:ut_report_generator/models/image_slide/image_slide_kind.dart';
@@ -20,8 +24,7 @@ class MainApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ScaffoldController(),
       child: MaterialApp.router(
-        title: "Generador de Reportes de la UTSJR",
-        // showSemanticsDebugger: IS_TESTING_MODE,
+        title: "UT Report Generator",
         routerConfig: router,
       ),
     );

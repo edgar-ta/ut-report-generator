@@ -17,6 +17,8 @@ def get_recent_reports():
     # This is the id of the last report
     # that the frontend loaded
     reference_report: str | None = getattr(request.json, 'report', None)
+    
+    os.makedirs(get_reports_directory(), exist_ok=True)
     reports_directories = sorted((
         full_directory_name 
         for directory_name in os.listdir(get_reports_directory()) 
