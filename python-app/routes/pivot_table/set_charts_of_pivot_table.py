@@ -19,7 +19,7 @@ def set_charts_of_pivot_table():
     if chart_index is None and super_chart_index is None:
         raise DescriptiveError(http_error_code=400, message="No se pasó ningún índice para editar el gráfico o super gráfico de la tabla dinámica")
 
-    if chart_index == super_chart_index and all(index is not None for index in [ super_chart_index, chart_index ]):
+    if chart_index == super_chart_index:
         raise DescriptiveError(http_error_code=400, message="Se intentó hacer que un mismo filtro sea gráfico y súper gráfico a la vez. Solo se puede uno solo")
     
     if chart_index is not None and chart_index < 0:

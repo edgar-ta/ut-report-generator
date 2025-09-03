@@ -318,8 +318,9 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       final secondFilterMode =
           pivotTable.filters[secondFilterIndex].chartingMode;
 
-      if (firstFilterMode == ChartingMode.superChart) {
-        (chartIndex, superChartIndex) = (superChartIndex, chartIndex);
+      if (secondFilterMode == ChartingMode.chart) {
+        chartIndex = secondFilterIndex;
+        superChartIndex = firstFilterIndex;
       }
 
       var filters = copyWithReplacement(
@@ -340,8 +341,8 @@ class _PivotTableSectionState extends State<PivotTableSection> {
         .setCharts(
           report: widget.report,
           pivotTable: widget.pivotTable.identifier,
-          chart: chartIndex,
-          superChart: superChartIndex,
+          chart: superChartIndex,
+          superChart: chartIndex,
         )
         .then((data) {
           widget.updatePivotTable(

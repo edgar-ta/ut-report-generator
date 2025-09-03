@@ -15,4 +15,3 @@ bool Function() isTestingMode =
     () => bool.parse(getEnvironmentVariable("IS_TESTING_MODE", "false"));
 int Function() serverPort =
     () => int.parse(getEnvironmentVariable("SERVER_PORT", "55001"));
-String Function() appTitle = () => getEnvironmentVariable("APP_TITLE", "FSDJL");
