@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
-import 'package:ut_report_generator/api/report/export_report.dart';
 import 'package:ut_report_generator/api/file_response.dart';
-import 'package:ut_report_generator/api/report/render_report.dart';
+import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
@@ -23,7 +21,11 @@ import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
 import 'package:ut_report_generator/pages/home/report-editor/slide/shimmer_slide.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
+import 'package:ut_report_generator/utils/copy_with_added.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
+import 'package:ut_report_generator/api/report/self.dart' as report_api;
+import 'package:ut_report_generator/api/pivot_table/self.dart'
+    as pivot_table_api;
 
 class ReportEditor extends StatefulWidget {
   final Future<ReportClass> Function() reportCallback;
@@ -37,11 +39,18 @@ class ReportEditor extends StatefulWidget {
 class _ReportEditorState extends State<ReportEditor> {
   late TextEditingController reportNameController;
   ReportClass? report;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _loadReport();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
   }
 
   Future<ReportClass> _loadReport() async {
@@ -77,8 +86,7 @@ class _ReportEditorState extends State<ReportEditor> {
             FloatingActionButton.small(
               heroTag: "add_pivot_table",
               onPressed: () {
-                // Lógica para añadir tabla dinámica
-                print("Añadir Tabla dinámica");
+                _addPivotTable();
               },
               tooltip: "Tabla dinámica",
               child: Column(
@@ -94,9 +102,8 @@ class _ReportEditorState extends State<ReportEditor> {
             // Botón para añadir Imagen
             FloatingActionButton.small(
               heroTag: "add_image",
-              onPressed: () {
-                // Lógica para añadir imagen
-                print("Añadir Imagen");
+              onPressed: () async {
+                //
               },
               tooltip: "Imagen",
               child: Column(
@@ -138,12 +145,40 @@ class _ReportEditorState extends State<ReportEditor> {
     });
   }
 
-  Future<RenderReport_Response> _renderReport() {
-    return renderReport(identifier: report!.identifier);
+  Future<void> _addPivotTable() async {
+    pivot_table_api
+        .createPivotTable(
+          report: report!.identifier,
+          dataFiles:
+              (report!.slides.firstWhere((slide) => slide is PivotTable)
+                      as PivotTable)
+                  .source
+                  .files,
+        )
+        .then((value) {
+          setState(() {
+            report = report!.copyWith(
+              slides: copyWithAdded(report!.slides, value),
+            );
+          });
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOut,
+              );
+            }
+          });
+        });
   }
 
-  Future<ExportReport_Response> _exportReport() {
-    return exportReport(identifier: report!.identifier);
+  Future<report_api.RenderReport_Response> _renderReport() {
+    return report_api.renderReport(identifier: report!.identifier);
+  }
+
+  Future<report_api.ExportReport_Response> _exportReport() {
+    return report_api.exportReport(identifier: report!.identifier);
   }
 
   Future<FileResponse> _renderReportAsPdf() {
@@ -177,6 +212,7 @@ class _ReportEditorState extends State<ReportEditor> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: _scrollController,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 0),
         child: AnimatedSwitcher(
