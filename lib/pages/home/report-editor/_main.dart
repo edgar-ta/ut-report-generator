@@ -51,26 +51,62 @@ class _ReportEditorState extends State<ReportEditor> {
         reportNameController = TextEditingController(text: report.reportName);
       });
 
-      context.read<ScaffoldController>().setFab(
-        ExpandableFab(
+      context.read<ScaffoldController>().setFabBuilder(
+        (context) => ExpandableFab(
           openButtonBuilder: RotateFloatingActionButtonBuilder(
-            child: const Icon(Icons.add),
             fabSize: ExpandableFabSize.regular,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.green,
+            child: const Text(
+              "Añadir",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            backgroundColor: Colors.yellow,
+            foregroundColor: Colors.black,
             shape: const CircleBorder(),
           ),
           type: ExpandableFabType.up,
+          distance: 80, // distancia de los botones hijos al FAB principal
+          overlayStyle: ExpandableFabOverlayStyle(
+            color: Colors.black.withOpacity(0.2), // fondo semitransparente
+          ),
+          childrenAnimation: ExpandableFabAnimation.none,
           children: [
+            // Botón para añadir Tabla dinámica
             FloatingActionButton.small(
-              heroTag: null,
-              onPressed: () {},
-              child: Icon(Icons.star),
+              heroTag: "add_pivot_table",
+              onPressed: () {
+                // Lógica para añadir tabla dinámica
+                print("Añadir Tabla dinámica");
+              },
+              tooltip: "Tabla dinámica",
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.bar_chart),
+                  SizedBox(height: 2),
+                  Text("Tabla", style: TextStyle(fontSize: 10)),
+                ],
+              ),
             ),
+
+            // Botón para añadir Imagen
             FloatingActionButton.small(
-              heroTag: null,
-              onPressed: () {},
-              child: Icon(Icons.email),
+              heroTag: "add_image",
+              onPressed: () {
+                // Lógica para añadir imagen
+                print("Añadir Imagen");
+              },
+              tooltip: "Imagen",
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.image),
+                  SizedBox(height: 2),
+                  Text("Imagen", style: TextStyle(fontSize: 10)),
+                ],
+              ),
             ),
           ],
         ),
@@ -90,7 +126,7 @@ class _ReportEditorState extends State<ReportEditor> {
             onPressed: () {
               context.read<ScaffoldController>()
                 ..setAppBarBuilder(null)
-                ..setFab(null);
+                ..setFabBuilder(null);
               context.pop();
             },
             icon: Icon(Icons.arrow_back),

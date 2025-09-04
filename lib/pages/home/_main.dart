@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
   @override
   void didPopNext() {
     context.read<ScaffoldController>()
-      ..setFab(null)
+      ..setFabBuilder(null)
       ..setAppBarBuilder(null);
   }
 

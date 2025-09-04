@@ -21,6 +21,7 @@ class _AppScaffoldState extends State<AppScaffold> {
   @override
   Widget build(BuildContext context) {
     final appBarBuilder = context.watch<ScaffoldController>().appBarBuilder;
+    final fabBuilder = context.watch<ScaffoldController>().fabBuilder;
 
     return Stack(
       children: [
@@ -28,11 +29,8 @@ class _AppScaffoldState extends State<AppScaffold> {
           padding: const EdgeInsets.only(top: APP_BAR_HEIGHT),
           child: Scaffold(
             floatingActionButtonLocation: ExpandableFab.location,
-            floatingActionButton: Consumer<ScaffoldController>(
-              builder: (_, controller, __) {
-                return controller.fab ?? SizedBox.shrink();
-              },
-            ),
+            floatingActionButton:
+                fabBuilder != null ? fabBuilder(context) : SizedBox.shrink(),
             appBar:
                 appBarBuilder != null
                     ? appBarBuilder(context)
