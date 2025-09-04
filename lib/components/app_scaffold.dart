@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/components/common_appbar.dart';
 import 'package:ut_report_generator/components/footer_component.dart';
 import 'package:ut_report_generator/components/header_component.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
+import 'package:ut_report_generator/utils/design_constants.dart';
 
 class AppScaffold extends StatefulWidget {
   StatefulNavigationShell child;
@@ -18,15 +20,19 @@ class AppScaffold extends StatefulWidget {
 class _AppScaffoldState extends State<AppScaffold> {
   @override
   Widget build(BuildContext context) {
-    final fab = context.watch<ScaffoldController>().fab;
     final appBarBuilder = context.watch<ScaffoldController>().appBarBuilder;
 
     return Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 48),
+          padding: const EdgeInsets.only(top: APP_BAR_HEIGHT),
           child: Scaffold(
-            floatingActionButton: fab,
+            floatingActionButtonLocation: ExpandableFab.location,
+            floatingActionButton: Consumer<ScaffoldController>(
+              builder: (_, controller, __) {
+                return controller.fab ?? SizedBox.shrink();
+              },
+            ),
             appBar:
                 appBarBuilder != null
                     ? appBarBuilder(context)

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
@@ -20,7 +21,6 @@ import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/widget.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/widget.dart';
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
-import 'package:ut_report_generator/pages/home/report-editor/render_button.dart';
 import 'package:ut_report_generator/pages/home/report-editor/slide/shimmer_slide.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
@@ -45,49 +45,37 @@ class _ReportEditorState extends State<ReportEditor> {
   }
 
   Future<ReportClass> _loadReport() async {
-    return waitAtLeast(Duration(seconds: 2), widget.reportCallback()).then((
-      report,
-    ) {
+    return widget.reportCallback().then((report) {
       setState(() {
         this.report = report;
         reportNameController = TextEditingController(text: report.reportName);
       });
+
       context.read<ScaffoldController>().setFab(
-        RenderButton(
-          distance: 8,
-          builder: (close, index) {
-            switch (index) {
-              case 0:
-                return _optionComponent(
-                  close: close,
-                  callback: _renderReport,
-                  label: "PPTX",
-                  icon: Icons.slideshow,
-                  alertTitle: "Renderizando PPTX",
-                );
-              case 1:
-                return _optionComponent(
-                  close: close,
-                  callback: _exportReport,
-                  label: "Reporte",
-                  icon: Icons.edit_document,
-                  alertTitle: "Exportando reporte",
-                );
-              default:
-                return _optionComponent(
-                  close: close,
-                  callback: _renderReportAsPdf,
-                  label: "PDF",
-                  icon: Icons.picture_as_pdf,
-                  alertTitle: "Renderizando PDF",
-                );
-            }
-          },
-          count: 3,
-          width: 192,
-          height: 48,
+        ExpandableFab(
+          openButtonBuilder: RotateFloatingActionButtonBuilder(
+            child: const Icon(Icons.add),
+            fabSize: ExpandableFabSize.regular,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
+            shape: const CircleBorder(),
+          ),
+          type: ExpandableFabType.up,
+          children: [
+            FloatingActionButton.small(
+              heroTag: null,
+              onPressed: () {},
+              child: Icon(Icons.star),
+            ),
+            FloatingActionButton.small(
+              heroTag: null,
+              onPressed: () {},
+              child: Icon(Icons.email),
+            ),
+          ],
         ),
       );
+
       context.read<ScaffoldController>().setAppBarBuilder(
         commonAppbar(
           title: InputComponent(

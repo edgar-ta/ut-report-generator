@@ -47,7 +47,6 @@ def get_combinable_filters(data_frame: pandas.DataFrame, filters: list[DataFilte
 
         if combinable_filter.possible_values.__len__() > 0:
             if combinable_filter.selected_values.__len__() == 0:
-                print(f"Empty filter. {combinable_filter.level = }")
                 combinable_filter.selected_values.append(combinable_filter.possible_values[0])
 
             if _filter == filters[-1]:
