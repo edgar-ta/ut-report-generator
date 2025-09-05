@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
+import 'package:ut_report_generator/components/file_selector/widget.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
@@ -40,6 +41,7 @@ class _ReportEditorState extends State<ReportEditor> {
   late TextEditingController reportNameController;
   ReportClass? report;
   final ScrollController _scrollController = ScrollController();
+  final fabKey = GlobalKey<ExpandableFabState>();
 
   @override
   void initState() {
@@ -62,6 +64,7 @@ class _ReportEditorState extends State<ReportEditor> {
 
       context.read<ScaffoldController>().setFabBuilder(
         (context) => ExpandableFab(
+          key: fabKey,
           openButtonBuilder: RotateFloatingActionButtonBuilder(
             fabSize: ExpandableFabSize.regular,
             child: const Text(
@@ -86,7 +89,33 @@ class _ReportEditorState extends State<ReportEditor> {
             FloatingActionButton.small(
               heroTag: "add_pivot_table",
               onPressed: () {
-                _addPivotTable();
+                fabKey.currentState?.close();
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    var pivotTables =
+                        report.slides.whereType<PivotTable>().toList();
+                    pivotTables.sort(
+                      (first, second) =>
+                          first.creationDate.compareTo(second.creationDate),
+                    );
+                    var uniqueFiles =
+                        pivotTables
+                            .map((pivotTable) => pivotTable.source.files)
+                            .expand((files) => files)
+                            .toSet()
+                            .toList();
+
+                    return FileSelector(
+                      initialFiles: uniqueFiles,
+                      defaultSelection: pivotTables.first.source.files,
+                      legend: null,
+                      onFilesSelected: (List<String> files) async {
+                        _addPivotTable(files);
+                      },
+                    );
+                  },
+                );
               },
               tooltip: "Tabla dinámica",
               child: Column(
@@ -145,16 +174,9 @@ class _ReportEditorState extends State<ReportEditor> {
     });
   }
 
-  Future<void> _addPivotTable() async {
+  Future<void> _addPivotTable(List<String> files) async {
     pivot_table_api
-        .createPivotTable(
-          report: report!.identifier,
-          dataFiles:
-              (report!.slides.firstWhere((slide) => slide is PivotTable)
-                      as PivotTable)
-                  .source
-                  .files,
-        )
+        .createPivotTable(report: report!.identifier, dataFiles: files)
         .then((value) {
           setState(() {
             report = report!.copyWith(
