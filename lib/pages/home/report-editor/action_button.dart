@@ -119,37 +119,41 @@ class _RenderButtonState extends State<RenderButton>
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 64,
+    return Container(
+      color: Colors.blue,
       child: Stack(
         alignment: Alignment.bottomRight,
         clipBehavior: Clip.none,
         children: [
-          _buildTapToCloseFab(),
-          ...List.generate(
-            widget.count,
-            (index) => AnimatedBuilder(
-              builder:
-                  (context, wrappedWidget) => Positioned(
-                    right: 0,
-                    bottom: (index + 1) * (widget.distance + widget.height),
-                    child: SizedBox(
-                      width: widget.width,
-                      height: widget.height,
-                      child: wrappedWidget,
+          IntrinsicHeight(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: List.generate(
+                widget.count,
+                (index) => AnimatedBuilder(
+                  builder:
+                      (context, wrappedWidget) => Positioned(
+                        right: 0,
+                        bottom: (index + 1) * (widget.distance + widget.height),
+                        child: SizedBox(
+                          width: widget.width,
+                          height: widget.height,
+                          child: wrappedWidget,
+                        ),
+                      ),
+                  animation: _expandAnimation,
+                  child: FadeTransition(
+                    opacity: _expandAnimation,
+                    child: IgnorePointer(
+                      ignoring: !_open,
+                      child: widget.builder(_close, index),
                     ),
                   ),
-              animation: _expandAnimation,
-              child: FadeTransition(
-                opacity: _expandAnimation,
-                child: IgnorePointer(
-                  ignoring: !_open,
-                  child: widget.builder(_close, index),
                 ),
               ),
             ),
           ),
-          // ..._buildExpandingActionButtons(),
+          _buildTapToCloseFab(),
           _buildTapToOpenFab(),
         ],
       ),
