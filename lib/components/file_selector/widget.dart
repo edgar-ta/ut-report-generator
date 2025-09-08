@@ -1,3 +1,4 @@
+import 'package:easy_sticky_header/easy_sticky_header.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/components/file_selector/file_entry.dart';
@@ -35,12 +36,17 @@ class _FileSelectorState extends State<FileSelector> {
     selectedFiles = widget.defaultSelection;
   }
 
-  void _addFileToSelection(String file) {
-    if (!selectedFiles.contains(file)) {
-      setState(() {
-        selectedFiles = copyWithAdded(selectedFiles, file);
-      });
+  void _addFilesToSelection(List<String> files) {
+    var newFiles = [...selectedFiles];
+    for (var file in files) {
+      if (!newFiles.contains(file)) {
+        newFiles.add(file);
+      }
     }
+
+    setState(() {
+      selectedFiles = newFiles;
+    });
   }
 
   void _removeFileFromSelection(String file) {
@@ -61,6 +67,19 @@ class _FileSelectorState extends State<FileSelector> {
 
     setState(() {
       possibleFiles = newFiles;
+    });
+  }
+
+  bool _isSelectAllHovered = false;
+  void _selectAllFiles() {
+    setState(() {
+      selectedFiles = possibleFiles;
+    });
+  }
+
+  void _deselectAllFiles() {
+    setState(() {
+      selectedFiles = [];
     });
   }
 
@@ -89,9 +108,67 @@ class _FileSelectorState extends State<FileSelector> {
             const SizedBox(height: 16),
             SizedBox(
               height: 300,
-              child: ListView(
-                children:
-                    possibleFiles.map((file) {
+              child: StickyHeader(
+                child: ListView(
+                  children: [
+                    StickyContainerWidget(
+                      index: 0,
+                      child: Container(
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Row(
+                            spacing: 4,
+                            children: [
+                              SizedBox.square(
+                                dimension: 64,
+                                child: AnimatedOpacity(
+                                  opacity:
+                                      selectedFiles.isNotEmpty ||
+                                              _isSelectAllHovered
+                                          ? 1
+                                          : 0,
+                                  duration: Duration(milliseconds: 200),
+                                  child: MouseRegion(
+                                    onEnter:
+                                        (_) => setState(() {
+                                          _isSelectAllHovered = true;
+                                        }),
+                                    onExit:
+                                        (_) => setState(() {
+                                          _isSelectAllHovered = false;
+                                        }),
+                                    child: Tooltip(
+                                      message:
+                                          (possibleFiles.length ==
+                                                  selectedFiles.length)
+                                              ? "No seleccionar ninguno"
+                                              : "Seleccionar todos",
+                                      child: Checkbox(
+                                        value:
+                                            possibleFiles.isNotEmpty &&
+                                            (possibleFiles.length ==
+                                                selectedFiles.length),
+                                        onChanged: (shouldSelectAll) {
+                                          if (shouldSelectAll!) {
+                                            _selectAllFiles();
+                                          } else {
+                                            _deselectAllFiles();
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Text("Archivos recientes"),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    ...possibleFiles.indexed.map((data) {
+                      final (index, file) = data;
                       final isSelected = selectedFiles.contains(file);
                       return FileEntry(
                         isSelected: isSelected,
@@ -99,12 +176,14 @@ class _FileSelectorState extends State<FileSelector> {
                           if (isSelected) {
                             _removeFileFromSelection(file);
                           } else {
-                            _addFileToSelection(file);
+                            _addFilesToSelection([file]);
                           }
                         },
                         path: file,
                       );
                     }).toList(),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -117,9 +196,9 @@ class _FileSelectorState extends State<FileSelector> {
                   ], // ⚠️ puede que necesites fileType: FileType.custom
                 );
                 if (result != null) {
-                  _addPossibleFiles(
-                    result.files.map((file) => file.path!).toList(),
-                  );
+                  var files = result.files.map((file) => file.path!).toList();
+                  _addPossibleFiles(files);
+                  _addFilesToSelection(files);
                 }
               },
               icon: const Icon(Icons.add),

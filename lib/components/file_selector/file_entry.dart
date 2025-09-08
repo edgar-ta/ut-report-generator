@@ -38,6 +38,7 @@ class _FileEntryState extends State<FileEntry> {
             isHovered = false;
           }),
       child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 4),
         title: AnimatedOpacity(
           opacity: isHovered ? 1 : 0.8,
           duration: Duration(milliseconds: 100),

@@ -55,6 +55,20 @@ class _ReportEditorState extends State<ReportEditor> {
     _scrollController.dispose();
   }
 
+  List<String> _getRecentFiles() {
+    var pivotTables = report!.slides.whereType<PivotTable>().toList();
+    pivotTables.sort(
+      (first, second) => first.creationDate.compareTo(second.creationDate),
+    );
+    var uniqueFiles =
+        pivotTables
+            .map((pivotTable) => pivotTable.source.files)
+            .expand((files) => files)
+            .toSet()
+            .toList();
+    return uniqueFiles;
+  }
+
   Future<ReportClass> _loadReport() async {
     return widget.reportCallback().then((report) {
       setState(() {
@@ -93,22 +107,11 @@ class _ReportEditorState extends State<ReportEditor> {
                 showDialog(
                   context: context,
                   builder: (context) {
-                    var pivotTables =
-                        report.slides.whereType<PivotTable>().toList();
-                    pivotTables.sort(
-                      (first, second) =>
-                          first.creationDate.compareTo(second.creationDate),
-                    );
-                    var uniqueFiles =
-                        pivotTables
-                            .map((pivotTable) => pivotTable.source.files)
-                            .expand((files) => files)
-                            .toSet()
-                            .toList();
+                    var recentFiles = _getRecentFiles();
 
                     return FileSelector(
-                      initialFiles: uniqueFiles,
-                      defaultSelection: pivotTables.first.source.files,
+                      initialFiles: recentFiles,
+                      defaultSelection: [],
                       legend: null,
                       onFilesSelected: (List<String> files) async {
                         _addPivotTable(files);
