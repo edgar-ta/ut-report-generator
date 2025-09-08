@@ -37,28 +37,31 @@ class _FileEntryState extends State<FileEntry> {
           (_) => setState(() {
             isHovered = false;
           }),
-      child: Row(
-        children: [
-          AnimatedOpacity(
-            opacity: (isHovered || widget.isSelected) ? 1 : 0,
-            duration: Duration(milliseconds: 250),
-            child: SizedBox.square(
-              dimension: 64,
-              child: Checkbox(
-                value: widget.isSelected,
-                onChanged: (_) {
-                  widget.toggleSelected();
-                },
-              ),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 4),
+        title: AnimatedOpacity(
+          opacity: isHovered ? 1 : 0.8,
+          duration: Duration(milliseconds: 100),
+          child: Text(filename),
+        ),
+        leading: AnimatedOpacity(
+          opacity: (isHovered || widget.isSelected) ? 1 : 0.25,
+          duration: Duration(milliseconds: 250),
+          child: SizedBox.square(
+            dimension: 64,
+            child: Checkbox(
+              value: widget.isSelected,
+              onChanged: (_) {
+                widget.toggleSelected();
+              },
             ),
           ),
-          Text(filename),
-          AnimatedOpacity(
-            opacity: isHovered ? 1 : 0,
-            duration: Duration(milliseconds: 250),
-            child: Text(rootPath),
-          ),
-        ],
+        ),
+        subtitle: AnimatedOpacity(
+          opacity: isHovered ? 1 : 0.25,
+          duration: Duration(milliseconds: 250),
+          child: Text(rootPath),
+        ),
       ),
     );
   }
