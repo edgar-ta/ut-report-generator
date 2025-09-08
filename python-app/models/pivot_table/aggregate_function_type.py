@@ -22,3 +22,16 @@ class AggregateFunctionType(Enum):
                 return lambda values: values.min()
             case AggregateFunctionType.MAX:
                 return lambda values: values.max()
+
+def aggregate_function_to_spanish(function_type: AggregateFunctionType) -> str:
+    match function_type:
+        case AggregateFunctionType.COUNT:
+            return "Conteo"
+        case AggregateFunctionType.AVERAGE:
+            return "Promedio"
+        case AggregateFunctionType.MIN:
+            return "Mínimo"
+        case AggregateFunctionType.MAX:
+            return "Máximo"
+        case _:
+            raise ValueError(f"Tipo de función desconocido: {function_type}")

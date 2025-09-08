@@ -5,6 +5,7 @@ from routes.pivot_table.reorder_filter_of_pivot_table import reorder_filter_of_p
 from routes.pivot_table.set_charts_of_pivot_table import set_charts_of_pivot_table
 from routes.pivot_table.toggle_visualization_mode_of_pivot_table import toggle_visualization_mode_of_pivot_table
 from routes.pivot_table.get_pivot_table import get_pivot_table
+from routes.pivot_table.render_pivot_table import render_pivot_table
 
 from routes.pivot_table.filter import blueprint as filter_blueprint
 
@@ -19,5 +20,6 @@ reorder_filter_of_pivot_table(blueprint)
 set_charts_of_pivot_table(blueprint)
 toggle_visualization_mode_of_pivot_table(blueprint)
 get_pivot_table(blueprint)
+render_pivot_table(blueprint)
 
 blueprint.register_blueprint(filter_blueprint)

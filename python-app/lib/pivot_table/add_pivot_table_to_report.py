@@ -72,7 +72,7 @@ def add_pivot_table_to_report(report: Report, local_request: flask.Request, inde
         name="Mi tabla dinámica",
         filters=filters,
         filters_order=[ _filter.level for _filter in filters ],
-        preview=None,
+        preview="dummy-preview.png",
         source=data_source,
         mode=SlideCategory.PIVOT_TABLE
     )

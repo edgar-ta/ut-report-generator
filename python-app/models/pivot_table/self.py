@@ -14,7 +14,7 @@ class PivotTable():
             identifier: str, 
             creation_date: pd.Timestamp, 
             last_edit: pd.Timestamp,
-            preview: str | None,
+            preview: str,
             filters: list[DataFilter],
             filters_order: list[PivotTableLevel],
             source: DataSource,
@@ -56,6 +56,23 @@ class PivotTable():
             "filter_function": self.filter_function.value,
             "mode": self.mode.value
         }
+    
+    @staticmethod
+    def from_no_preview(
+        name: str, 
+        identifier: str, 
+        creation_date: pd.Timestamp, 
+        last_edit: pd.Timestamp,
+        filters: list[DataFilter],
+        filters_order: list[PivotTableLevel],
+        source: DataSource,
+        data: dict[str, dict[str, float]] | dict[str, float],
+        aggregate_function: AggregateFunctionType,
+        filter_function: FilterFunctionType,
+        mode: SlideCategory
+        ):
+        # preview = 
+        pass
 
     @classmethod
     def from_json(cls, json_data: dict[str, any]) -> "PivotTable":
