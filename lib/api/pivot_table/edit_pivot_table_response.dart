@@ -5,8 +5,13 @@ import 'package:ut_report_generator/models/pivot_table/pivot_data.dart';
 class EditPivotTable_Response {
   final List<DataFilter> filters;
   final PivotData data;
+  final String preview;
 
-  EditPivotTable_Response({required this.filters, required this.data});
+  EditPivotTable_Response({
+    required this.filters,
+    required this.data,
+    required this.preview,
+  });
 
   factory EditPivotTable_Response.fromJson(Map<String, dynamic> json) {
     return EditPivotTable_Response(
@@ -15,6 +20,7 @@ class EditPivotTable_Response {
               .map((e) => DataFilter.fromJson(e as Map<String, dynamic>))
               .toList(),
       data: PivotData.fromJson(json['data']),
+      preview: json['preview'] as String,
     );
   }
 }

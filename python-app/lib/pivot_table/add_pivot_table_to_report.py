@@ -1,6 +1,6 @@
 from lib.get_or_panic import get_or_panic
 from lib.file_extension import get_file_extension, without_extension
-from lib.directory_definitions import data_file_of_slide
+from lib.directory_definitions import data_file_of_slide, preview_image_of_slide
 from lib.group_name import group_name_from_path
 from lib.data_frame.data_frame_io import export_data_frame
 from lib.data_frame.validate_file import validate_file
@@ -8,6 +8,7 @@ from lib.pivot_table.get_data_of_frame import get_data_of_frame
 from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
 from lib.pivot_table.read_excel import read_excel
 from lib.pivot_table.create_default_filters import create_default_filters
+from lib.pivot_table.plot_pivot_table import plot_from_components
 
 from models.pivot_table.self import PivotTable
 from models.pivot_table.aggregate_function_type import AggregateFunctionType
@@ -51,30 +52,40 @@ def add_pivot_table_to_report(report: Report, local_request: flask.Request, inde
     export_data_frame(data_frame=main_frame, file_path=data_file, key=slide_identifier)
 
     data_source = DataSource(files=data_files, merged_file=data_file)
-    filter_function = FilterFunctionType.FAILED_STUDENTS
-    aggregate_function = AggregateFunctionType.COUNT
-    filters = create_default_filters(data_frame=main_frame)
+    default_filter_function = FilterFunctionType.FAILED_STUDENTS
+    default_aggregate_function = AggregateFunctionType.COUNT
+    default_filters = create_default_filters(data_frame=main_frame)
+    default_title = "Mi tabla dinámica"
 
     data = get_data_of_frame(
         data_frame=main_frame, 
-        filters=filters, 
-        filter_function=filter_function, 
-        aggregate_function=aggregate_function, 
+        filters=default_filters, 
+        filter_function=default_filter_function, 
+        aggregate_function=default_aggregate_function, 
         )
     
+    preview_filepath = preview_image_of_slide(root_directory=report.root_directory, slide_id=slide_identifier)
+    plot_from_components(
+        data=data, 
+        title=default_title, 
+        outer_chart=default_filters[0].level,
+        _filter=default_filter_function, 
+        aggregate=default_aggregate_function, 
+        filepath=preview_filepath
+        )
+
     pivot_table = PivotTable(
-        aggregate_function=aggregate_function,
+        aggregate_function=default_aggregate_function,
         creation_date=pd.Timestamp.now(),
         data=data,
-        filter_function=filter_function,
+        filter_function=default_filter_function,
         identifier=slide_identifier,
         last_edit=pd.Timestamp.now(),
-        name="Mi tabla dinámica",
-        filters=filters,
-        filters_order=[ _filter.level for _filter in filters ],
-        preview="dummy-preview.png",
+        name=default_title,
+        filters=default_filters,
+        filters_order=[ _filter.level for _filter in default_filters ],
+        preview=preview_filepath,
         source=data_source,
-        mode=SlideCategory.PIVOT_TABLE
     )
 
     if index is None:

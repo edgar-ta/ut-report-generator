@@ -2,6 +2,7 @@ from lib.pivot_table.get_combinable_filters import get_combinable_filters
 from lib.pivot_table.ordered_filters import ordered_filters
 from lib.pivot_table.get_data_of_frame import get_data_of_frame
 from lib.pivot_table.ordered_filters import find_filter
+from lib.pivot_table.plot_pivot_table import plot_from_entities
 from lib.data_filter.is_valid_filter import is_valid_filter
 from lib.data_frame.data_frame_io import import_data_frame
 
@@ -9,6 +10,7 @@ from models.pivot_table.self import PivotTable
 from models.pivot_table.data_filter.self import DataFilter
 from models.pivot_table.pivot_table_level import PivotTableLevel
 from models.pivot_table.data_filter.charting_mode import ChartingMode
+from models.report import Report
 
 import pandas
 
@@ -35,7 +37,11 @@ def fix_charts(filters: list[DataFilter], filters_order: list[PivotTable]) -> No
         new_chart.charting_mode = ChartingMode.CHART
     
 
-def recalculate(pivot_table: PivotTable, preloaded_data_frame: pandas.DataFrame | None = None) -> tuple[dict[str, dict[str, float]] | dict[str, float], list[DataFilter]]:
+def recalculate(report: Report, pivot_table: PivotTable, preloaded_data_frame: pandas.DataFrame | None = None):
+    '''
+    Re calculates the data of the pivot table based on its filters. It modifies the pivot table in place.
+    Also, it creates a new preview
+    '''
     data_frame = preloaded_data_frame
     if data_frame is None:
         data_frame = import_data_frame(file_path=pivot_table.source.merged_file, key=pivot_table.identifier)
@@ -52,5 +58,4 @@ def recalculate(pivot_table: PivotTable, preloaded_data_frame: pandas.DataFrame 
         aggregate_function=pivot_table.aggregate_function
         )
     pivot_table.data = new_data
-
-    return (new_data, combinable_filters)
+    pivot_table.preview = plot_from_entities(report=report, pivot_table=pivot_table)

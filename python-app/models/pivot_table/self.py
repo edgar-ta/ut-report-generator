@@ -21,7 +21,6 @@ class PivotTable():
             data: dict[str, dict[str, float]] | dict[str, float],
             aggregate_function: AggregateFunctionType,
             filter_function: FilterFunctionType,
-            mode: SlideCategory
             ) -> None:
         
         self.name = name
@@ -37,7 +36,6 @@ class PivotTable():
         self.data = data
         self.aggregate_function = aggregate_function
         self.filter_function = filter_function
-        self.mode = mode
 
     def to_dict(self) -> dict:
         return {
@@ -54,26 +52,8 @@ class PivotTable():
             "data": self.data,
             "aggregate_function": self.aggregate_function.value,
             "filter_function": self.filter_function.value,
-            "mode": self.mode.value
         }
     
-    @staticmethod
-    def from_no_preview(
-        name: str, 
-        identifier: str, 
-        creation_date: pd.Timestamp, 
-        last_edit: pd.Timestamp,
-        filters: list[DataFilter],
-        filters_order: list[PivotTableLevel],
-        source: DataSource,
-        data: dict[str, dict[str, float]] | dict[str, float],
-        aggregate_function: AggregateFunctionType,
-        filter_function: FilterFunctionType,
-        mode: SlideCategory
-        ):
-        # preview = 
-        pass
-
     @classmethod
     def from_json(cls, json_data: dict[str, any]) -> "PivotTable":
         filters = [
@@ -108,5 +88,4 @@ class PivotTable():
             data=data,
             aggregate_function=AggregateFunctionType(json_data["aggregate_function"]),
             filter_function=FilterFunctionType(json_data["filter_function"]),
-            mode=SlideCategory(json_data["mode"])
         )

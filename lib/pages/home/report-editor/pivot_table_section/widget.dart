@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/api/pivot_table/edit_pivot_table_response.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
@@ -48,6 +49,16 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       });
   }
 
+  void _updateAfterEdition(EditPivotTable_Response response) {
+    widget.updatePivotTable(
+      (pivotTable) => pivotTable.copyWith(
+        data: response.data,
+        filters: response.filters,
+        preview: response.preview,
+      ),
+    );
+  }
+
   Future<void> _onFileRemoved(String file) async {
     // @todo
     // route missing
@@ -65,14 +76,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
           pivotTable: widget.pivotTable.identifier,
           fileName: file,
         )
-        .then((response) {
-          widget.updatePivotTable(
-            (pivotTable) => pivotTable.copyWith(
-              data: response.data,
-              filters: response.filters,
-            ),
-          );
-        });
+        .then(_updateAfterEdition);
   }
 
   Future<void> _onFileAdded(String file) async {
@@ -95,14 +99,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
           pivotTable: widget.pivotTable.identifier,
           fileName: file,
         )
-        .then((response) {
-          widget.updatePivotTable(
-            (pivotTable) => pivotTable.copyWith(
-              data: response.data,
-              filters: response.filters,
-            ),
-          );
-        });
+        .then(_updateAfterEdition);
   }
 
   Future<void> _onOptionAdded(String option, int filterIndex) async {
@@ -125,14 +122,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
           filter: filterIndex,
           option: option,
         )
-        .then((response) {
-          widget.updatePivotTable(
-            (pivotTable) => pivotTable.copyWith(
-              data: response.data,
-              filters: response.filters,
-            ),
-          );
-        });
+        .then(_updateAfterEdition);
   }
 
   // This function should handle invalid deletion cases. That is, when the
@@ -162,14 +152,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
           filter: filterIndex,
           option: option,
         )
-        .then((response) {
-          widget.updatePivotTable(
-            (pivotTable) => pivotTable.copyWith(
-              data: response.data,
-              filters: response.filters,
-            ),
-          );
-        });
+        .then(_updateAfterEdition);
   }
 
   Future<void> _onOptionSwitched(String option, int filterIndex) async {
@@ -190,14 +173,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
           filter: filterIndex,
           option: option,
         )
-        .then((response) {
-          widget.updatePivotTable(
-            (pivotTable) => pivotTable.copyWith(
-              data: response.data,
-              filters: response.filters,
-            ),
-          );
-        });
+        .then(_updateAfterEdition);
   }
 
   Future<void> _onFilterDeleted(int filterIndex) async {
@@ -238,14 +214,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
             filter: filterIndex,
           ),
         )
-        .then((response) {
-          widget.updatePivotTable(
-            (pivotTable) => pivotTable.copyWith(
-              data: response.data,
-              filters: response.filters,
-            ),
-          );
-        });
+        .then(_updateAfterEdition);
   }
 
   Future<void> _onFiltersReordered(int oldIndex, int newIndex) async {
@@ -296,14 +265,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
           pivotTable: widget.pivotTable.identifier,
           filter: filterIndex,
         )
-        .then((response) {
-          widget.updatePivotTable(
-            (pivotTable) => pivotTable.copyWith(
-              data: response.data,
-              filters: response.filters,
-            ),
-          );
-        });
+        .then(_updateAfterEdition);
   }
 
   Future<void> _swapChartingModes(
@@ -441,22 +403,6 @@ class _PivotTableSectionState extends State<PivotTableSection> {
         });
   }
 
-  Future<void> _toggleVisualizationMode() async {
-    widget.updatePivotTable(
-      (pivotTable) => pivotTable.copyWith(
-        mode:
-            pivotTable.mode == SlideCategory.pivotTable
-                ? SlideCategory.imageSlide
-                : SlideCategory.pivotTable,
-      ),
-    );
-
-    await pivot_table.toggleVisualizationMode(
-      report: widget.report,
-      pivotTable: widget.pivotTable.identifier,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return SlideFrame(
@@ -465,7 +411,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
         editTabBuilder: (_) {
           return PivotEditPane(
             report: widget.report,
-            pivotTable: widget.pivotTable.identifier,
+            pivotTable: widget.pivotTable,
             setPivotTable: widget.updatePivotTable,
             nameController: nameController,
             filters: widget.pivotTable.filters,
@@ -489,15 +435,10 @@ class _PivotTableSectionState extends State<PivotTableSection> {
           );
         },
       ),
-      child:
-          widget.pivotTable.mode == SlideCategory.pivotTable
-              ? (PivotTableChart(
-                data: widget.pivotTable.data,
-                chartName: widget.pivotTable.name,
-              ))
-              : Image.asset(
-                widget.pivotTable.preview ?? "assets/soy-ut-logo.png",
-              ),
+      child: PivotTableChart(
+        data: widget.pivotTable.data,
+        chartName: widget.pivotTable.name,
+      ),
     );
   }
 }

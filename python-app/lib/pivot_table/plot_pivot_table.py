@@ -10,21 +10,42 @@ from lib.directory_definitions import preview_image_of_slide
 
 import os
 
-def render_pivot_table(report: Report, pivot_table: PivotTable) -> str:
+def plot_from_components(
+        data, 
+        title: str, 
+        outer_chart: PivotTableLevel, 
+        _filter: FilterFunctionType, 
+        aggregate: AggregateFunctionType,
+        filepath: str,
+        former_preview: str | None = None
+        ) -> None:
+    plot_data(
+        data=data, 
+        title=title, 
+        kind="bar", 
+        x_label=level_to_spanish(outer_chart), 
+        y_label=aggregate_function_to_spanish(aggregate) + " de calificaciones de " + filter_function_to_spanish(_filter),
+        filepath=filepath
+        )
+    
+    if former_preview is not None:
+        os.remove(former_preview)
+
+def plot_from_entities(report: Report, pivot_table: PivotTable) -> str:
     outer_filter = next((_filter for _filter in pivot_table.filters if _filter.charting_mode == ChartingMode.SUPER_CHART), None)
     if outer_filter is None:
         outer_filter = next((_filter for _filter in pivot_table.filters if _filter.charting_mode == ChartingMode.CHART), None)
 
     filepath = preview_image_of_slide(root_directory=report.root_directory, slide_id=pivot_table.identifier)
-    plot_data(
+
+    plot_from_components(
         data=pivot_table.data, 
         title=pivot_table.name, 
-        kind="bar", 
-        x_label=level_to_spanish(outer_filter.level), 
-        y_label=aggregate_function_to_spanish(pivot_table.aggregate_function) + " de calificaciones de " + filter_function_to_spanish(pivot_table.filter_function),
-        filepath=filepath
+        outer_chart=outer_filter.level, 
+        _filter=pivot_table.filter_function, 
+        aggregate=pivot_table.aggregate_function, 
+        filepath=filepath, 
+        former_preview=pivot_table.preview
         )
     
-    if pivot_table.preview is not None:
-        os.remove(pivot_table.preview)
     return filepath

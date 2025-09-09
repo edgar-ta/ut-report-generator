@@ -43,13 +43,13 @@ def add_file_to_pivot_table():
         )
     pivot_table.source.merged_file = new_merged_file
 
-    recalculate(pivot_table=pivot_table, preloaded_data_frame=new_data_frame)    
+    recalculate(report=report, pivot_table=pivot_table, preloaded_data_frame=new_data_frame)    
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()
-    
 
     return EditPivotTable_Response(
         data=pivot_table.data, 
-        filters=pivot_table.filters
+        filters=pivot_table.filters,
+        preview=pivot_table.preview
         ).to_dict(), 200

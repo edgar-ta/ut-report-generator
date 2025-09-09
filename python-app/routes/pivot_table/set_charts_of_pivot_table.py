@@ -47,7 +47,7 @@ def set_charts_of_pivot_table():
 
             _filter.charting_mode = ChartingMode.NONE
 
-    recalculate(pivot_table=pivot_table)
+    recalculate(report=report, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()

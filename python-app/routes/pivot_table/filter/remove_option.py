@@ -3,6 +3,7 @@ from lib.descriptive_error import DescriptiveError
 from lib.get_entities_from_request import entities_for_editing_filter
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.bring_filter_up import bring_filter_up
+from lib.pivot_table.plot_pivot_table import plot_from_entities
 
 from models.response.edit_pivot_table_response import EditPivotTable_Response
 
@@ -20,14 +21,13 @@ def remove_option_from_filter():
     _filter.selected_values.remove(option)
     pivot_table.filters_order = bring_filter_up(filters=pivot_table.filters_order, edited_filter=_filter.level)
 
-    recalculate(pivot_table=pivot_table)
+    recalculate(report=report, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()
 
-    print("Hello 1")
-
     return EditPivotTable_Response(
         data=pivot_table.data,
-        filters=pivot_table.filters
+        filters=pivot_table.filters,
+        preview=pivot_table.preview
     ).to_dict(), 200

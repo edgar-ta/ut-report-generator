@@ -236,42 +236,72 @@ class _ReportEditorState extends State<ReportEditor> {
 
   @override
   Widget build(BuildContext context) {
+    // return ListView.builder(controller: _scrollController, itemCount: ,);
+    // return Padding(
+    //   padding: const EdgeInsets.all(8),
+    //   child: AnimatedSwitcher(
+    //     duration: Duration(milliseconds: 750),
+    //     child:
+    //         report != null
+    //             ? ListView.builder(
+    //               itemBuilder: (context, index) {
+    //                 final slide = report!.slides[index];
+    //                 if (slide is PivotTable) {
+    //                   return PivotTableSection(
+    //                     report: report!.identifier,
+    //                     pivotTable: slide,
+    //                     updatePivotTable: (callback) {
+    //                       setState(() {
+    //                         report!.slides[index] = callback(slide);
+    //                       });
+    //                     },
+    //                   );
+    //                 }
+    //                 if (slide is ImageSlide) {
+    //                   return ImageSlideSection(initialSlide: slide);
+    //                 }
+    //                 return const Text("Tipo de slide inválido");
+    //               },
+    //               itemCount: report!.slides.length,
+    //             )
+    //             : Text(""),
+    //   ),
+    // );
+
     return SingleChildScrollView(
       controller: _scrollController,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        child: AnimatedSwitcher(
-          duration: const Duration(
-            milliseconds: 500,
-          ), // duración de la transición
-          switchInCurve: Curves.easeInOut,
-          switchOutCurve: Curves.easeInOut,
-          child:
-              report != null
-                  ? Column(
-                    key: ValueKey('content_loaded'),
-                    children:
-                        report!.slides.indexed.map((data) {
-                          final (index, slide) = data;
-                          if (slide is PivotTable) {
-                            return PivotTableSection(
-                              report: report!.identifier,
-                              pivotTable: slide,
-                              updatePivotTable: (callback) {
-                                setState(() {
-                                  report!.slides[index] = callback(slide);
-                                });
-                              },
-                            );
-                          }
-                          if (slide is ImageSlide) {
-                            return ImageSlideSection(initialSlide: slide);
-                          }
-                          return const Text("Tipo de slide inválido");
-                        }).toList(),
-                  )
-                  : const ShimmerSlide(key: ValueKey('shimmer')),
-        ),
+      child: AnimatedSwitcher(
+        duration: const Duration(
+          milliseconds: 500,
+        ), // duración de la transición
+        switchInCurve: Curves.easeInOut,
+        switchOutCurve: Curves.easeInOut,
+        child:
+            report != null
+                ? Column(
+                  spacing: 32,
+                  key: ValueKey('content_loaded'),
+                  children:
+                      report!.slides.indexed.map((data) {
+                        final (index, slide) = data;
+                        if (slide is PivotTable) {
+                          return PivotTableSection(
+                            report: report!.identifier,
+                            pivotTable: slide,
+                            updatePivotTable: (callback) {
+                              setState(() {
+                                report!.slides[index] = callback(slide);
+                              });
+                            },
+                          );
+                        }
+                        if (slide is ImageSlide) {
+                          return ImageSlideSection(initialSlide: slide);
+                        }
+                        return const Text("Tipo de slide inválido");
+                      }).toList(),
+                )
+                : const ShimmerSlide(key: ValueKey('shimmer')),
       ),
     );
   }

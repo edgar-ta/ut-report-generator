@@ -6,6 +6,7 @@ import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mod
 import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
+import 'package:ut_report_generator/models/slide_category.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/filter_component.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/filter_selector.dart';
 import 'package:ut_report_generator/api/pivot_table/filter/self.dart'
@@ -14,7 +15,7 @@ import 'package:ut_report_generator/utils/copy_with_added.dart';
 
 class PivotEditPane extends StatefulWidget {
   final String report;
-  final String pivotTable;
+  final PivotTable pivotTable;
   final void Function(PivotTable Function(PivotTable)) setPivotTable;
 
   final TextEditingController nameController;
@@ -64,13 +65,6 @@ class _PivotEditPaneState extends State<PivotEditPane> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           InvisibleTextField(controller: widget.nameController),
-          SegmentedButton(
-            segments: [
-              ButtonSegment(value: "a", icon: Icon(Icons.bar_chart)),
-              ButtonSegment(value: "b", icon: Icon(Icons.image)),
-            ],
-            selected: {"a"},
-          ),
           FilterSelector(
             title: "Filtros",
             availableFilters:
@@ -102,7 +96,7 @@ class _PivotEditPaneState extends State<PivotEditPane> {
               filter_api
                   .createDataFilter(
                     report: widget.report,
-                    pivotTable: widget.pivotTable,
+                    pivotTable: widget.pivotTable.identifier,
                     level: level,
                   )
                   .then((newFilter) {
