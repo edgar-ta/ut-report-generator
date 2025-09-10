@@ -13,7 +13,8 @@ import pandas as pd
 def create_default_filters(data_frame: pd.DataFrame) -> list[DataFilter]:
     '''
     Creates a list of valid default filters for the frame. It uses
-    professor, subject and unit
+    professor, subject and unit.
+    The first filter's charting mode is `CHART`; that's important
     '''
 
     first_filter = DataFilter(
@@ -21,7 +22,7 @@ def create_default_filters(data_frame: pd.DataFrame) -> list[DataFilter]:
         selected_values=[],
         possible_values=[],
         selection_mode=SelectionMode.ONE,
-        charting_mode=ChartingMode.NONE,
+        charting_mode=ChartingMode.CHART,
         )
 
     second_filter = DataFilter(
@@ -29,7 +30,7 @@ def create_default_filters(data_frame: pd.DataFrame) -> list[DataFilter]:
         selected_values=[],
         possible_values=[],
         selection_mode=SelectionMode.ONE,
-        charting_mode=ChartingMode.CHART
+        charting_mode=ChartingMode.NONE
         )
     
     third_filter = DataFilter(

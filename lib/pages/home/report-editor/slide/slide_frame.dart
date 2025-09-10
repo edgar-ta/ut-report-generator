@@ -37,13 +37,14 @@ class _SlideFrameState extends State<SlideFrame> {
     final screenHeight = slideHeight(context);
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return SizedBox(
+    return Container(
       height: screenHeight,
       width: screenWidth,
+      color: Colors.white,
       child: Stack(
         children: [
           // Contenido principal con scroll
-          widget.child,
+          Positioned.fill(child: widget.child),
 
           // Overlay oscuro -> cubre también el FAB de la app
           if (_menuOpen)

@@ -8,6 +8,7 @@ from lib.data_frame.data_frame_io import import_data_frame, export_data_frame
 from lib.pivot_table.read_excel import read_excel
 from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
 from lib.pivot_table.recalculate import recalculate
+from lib.pivot_table.plot_pivot_table import plot_from_entities
 from lib.directory_definitions import data_file_of_slide
 
 from models.response.edit_pivot_table_response import EditPivotTable_Response
@@ -56,7 +57,7 @@ def remove_file_from_pivot_table():
     )
     pivot_table.source.merged_file = new_merged_file
 
-    recalculate(pivot_table=pivot_table, preloaded_data_frame=new_data_frame)
+    recalculate(report=report, pivot_table=pivot_table, preloaded_data_frame=new_data_frame)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()
@@ -64,4 +65,5 @@ def remove_file_from_pivot_table():
     return EditPivotTable_Response(
         data=pivot_table.data,
         filters=pivot_table.filters,
+        preview=pivot_table.preview
         ).to_dict(), 200

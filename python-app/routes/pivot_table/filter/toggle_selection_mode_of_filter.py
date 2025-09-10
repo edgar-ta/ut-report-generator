@@ -28,7 +28,7 @@ def toggle_selection_mode_of_filter():
     
     if do_recalculation:
         pivot_table.filters_order = bring_filter_up(filters=pivot_table.filters_order, edited_filter=_filter.level)
-        recalculate(pivot_table=pivot_table)
+        recalculate(report=report, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()

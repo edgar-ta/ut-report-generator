@@ -15,3 +15,14 @@ class FilterFunctionType(Enum):
                 return lambda x: x >= 7
             case FilterFunctionType.ALL_STUDENTS:
                 return lambda _: True
+
+def filter_function_to_spanish(function_type: FilterFunctionType) -> str:
+    match function_type:
+        case FilterFunctionType.FAILED_STUDENTS:
+            return "Estudiantes reprobados"
+        case FilterFunctionType.APPROVED_STUDENTS:
+            return "Estudiantes aprobados"
+        case FilterFunctionType.ALL_STUDENTS:
+            return "Todos los estudiantes"
+        case _:
+            raise ValueError(f"Tipo de función desconocido: {function_type}")

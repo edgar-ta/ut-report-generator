@@ -5,6 +5,8 @@ from lib.descriptive_error import DescriptiveError
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.ordered_filters import find_filter
 from lib.pivot_table.get_combinable_filters import get_combinable_filters
+from lib.pivot_table.plot_pivot_table import plot_from_entities
+from lib.pivot_table.recalculate import recalculate
 from lib.data_frame.data_frame_io import import_data_frame
 
 from models.pivot_table.pivot_table_level import PivotTableLevel
@@ -44,12 +46,11 @@ def create_filter():
 
     data_frame = import_data_frame(file_path=pivot_table.source.merged_file, key=pivot_table.identifier)
     refined_filters = get_combinable_filters(data_frame=data_frame, filters=pivot_table.filters)
-    # Given the fact that I created a new, empty filter, there is no need to fix charts nor to
-    # recalculate data
-
     refined_filter = find_filter(level=level, filters=refined_filters)
 
     pivot_table.filters = refined_filters
+    recalculate(report=report, pivot_table=pivot_table)
+
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()
     

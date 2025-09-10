@@ -22,7 +22,6 @@ class PivotTable implements Slide {
   final PivotData data;
   final AggregateFunctionType aggregateFunction;
   final FilterFunctionType filterFunction;
-  final SlideCategory mode;
 
   PivotTable({
     required this.name,
@@ -36,7 +35,6 @@ class PivotTable implements Slide {
     required this.data,
     required this.aggregateFunction,
     required this.filterFunction,
-    required this.mode,
   }) : category = SlideCategory.pivotTable;
 
   Map<String, dynamic> toJson() {
@@ -53,7 +51,6 @@ class PivotTable implements Slide {
       "data": data,
       "aggregate_function": aggregateFunction.name,
       "filter_function": filterFunction.name,
-      "mode": mode.name,
     };
   }
 
@@ -76,7 +73,6 @@ class PivotTable implements Slide {
         json["aggregate_function"],
       ),
       filterFunction: FilterFunctionType.values.byName(json["filter_function"]),
-      mode: SlideCategory.values.byName(json["mode"]),
     );
   }
 
@@ -92,7 +88,6 @@ class PivotTable implements Slide {
     PivotData? data,
     AggregateFunctionType? aggregateFunction,
     FilterFunctionType? filterFunction,
-    SlideCategory? mode,
   }) {
     return PivotTable(
       name: name ?? this.name,
@@ -106,7 +101,6 @@ class PivotTable implements Slide {
       data: data ?? this.data,
       aggregateFunction: aggregateFunction ?? this.aggregateFunction,
       filterFunction: filterFunction ?? this.filterFunction,
-      mode: mode ?? this.mode,
     );
   }
 }

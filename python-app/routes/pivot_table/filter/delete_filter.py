@@ -2,6 +2,7 @@ from lib.with_flask import with_flask
 from lib.descriptive_error import DescriptiveError
 from lib.get_entities_from_request import entities_for_editing_filter
 from lib.pivot_table.recalculate import recalculate
+from lib.pivot_table.plot_pivot_table import plot_from_entities
 
 from models.response.edit_pivot_table_response import EditPivotTable_Response
 
@@ -19,12 +20,13 @@ def delete_filter():
     pivot_table.filters.remove(_filter)
     pivot_table.filters_order = [ level for level in pivot_table.filters_order if level != _filter.level ]
 
-    new_data, new_filters = recalculate(pivot_table=pivot_table)
+    recalculate(report=report, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()
 
     return EditPivotTable_Response(
-        data=new_data,
-        filters=new_filters
+        data=pivot_table.data,
+        filters=pivot_table.filters,
+        preview=pivot_table.preview
     ).to_dict(), 200
