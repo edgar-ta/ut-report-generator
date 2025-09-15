@@ -36,3 +36,45 @@ if __name__ == '__main__':
     elif mode == "release":
         from waitress import serve
         serve(app=app, port=port)
+    elif mode == "playground":
+        from pptx import Presentation
+        from pptx.util import Cm
+
+        from render.drawable_area import DrawableArea
+        from render.grid_layout.grid_layout import grid_layout
+        from render.grid_layout.grid_layout_item import GridLayoutItem
+        from render.fractional_unit import FractionalUnit
+        from render.widget.text_widget import TextWidget
+
+        path = r'D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\.logistics-assets\example-presentation-copy.pptx'
+
+        presentation = Presentation(path)
+        slide = presentation.slides.add_slide(presentation.slides[0].slide_layout)
+        base_area = DrawableArea(x=0, y=0, width=presentation.slide_width.emu, height=presentation.slide_height.emu)
+        for placeholder in slide.placeholders:
+            slide.placeholders.element.remove(placeholder.element)
+
+        grid_layout(
+            slide=slide, 
+            drawable_area=base_area.with_padding(horizontal=Cm(1).emu, vertical=Cm(2).emu), 
+            grid_areas='''
+            a a
+            c b
+            ''',
+            gap=Cm(0.5).emu,
+            column_widths=[
+                FractionalUnit(count=1),
+                FractionalUnit(count=2),
+            ],
+            row_heights=[
+                Cm(2),
+                FractionalUnit(count=1)
+            ],
+            children=[
+                GridLayoutItem( area='a', child=TextWidget("Título") ),
+                GridLayoutItem( area='b', child=TextWidget("Contenido extraño") ),
+                GridLayoutItem( area='c', child=TextWidget("Algo más") ),
+            ]
+            )
+        
+        presentation.save(path)

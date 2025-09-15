@@ -14,6 +14,17 @@ class DrawableArea():
         return DrawableArea(
             x=self.x + subarea.x,
             y=self.y + subarea.y,
-            width=subarea.width,
-            height=subarea.height
+            width=min(subarea.width, self.width - self.x),
+            height=min(subarea.height, self.height - self.y)
         )
+    
+    def with_padding(self, horizontal: int, vertical: int) -> "DrawableArea":
+        return DrawableArea(
+            x=horizontal,
+            y=vertical,
+            width=self.width - 2 * horizontal,
+            height=self.height - 2 * vertical
+        )
+    
+    def __repr__(self) -> str:
+        return f"DrawableArea(x={self.x}, y={self.y}, width={self.width}, height={self.height})"
