@@ -14,8 +14,8 @@ class DrawableArea():
         return DrawableArea(
             x=self.x + subarea.x,
             y=self.y + subarea.y,
-            width=min(subarea.width, self.width - self.x),
-            height=min(subarea.height, self.height - self.y)
+            width=min(subarea.width, self.width - subarea.x),
+            height=min(subarea.height, self.height - subarea.y)
         )
     
     def with_padding(self, horizontal: int, vertical: int) -> "DrawableArea":

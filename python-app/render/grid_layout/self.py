@@ -110,11 +110,6 @@ def grid_layout(
 
             width, height = measure_area(start=start, size=size, gap=gap, widths=column_widths, heights=row_heights)
             x, y = position_area(start=start, gap=gap, widths=column_widths, heights=row_heights)
-
-            print(f'{(column_widths, row_heights) = }')
-            print(f'{size = }')
-            print(f'{start = }')
-            print(f'{(x, y) = }')
             
             areas_map[key] = drawable_area.position_subarea(DrawableArea(x=x, y=y, width=width, height=height))
 
@@ -124,4 +119,3 @@ def grid_layout(
         
         item_area = areas_map[item.area]
         item.child.draw(slide=slide, drawable_area=item_area)
-

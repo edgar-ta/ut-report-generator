@@ -129,7 +129,7 @@ class Report:
             slide.build_new_assets()
             slide.controller.render_slide(
                 presentation=presentation, 
-                arguments=slide.arguments, 
+                arguments=slide.parameters, 
                 assets=slide.assets
             )
         
