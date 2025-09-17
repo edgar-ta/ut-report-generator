@@ -22,6 +22,11 @@ def rendered_file_of_report(root_directory: str, report_name: str) -> str:
     return os.path.join(root_directory, f"{report_name}.pptx")
 
 @cache
+def temporary_rendered_file_of_report(root_directory: str) -> str:
+    file_name = str(uuid4())
+    return os.path.join(root_directory, f"temporary-{file_name}.pptx")
+
+@cache
 def export_file_of_report(root_directory: str, report_name: str) -> str:
     return os.path.join(root_directory, f"{report_name}.zip")
 

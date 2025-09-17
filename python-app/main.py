@@ -6,6 +6,7 @@ import routes.report as report
 
 from flask import Flask, request, jsonify
 from typing import TypeVar
+from dotenv import load_dotenv
 
 import logging
 import sys
@@ -29,6 +30,7 @@ def item_or(_list: list[T], index: int, default: T) -> T:
 if __name__ == '__main__':
     mode = item_or(_list=sys.argv, index=1, default="dev")
     port = int(item_or(_list=sys.argv, index=2, default="5000"))
+    load_dotenv()
 
     if mode == "dev":
         logging.basicConfig(filename='logs.log')

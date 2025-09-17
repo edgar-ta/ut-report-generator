@@ -236,38 +236,6 @@ class _ReportEditorState extends State<ReportEditor> {
 
   @override
   Widget build(BuildContext context) {
-    // return ListView.builder(controller: _scrollController, itemCount: ,);
-    // return Padding(
-    //   padding: const EdgeInsets.all(8),
-    //   child: AnimatedSwitcher(
-    //     duration: Duration(milliseconds: 750),
-    //     child:
-    //         report != null
-    //             ? ListView.builder(
-    //               itemBuilder: (context, index) {
-    //                 final slide = report!.slides[index];
-    //                 if (slide is PivotTable) {
-    //                   return PivotTableSection(
-    //                     report: report!.identifier,
-    //                     pivotTable: slide,
-    //                     updatePivotTable: (callback) {
-    //                       setState(() {
-    //                         report!.slides[index] = callback(slide);
-    //                       });
-    //                     },
-    //                   );
-    //                 }
-    //                 if (slide is ImageSlide) {
-    //                   return ImageSlideSection(initialSlide: slide);
-    //                 }
-    //                 return const Text("Tipo de slide inválido");
-    //               },
-    //               itemCount: report!.slides.length,
-    //             )
-    //             : Text(""),
-    //   ),
-    // );
-
     return SingleChildScrollView(
       controller: _scrollController,
       child: AnimatedSwitcher(

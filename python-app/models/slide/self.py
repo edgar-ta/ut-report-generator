@@ -22,18 +22,6 @@ class Slide(ABC):
         self.preview = preview
         self.category = category
 
-    @classmethod
-    def from_dict(cls, json):
-        return cls(
-            title=json['title'],
-            identifier=json['identifier'],
-            creation_date=json['creation_date'],
-            last_edit=json['last_edit'],
-            preview=json['preview'],
-            category=json['category'],
-            **json['parameters'],
-        )
-
     def to_dict(self) -> dict[str, any]:
         return {
             "title": self.title,
@@ -42,13 +30,7 @@ class Slide(ABC):
             "last_edit": self.last_edit.isoformat(),
             "preview": self.preview,
             "category": self.category.value,
-            "parameters": self.parameters_dict,
         }
-
-    @property
-    @abstractmethod
-    def parameters_dict(self) -> dict[str, any]:
-        pass
 
     @abstractmethod
     def render(self, slide: Slide, drawable_area: DrawableArea):

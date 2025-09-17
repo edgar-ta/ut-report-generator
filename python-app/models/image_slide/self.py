@@ -11,10 +11,17 @@ class ImageSlide(Slide):
         super().__init__(title, identifier, creation_date, last_edit, preview, SlideCategory.IMAGE_SLIDE)
         self.kind = kind
     
-    def parameters_dict(self) -> dict[str, any]:
-        return { 
-            'kind': self.kind.value 
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            'kind': self.kind.value,
+            'parameters': self.parameters_dict
         }
+
+    @property
+    @abstractmethod
+    def parameters_dict(self) -> dict[str, any]:
+        pass
 
     @abstractmethod
     def render(self, slide: Slide, drawable_area: DrawableArea):

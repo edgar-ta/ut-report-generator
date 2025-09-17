@@ -11,4 +11,4 @@ def get_report():
     report = get_or_panic(request.json, 'report', 'El directorio del reporte debe estar presente')
     report = Report.from_identifier(identifier=report)
 
-    return format_for_create(response=report), 200
+    return report.to_dict(), 200

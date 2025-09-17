@@ -29,9 +29,9 @@ class CoverPageSlide(ImageSlide):
         self.period = period
         self.date = date
 
+    @property
     def parameters_dict(self):
         return {
-            **super.parameters_dict,
             'professor_name': self.professor_name,
             'period': self.period,
             'date': self.date

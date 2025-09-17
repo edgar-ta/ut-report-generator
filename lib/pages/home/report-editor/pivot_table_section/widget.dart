@@ -36,15 +36,15 @@ class PivotTableSection extends StatefulWidget {
 }
 
 class _PivotTableSectionState extends State<PivotTableSection> {
-  late TextEditingController nameController;
+  late TextEditingController titleController;
 
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.pivotTable.name)
+    titleController = TextEditingController(text: widget.pivotTable.title)
       ..addListener(() {
         widget.updatePivotTable(
-          (pivotTable) => pivotTable.copyWith(name: nameController.text),
+          (pivotTable) => pivotTable.copyWith(title: titleController.text),
         );
       });
   }
@@ -413,7 +413,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
             report: widget.report,
             pivotTable: widget.pivotTable,
             setPivotTable: widget.updatePivotTable,
-            nameController: nameController,
+            nameController: titleController,
             filters: widget.pivotTable.filters,
             onOptionAdded: _onOptionAdded,
             onOptionRemoved: _onOptionRemoved,
@@ -437,7 +437,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       ),
       child: PivotTableChart(
         data: widget.pivotTable.data,
-        chartName: widget.pivotTable.name,
+        chartName: widget.pivotTable.title,
       ),
     );
   }
