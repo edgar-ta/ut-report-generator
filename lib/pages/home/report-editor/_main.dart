@@ -8,7 +8,7 @@ import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
 import 'package:ut_report_generator/components/file_selector/widget.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
-import 'package:ut_report_generator/models/report.dart';
+import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
 import 'package:ut_report_generator/models/image_slide/image_slide_kind.dart';
 import 'package:ut_report_generator/components/common_appbar.dart';

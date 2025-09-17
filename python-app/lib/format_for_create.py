@@ -1,4 +1,4 @@
-from models.report import Report
+from models.report.self import Report
 from models.image_slide.self import ImageSlide
 from models.pivot_table.self import PivotTable
 

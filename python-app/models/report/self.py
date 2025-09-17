@@ -2,14 +2,15 @@ from lib.get_metadata import get_metadata
 from lib.descriptive_error import DescriptiveError
 from lib.directory_definitions import metadata_file_of_report, slides_directory_of_report, root_directory_of_report, rendered_file_of_report, export_file_of_report, export_directory_of_report, data_directory_of_report, get_reports_directory
 from lib.image_slide.image_slide_from_json import image_slide_from_json
+from lib.pivot_table.pivot_table_from_json import pivot_table_from_json
 
 from models.image_slide.self import ImageSlide
 from models.pivot_table.self import PivotTable
 from models.slide.slide_category import SlideCategory
+from models.report.visualization_mode import VisualizationMode
 
 from control_variables import CURRENT_DIRECTORY_PATH, CURRENT_PROJECT_VERSION
 
-from pptx import Presentation
 from functools import cached_property
 
 import pandas
@@ -29,18 +30,18 @@ class Report:
             last_edit: pandas.Timestamp,
             last_open: pandas.Timestamp,
             slides: list[ImageSlide | PivotTable],
+            visualization_mode: VisualizationMode,
             version: str
             ) -> None:
-        # Data that goes to the serialization dict
         self.identifier = identifier
         self.report_name = report_name
         self.creation_date = creation_date
         self.last_edit = last_edit
         self.last_open = last_open
         self.slides = slides
+        self.visualization_mode = visualization_mode
         self.version = version
 
-        # Data that does not go to the serialization dict
         self.root_directory = root_directory
 
     def to_dict(self) -> dict:
@@ -55,6 +56,7 @@ class Report:
             "last_edit": self.last_edit.isoformat(),
             "last_open": self.last_open.isoformat(),
             "slides": [slide.to_dict() for slide in self.slides],
+            "visualization_mode": self.visualization_mode.value,
             "version": self.version
         }
     
@@ -76,9 +78,10 @@ class Report:
             slides=[
                     image_slide_from_json(json=slide) 
                     if SlideCategory(slide["category"]) == SlideCategory.IMAGE_SLIDE
-                    else PivotTable.from_json(json_data=slide)
+                    else pivot_table_from_json(json=slide)
                 for slide in metadata.get("slides", [])
             ],
+            visualization_mode=VisualizationMode(metadata['visualization_mode']),
             version=version
         )
 
@@ -92,7 +95,7 @@ class Report:
         raise DescriptiveError(http_error_code=400, message=f'La id especificada ({identifier}) no corresponde a ningún reporte')
 
     @classmethod
-    def from_nothing(cls) -> "Report":
+    def from_nothing(cls, visualization_mode: VisualizationMode) -> "Report":
         report_id = cls.new_report_id()
 
         report = Report(
@@ -103,6 +106,7 @@ class Report:
             last_edit=pandas.Timestamp.now(),
             last_open=pandas.Timestamp.now(),
             slides=[],
+            visualization_mode=visualization_mode,
             version=CURRENT_PROJECT_VERSION
         )
         return report

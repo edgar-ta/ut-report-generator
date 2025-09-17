@@ -2,7 +2,7 @@ from control_variables import PATH_OF_PPTX_TEMPLATE
 
 from lib.directory_definitions import temporary_rendered_file_of_report, preview_image_of_slide
 
-from models.report import Report
+from models.report.self import Report
 
 from render.drawable_area import DrawableArea
 
@@ -20,7 +20,7 @@ def fresh_slide(presentation: Presentation) -> Slide:
         slide.placeholders.element.remove(placeholder.element)
     return slide
 
-def render_previews(report: Report):
+def render_previews_of_report(report: Report):
     template_path = PATH_OF_PPTX_TEMPLATE()
     temporary_path = temporary_rendered_file_of_report(root_directory=report.root_directory)
 

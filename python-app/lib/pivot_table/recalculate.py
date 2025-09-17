@@ -10,7 +10,7 @@ from models.pivot_table.self import PivotTable
 from models.pivot_table.data_filter.self import DataFilter
 from models.pivot_table.pivot_table_level import PivotTableLevel
 from models.pivot_table.data_filter.charting_mode import ChartingMode
-from models.report import Report
+from models.report.self import Report
 
 import pandas
 
@@ -58,4 +58,4 @@ def recalculate(report: Report, pivot_table: PivotTable, preloaded_data_frame: p
         aggregate_function=pivot_table.aggregate_function
         )
     pivot_table.data = new_data
-    pivot_table.preview = plot_from_entities(report=report, pivot_table=pivot_table)
+    pivot_table.bare_preview = plot_from_entities(report=report, pivot_table=pivot_table)

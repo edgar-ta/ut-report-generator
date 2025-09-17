@@ -4,7 +4,7 @@ from lib.format_for_create import format_for_create
 
 from lib.image_slide.add_image_slide_to_report import add_image_slide_to_report
 
-from models.report import Report
+from models.report.self import Report
 
 from flask import request
 

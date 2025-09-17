@@ -4,7 +4,7 @@ from lib.directory_definitions import base_directory_of_slide
 from lib.image_slide.controller_for_kind import controller_for_kind
 from lib.image_slide.build_image_slide_preview import build_image_slide_preview
 
-from models.report import Report
+from models.report.self import Report
 from models.image_slide.self import ImageSlide
 from models.image_slide.image_slide_kind import ImageSlideKind
 

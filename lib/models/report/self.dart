@@ -1,5 +1,6 @@
 import 'package:ut_report_generator/models/image_slide/self.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
+import 'package:ut_report_generator/models/pivot_table/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
 
@@ -8,12 +9,14 @@ class ReportClass {
   String reportName;
   DateTime creationDate;
   List<Slide> slides;
+  VisualizationMode visualizationMode;
 
   ReportClass({
     required this.identifier,
     required this.reportName,
     required this.creationDate,
     required this.slides,
+    required this.visualizationMode,
   });
 
   factory ReportClass.fromJson(Map<String, dynamic> json) {
@@ -31,6 +34,9 @@ class ReportClass {
                         : PivotTable.fromJson(slide),
               )
               .toList(),
+      visualizationMode: VisualizationMode.values.byName(
+        json['visualization_mode'],
+      ),
     );
   }
 
@@ -39,13 +45,14 @@ class ReportClass {
     String? reportName,
     DateTime? creationDate,
     List<Slide>? slides,
-    String? renderedFile,
+    VisualizationMode? visualizationMode,
   }) {
     return ReportClass(
       identifier: identifier ?? this.identifier,
       reportName: reportName ?? this.reportName,
       creationDate: creationDate ?? this.creationDate,
       slides: slides ?? this.slides,
+      visualizationMode: visualizationMode ?? this.visualizationMode,
     );
   }
 }

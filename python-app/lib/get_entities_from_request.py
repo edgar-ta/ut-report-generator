@@ -1,7 +1,7 @@
 from lib.get_or_panic import get_or_panic
 from lib.descriptive_error import DescriptiveError
 
-from models.report import Report
+from models.report.self import Report
 from models.pivot_table.self import PivotTable
 from models.pivot_table.data_filter.self import DataFilter
 

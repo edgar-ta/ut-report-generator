@@ -15,7 +15,7 @@ from models.pivot_table.aggregate_function_type import AggregateFunctionType
 from models.pivot_table.filter_function_type import FilterFunctionType
 from models.pivot_table.data_source import DataSource
 from models.slide.slide_category import SlideCategory
-from models.report import Report
+from models.report.self import Report
 
 from uuid import uuid4
 
@@ -80,11 +80,12 @@ def add_pivot_table_to_report(report: Report, local_request: flask.Request, inde
         data=data,
         filter_function=default_filter_function,
         identifier=slide_identifier,
+        preview=None,
+        bare_preview=preview_filepath,
         last_edit=pd.Timestamp.now(),
-        name=default_title,
+        title=default_title,
         filters=default_filters,
         filters_order=[ _filter.level for _filter in default_filters ],
-        preview=preview_filepath,
         source=data_source,
     )
 

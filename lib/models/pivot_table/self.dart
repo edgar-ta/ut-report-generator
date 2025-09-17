@@ -8,6 +8,7 @@ import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
 
 class PivotTable extends Slide {
+  final String barePreview;
   final DataSource source;
   final List<DataFilter> filters;
   final List<PivotTableLevel> filtersOrder;
@@ -21,6 +22,7 @@ class PivotTable extends Slide {
     required super.creationDate,
     required super.lastEdit,
     required super.preview,
+    required this.barePreview,
     required this.source,
     required this.filters,
     required this.filtersOrder,
@@ -32,6 +34,7 @@ class PivotTable extends Slide {
   Map<String, dynamic> toJson() {
     return {
       ...super.toMap(),
+      "bare_preview": barePreview,
       "source": source.toJson(),
       "filters": filters.map((f) => f.toJson()).toList(),
       "filters_order": filtersOrder.map((value) => value.name).toList(),
@@ -48,6 +51,7 @@ class PivotTable extends Slide {
       creationDate: DateTime.parse(json["creation_date"]),
       lastEdit: DateTime.parse(json["last_edit"]),
       preview: json["preview"],
+      barePreview: json["bare_preview"],
       source: DataSource.fromJson(json["source"]),
       filters:
           (json["filters"] as List).map((e) => DataFilter.fromJson(e)).toList(),
@@ -68,6 +72,7 @@ class PivotTable extends Slide {
     String? identifier,
     DateTime? creationDate,
     DateTime? lastEdit,
+    String? barePreview,
     String? preview,
     DataSource? source,
     List<DataFilter>? filters,
@@ -82,6 +87,7 @@ class PivotTable extends Slide {
       creationDate: creationDate ?? this.creationDate,
       lastEdit: lastEdit ?? this.lastEdit,
       preview: preview ?? this.preview,
+      barePreview: barePreview ?? this.barePreview,
       source: source ?? this.source,
       filters: filters ?? this.filters,
       filtersOrder: filtersOrder ?? this.filtersOrder,

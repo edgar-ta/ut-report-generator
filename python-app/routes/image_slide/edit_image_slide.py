@@ -6,7 +6,7 @@ from lib.format_for_edit import format_for_edit
 from lib.image_slide.build_image_slide_preview import build_image_slide_preview
 from lib.image_slide.controller_for_kind import controller_for_kind
 
-from models.report import Report
+from models.report.self import Report
 from models.image_slide.self import ImageSlide
 
 from flask import request

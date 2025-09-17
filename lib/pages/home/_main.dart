@@ -9,7 +9,7 @@ import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/api/report/import_report.dart';
 import 'package:ut_report_generator/api/report/start_report_with_image_slide.dart';
 import 'package:ut_report_generator/api/report/start_report_with_pivot_table.dart';
-import 'package:ut_report_generator/models/report.dart';
+import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
 import 'package:ut_report_generator/main_app/route_observer.dart';
