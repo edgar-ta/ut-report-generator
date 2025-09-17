@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/api/report/import_report.dart';
+import 'package:ut_report_generator/api/report/start_report_with_image_slide.dart';
 import 'package:ut_report_generator/api/report/start_report_with_pivot_table.dart';
 import 'package:ut_report_generator/models/report.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
@@ -18,7 +19,7 @@ import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 
-Future<ReportClass> _createNewReport(List<File> files) async {
+Future<ReportClass> _createNewVisualization(List<File> files) async {
   return startReport_withPivotTable(
     files.map((file) => file.absolute.path).toList(),
   );
@@ -29,34 +30,23 @@ Future<ReportClass> _importReportFromZip(List<File> files) async {
 }
 
 enum PossibleOption {
-  createNewReport(
-    displayName: "Crear nuevo reporte",
+  createNewVisualization(
+    displayName: "Crear visualización",
     icon: Icon(Icons.add),
-    callback: _createNewReport,
-    allowMultiple: true,
-    allowedExtensions: ["xls"],
+  ),
+  createNewReport(
+    displayName: "Crear reporte",
+    icon: Icon(Icons.document_scanner),
   ),
   importReportFromZip(
     displayName: "Importar reporte",
     icon: Icon(Icons.file_open),
-    callback: _importReportFromZip,
-    allowMultiple: false,
-    allowedExtensions: ["zip"],
   );
 
   final String displayName;
   final Widget icon;
-  final Future<ReportClass> Function(List<File> files) callback;
-  final bool allowMultiple;
-  final List<String> allowedExtensions;
 
-  const PossibleOption({
-    required this.displayName,
-    required this.icon,
-    required this.callback,
-    required this.allowMultiple,
-    required this.allowedExtensions,
-  });
+  const PossibleOption({required this.displayName, required this.icon});
 }
 
 class HomePage extends StatefulWidget {
@@ -67,20 +57,36 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with RouteAware {
-  PossibleOption selectedValue = PossibleOption.createNewReport;
+  PossibleOption selectedValue = PossibleOption.createNewVisualization;
 
   Future<void> _openReportEditor(PossibleOption possibleOption) async {
+    if (possibleOption == PossibleOption.createNewReport) {
+      if (!mounted) return;
+      context.go(
+        "/home/report-editor",
+        extra: () => startReport_withImageSlide(),
+      );
+      return;
+    }
+
+    var allowMultipleFiles = true;
+    var allowedExtensions = ["xlsx"];
+    var callback = _createNewVisualization;
+
+    if (possibleOption == PossibleOption.importReportFromZip) {
+      allowMultipleFiles = false;
+      allowedExtensions = ["zip"];
+      callback = _importReportFromZip;
+    }
+
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowMultiple: possibleOption.allowMultiple,
-      allowedExtensions: possibleOption.allowedExtensions,
+      allowMultiple: allowMultipleFiles,
+      allowedExtensions: allowedExtensions,
     );
     if (result != null) {
       var files = result.files.map((file) => File(file.path!)).toList();
       if (!mounted) return;
-      context.go(
-        "/home/report-editor",
-        extra: () => possibleOption.callback(files),
-      );
+      context.go("/home/report-editor", extra: () => callback(files));
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:ut_report_generator/models/image_slide/self.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
@@ -26,7 +27,7 @@ class ReportClass {
                 (slide) =>
                     SlideCategory.values.byName(slide['category']) ==
                             SlideCategory.imageSlide
-                        ? PivotTable.fromJson(slide)
+                        ? ImageSlide.fromJson(slide)
                         : PivotTable.fromJson(slide),
               )
               .toList(),

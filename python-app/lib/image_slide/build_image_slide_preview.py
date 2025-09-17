@@ -24,9 +24,9 @@ def build_image_slide_preview(image_slide: ImageSlide, root_directory: str) -> s
     '''
     presentation = LibrePresentation()
 
-    controller_for_kind(kind=image_slide.kind).render_slide(
+    controller_for_kind(kind=image_slide.category).render_slide(
         presentation=presentation,
-        arguments=image_slide.arguments
+        arguments=image_slide.parameters
     )
 
     pptx_preview_path = os.path.join(

@@ -1,6 +1,7 @@
 from lib.get_metadata import get_metadata
 from lib.descriptive_error import DescriptiveError
 from lib.directory_definitions import metadata_file_of_report, slides_directory_of_report, root_directory_of_report, rendered_file_of_report, export_file_of_report, export_directory_of_report, data_directory_of_report, get_reports_directory
+from lib.image_slide.image_slide_from_json import image_slide_from_json
 
 from models.image_slide.self import ImageSlide
 from models.pivot_table.self import PivotTable
@@ -73,7 +74,7 @@ class Report:
             last_edit=pandas.Timestamp(metadata["last_edit"]),
             last_open=pandas.Timestamp(metadata["last_open"]),
             slides=[
-                    ImageSlide.from_json(json_data=slide) 
+                    image_slide_from_json(json=slide) 
                     if SlideCategory(slide["category"]) == SlideCategory.IMAGE_SLIDE
                     else PivotTable.from_json(json_data=slide)
                 for slide in metadata.get("slides", [])
@@ -119,24 +120,12 @@ class Report:
             slide.makedirs(exist_ok=exist_ok)
 
     def new_render(self) -> None:
-        is_render_updated = self.last_render is not None and self.last_render >= self.last_edit
-
-        if is_render_updated and os.path.exists(self.rendered_file):
-            return
-        
-        presentation = Presentation()
-        for slide in self.slides:
-            slide.build_new_assets()
-            slide.controller.render_slide(
-                presentation=presentation, 
-                arguments=slide.arguments, 
-                assets=slide.assets
-            )
-        
-        if os.path.exists(self.rendered_file):
-            os.remove(self.rendered_file)
-        
-        presentation.save(self.rendered_file)
+        '''
+        It shall create a new PowerPoint presentation based on the report depending
+        on whether its last edit timestamp is greater than the time the last
+        PowerPoint was created (if there is any PowerPoint)
+        '''
+        pass
 
     def add_slide(self, slide: Slide) -> None:
         self.slides.append(slide)

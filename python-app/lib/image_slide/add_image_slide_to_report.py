@@ -20,8 +20,8 @@ def add_image_slide_to_report(report: Report, local_request) -> ImageSlide:
     controller = controller_for_kind(kind=kind)
     image_slide = ImageSlide(
         name="Mi diapositiva",
-        kind=kind,
-        arguments=controller.default_arguments(),
+        category=kind,
+        parameters=controller.default_arguments(),
         creation_date=pandas.Timestamp.now(),
         identifier=str(uuid4()),
         last_edit=pandas.Timestamp.now(),

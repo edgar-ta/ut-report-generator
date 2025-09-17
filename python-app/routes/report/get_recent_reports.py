@@ -14,8 +14,6 @@ import os
 
 @with_flask("/get_recent", methods=["POST"])
 def get_recent_reports():
-    # This is the id of the last report
-    # that the frontend loaded
     reference_report: str | None = getattr(request.json, 'report', None)
     
     os.makedirs(get_reports_directory(), exist_ok=True)
@@ -36,9 +34,6 @@ def get_recent_reports():
         try:
             if len(reports) >= REPORTS_CHUNK_SIZE:
                 break
-            # @todo This might be insanely time-consuming in the future. Since I only use the
-            # preview field of the first slide I don't think it is necessary for me to parse 
-            # the whole report JSON file
             report = Report.from_root_directory(root_directory=directory)
             reports.append(report)
         except Exception as e:

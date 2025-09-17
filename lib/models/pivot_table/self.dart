@@ -7,15 +7,7 @@ import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
 
-class PivotTable implements Slide {
-  final String name;
-
-  @override
-  final String identifier;
-  final DateTime creationDate;
-  final DateTime lastEdit;
-  final SlideCategory category;
-  final String? preview;
+class PivotTable extends Slide {
   final DataSource source;
   final List<DataFilter> filters;
   final List<PivotTableLevel> filtersOrder;
@@ -24,27 +16,22 @@ class PivotTable implements Slide {
   final FilterFunctionType filterFunction;
 
   PivotTable({
-    required this.name,
-    required this.identifier,
-    required this.creationDate,
-    required this.lastEdit,
-    this.preview,
+    required super.title,
+    required super.identifier,
+    required super.creationDate,
+    required super.lastEdit,
+    required super.preview,
     required this.source,
     required this.filters,
     required this.filtersOrder,
     required this.data,
     required this.aggregateFunction,
     required this.filterFunction,
-  }) : category = SlideCategory.pivotTable;
+  }) : super(category: SlideCategory.pivotTable);
 
   Map<String, dynamic> toJson() {
     return {
-      "name": name,
-      "identifier": identifier,
-      "creation_date": creationDate.toIso8601String(),
-      "last_edit": lastEdit.toIso8601String(),
-      "category": category.name,
-      "preview": preview,
+      ...super.toMap(),
       "source": source.toJson(),
       "filters": filters.map((f) => f.toJson()).toList(),
       "filters_order": filtersOrder.map((value) => value.name).toList(),
@@ -56,7 +43,7 @@ class PivotTable implements Slide {
 
   factory PivotTable.fromJson(Map<String, dynamic> json) {
     return PivotTable(
-      name: json["name"],
+      title: json["title"],
       identifier: json["identifier"],
       creationDate: DateTime.parse(json["creation_date"]),
       lastEdit: DateTime.parse(json["last_edit"]),
@@ -77,7 +64,7 @@ class PivotTable implements Slide {
   }
 
   PivotTable copyWith({
-    String? name,
+    String? title,
     String? identifier,
     DateTime? creationDate,
     DateTime? lastEdit,
@@ -90,7 +77,7 @@ class PivotTable implements Slide {
     FilterFunctionType? filterFunction,
   }) {
     return PivotTable(
-      name: name ?? this.name,
+      title: title ?? this.title,
       identifier: identifier ?? this.identifier,
       creationDate: creationDate ?? this.creationDate,
       lastEdit: lastEdit ?? this.lastEdit,

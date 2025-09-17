@@ -23,10 +23,10 @@ def edit_image_slide():
 
     report = Report.from_identifier(identifier=report)
     image_slide: ImageSlide = report[image_slide]
-    controller = controller_for_kind(kind=image_slide.kind)
+    controller = controller_for_kind(kind=image_slide.category)
     
     controller.validate_arguments(arguments=arguments)
-    image_slide.arguments = arguments
+    image_slide.parameters = arguments
     image_slide.last_edit = pandas.Timestamp.now()
 
     base_directory = base_directory_of_slide(root_directory=report.root_directory, slide_id=image_slide.identifier)
