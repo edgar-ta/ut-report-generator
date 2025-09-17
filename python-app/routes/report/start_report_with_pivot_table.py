@@ -18,4 +18,4 @@ def start_report_with_pivot_table():
 
     render_previews_of_report(report=report)
     report.save()
-    return format_for_create(response=report), 200
+    return report.to_dict(), 200

@@ -1,6 +1,6 @@
 import 'package:ut_report_generator/models/image_slide/self.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
-import 'package:ut_report_generator/models/pivot_table/visualization_mode.dart';
+import 'package:ut_report_generator/models/report/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
 

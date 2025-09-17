@@ -28,15 +28,13 @@ def plot_from_components(
         filepath=filepath
         )
     
-    if former_preview is not None:
+    if former_preview is not None and os.path.exists(former_preview):
         os.remove(former_preview)
 
-def plot_from_entities(report: Report, pivot_table: PivotTable) -> str:
+def plot_from_entities(filepath: str, pivot_table: PivotTable) -> str:
     outer_filter = next((_filter for _filter in pivot_table.filters if _filter.charting_mode == ChartingMode.SUPER_CHART), None)
     if outer_filter is None:
         outer_filter = next((_filter for _filter in pivot_table.filters if _filter.charting_mode == ChartingMode.CHART), None)
-
-    filepath = preview_image_of_slide(root_directory=report.root_directory, slide_id=pivot_table.identifier)
 
     plot_from_components(
         data=pivot_table.data, 
@@ -47,5 +45,3 @@ def plot_from_entities(report: Report, pivot_table: PivotTable) -> str:
         filepath=filepath, 
         former_preview=pivot_table.preview
         )
-    
-    return filepath
