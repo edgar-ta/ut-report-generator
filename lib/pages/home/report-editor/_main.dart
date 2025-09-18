@@ -329,7 +329,9 @@ class _ReportEditorState extends State<ReportEditor>
                     initialPivotTable: slide,
                     setPivotTable: (callback) {
                       setState(() {
-                        report!.slides[openSlideMenuIndex] = callback(slide);
+                        report!.slides[openSlideMenuIndex] = callback(
+                          report!.slides[openSlideMenuIndex] as PivotTable,
+                        );
                       });
                     },
                   );

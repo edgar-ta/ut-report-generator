@@ -35,7 +35,7 @@ class _SlideFrameState extends State<SlideFrame> {
           Positioned.fill(child: widget.child),
 
           AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
             top: screenHeight / 2 - 24,
             right: widget.isMenuOpen ? MENU_WIDTH : 0,
@@ -55,7 +55,8 @@ class _SlideFrameState extends State<SlideFrame> {
                   ),
                   child: AnimatedRotation(
                     turns: widget.isMenuOpen ? 0.0 : 0.5,
-                    duration: const Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
                     child: const Icon(
                       Icons.arrow_back_ios_new,
                       color: Colors.black,
