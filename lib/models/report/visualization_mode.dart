@@ -1,0 +1,1 @@
+enum VisualizationMode { asReport, chartsOnly }

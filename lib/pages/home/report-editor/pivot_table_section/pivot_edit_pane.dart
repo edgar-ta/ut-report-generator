@@ -134,11 +134,11 @@ class _PivotEditPaneState extends State<PivotEditPane> {
 
                       if (HardwareKeyboard.instance.isControlPressed) {
                         if (filter.chartingMode == ChartingMode.superChart) {
-                          widget.unsetSuperChart();
+                          await widget.unsetSuperChart();
                           return;
                         }
                         if (filter.chartingMode == ChartingMode.none) {
-                          widget.setSuperChart(index);
+                          await widget.setSuperChart(index);
                           return;
                         }
 
@@ -146,12 +146,13 @@ class _PivotEditPaneState extends State<PivotEditPane> {
                           (element) =>
                               element.chartingMode == ChartingMode.superChart,
                         );
-                        widget.swapChartingModes(index, superChartFilterIndex);
-                        return;
+                        await widget.swapChartingModes(
+                          index,
+                          superChartFilterIndex,
+                        );
                       } else {
                         if (filter.chartingMode == ChartingMode.none) {
-                          widget.setChart(index);
-                          return;
+                          await widget.setChart(index);
                         }
                       }
                     },

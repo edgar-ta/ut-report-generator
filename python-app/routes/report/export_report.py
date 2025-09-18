@@ -5,7 +5,7 @@ from lib.random_message import random_message, RandomMessageType
 
 from control_variables import ZIP_COMPRESSION_LEVEL
 
-from models.report import Report
+from models.report.self import Report
 
 from flask import request
 

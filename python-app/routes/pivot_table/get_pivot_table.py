@@ -5,7 +5,7 @@ from lib.get_entities_from_request import entities_for_editing_pivot_table
 
 from lib.pivot_table.add_pivot_table_to_report import add_pivot_table_to_report
 
-from models.report import Report
+from models.report.self import Report
 
 from flask import request
 

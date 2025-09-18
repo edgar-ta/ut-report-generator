@@ -5,9 +5,10 @@ from lib.descriptive_error import DescriptiveError
 from lib.format_for_create import format_for_create
 from lib.image_slide.add_image_slide_to_report import add_image_slide_to_report
 from lib.directory_definitions import base_directory_of_slide
-from lib.report.render_previews import render_previews
+from lib.report.render_previews_of_report import render_previews_of_report
 
-from models.report import Report
+from models.report.self import Report
+from models.report.visualization_mode import VisualizationMode
 from models.image_slide.cover_page_slide import CoverPageSlide
 
 from render.drawable_area import DrawableArea
@@ -22,7 +23,7 @@ import os
 
 @with_flask("/start_with_image_slide", methods=["POST"])
 def start_report_with_image_slide():
-    report = Report.from_nothing()
+    report = Report.from_nothing(visualization_mode=VisualizationMode.AS_REPORT)
     report.makedirs()
 
     slide_identifier = str(uuid4())
@@ -39,7 +40,7 @@ def start_report_with_image_slide():
     os.makedirs(base_directory_of_slide(root_directory=report.root_directory, slide_id=cover_page.identifier))
     report.slides.append(cover_page)
 
-    render_previews(report=report)
+    render_previews_of_report(report=report)
     report.save()
 
     return report.to_dict(), 200

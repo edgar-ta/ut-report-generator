@@ -2,7 +2,7 @@ from lib.with_flask import with_flask
 from lib.get_or_panic import get_or_panic
 from lib.format_for_create import format_for_create
 
-from models.report import Report
+from models.report.self import Report
 
 from flask import request
 

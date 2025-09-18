@@ -1,16 +1,26 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_data.dart';
-import 'package:ut_report_generator/utils/roud_up.dart';
+import 'package:ut_report_generator/utils/divide_length.dart';
+import 'package:ut_report_generator/utils/round_up.dart';
 
 class PivotTableChart extends StatefulWidget {
   final PivotData data;
   final String chartName;
+  final List<Color> barColors;
 
   const PivotTableChart({
     super.key,
     required this.data,
     required this.chartName,
+    this.barColors = const [
+      Colors.blue,
+      Colors.orange,
+      Colors.green,
+      Colors.red,
+      Colors.purple,
+      Colors.brown,
+    ],
   });
 
   @override
@@ -23,6 +33,10 @@ class _PivotTableChartState extends State<PivotTableChart> {
 
   @override
   Widget build(BuildContext context) {
+    final double totalWidth = MediaQuery.of(context).size.width * 3 / 4;
+    final double spaceBetweenBars = 10;
+    final double spaceBetweenGarGroups = 10;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -103,7 +117,12 @@ class _PivotTableChartState extends State<PivotTableChart> {
                     getTooltipItem: createTooltipItem,
                   ),
                 ),
-                barGroups: createBarGroups(),
+                barGroups: createBarGroups(
+                  spaceBetweenBarGroups: spaceBetweenGarGroups,
+                  spaceBetweenBars: spaceBetweenBars,
+                  totalWidth: totalWidth,
+                ),
+                groupsSpace: spaceBetweenGarGroups,
               ),
             ),
           ),
@@ -176,9 +195,20 @@ class _PivotTableChartState extends State<PivotTableChart> {
     }
   }
 
-  List<BarChartGroupData> createBarGroups() {
+  List<BarChartGroupData> createBarGroups({
+    required double totalWidth,
+    required double spaceBetweenBars,
+    required double spaceBetweenBarGroups,
+  }) {
     switch (widget.data) {
       case FlatData(data: final flatData):
+        final numberOfBars = flatData.entries.length.toDouble();
+        final barWidth = divideLength(
+          length: totalWidth,
+          itemCount: numberOfBars,
+          spacing: spaceBetweenBars,
+        );
+
         return flatData.entries.indexed.map((parameters) {
           final (index, entry) = parameters;
           final value = (entry.value as num).toDouble();
@@ -186,15 +216,16 @@ class _PivotTableChartState extends State<PivotTableChart> {
 
           return BarChartGroupData(
             x: index,
+            barsSpace: spaceBetweenBars,
             barRods: [
               BarChartRodData(
                 toY: value,
-                width: 32,
+                width: barWidth,
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.zero,
                   top: Radius.circular(8),
                 ),
-                color: Colors.blue,
+                color: widget.barColors[index % widget.barColors.length],
                 borderSide: BorderSide(
                   color: const Color.fromARGB(255, 0, 247, 255),
                   width: isTouched ? 8 : 0,
@@ -205,13 +236,28 @@ class _PivotTableChartState extends State<PivotTableChart> {
         }).toList();
 
       case GroupedData(data: final groupedData):
+        final numberOfGroups = groupedData.entries.length.toDouble();
+        final numberOfBars =
+            groupedData.entries.toList()[0].value.entries.length.toDouble();
+
+        final groupWidth = divideLength(
+          length: totalWidth,
+          itemCount: numberOfGroups,
+          spacing: spaceBetweenBarGroups,
+        );
+        final barWidth = divideLength(
+          length: groupWidth,
+          itemCount: numberOfBars,
+          spacing: spaceBetweenBars,
+        );
+
         return groupedData.entries.indexed.map((outerParameters) {
           final (groupIndex, groupEntry) = outerParameters;
           final groupData = groupEntry.value;
 
           return BarChartGroupData(
             x: groupIndex,
-            barsSpace: 8,
+            barsSpace: spaceBetweenBars,
             barRods:
                 groupData.entries.indexed.map((parameters) {
                   var (rodIndex, rodEntry) = parameters;
@@ -222,12 +268,12 @@ class _PivotTableChartState extends State<PivotTableChart> {
                   final value = (rodEntry.value as num).toDouble();
                   return BarChartRodData(
                     toY: value,
-                    width: 256 / groupData.entries.length,
+                    width: barWidth,
                     borderRadius: const BorderRadius.vertical(
                       bottom: Radius.zero,
                       top: Radius.circular(8),
                     ),
-                    color: Colors.blue,
+                    color: widget.barColors[rodIndex % widget.barColors.length],
                     borderSide: BorderSide(
                       color: const Color.fromARGB(255, 0, 247, 255),
                       width: isTouched ? 8 : 0,

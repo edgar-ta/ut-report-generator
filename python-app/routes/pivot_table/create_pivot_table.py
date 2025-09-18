@@ -1,10 +1,12 @@
 from lib.with_flask import with_flask
 from lib.get_or_panic import get_or_panic
 from lib.format_for_create import format_for_create
+from lib.directory_definitions import preview_image_of_slide
 
 from lib.pivot_table.add_pivot_table_to_report import add_pivot_table_to_report
+from lib.pivot_table.plot_pivot_table import plot_from_entities
 
-from models.report import Report
+from models.report.self import Report
 
 from flask import request
 

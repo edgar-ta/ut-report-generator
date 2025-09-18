@@ -1,6 +1,6 @@
 from lib.get_or_panic import get_or_panic
 from lib.file_extension import get_file_extension, without_extension
-from lib.directory_definitions import data_file_of_slide, preview_image_of_slide
+from lib.directory_definitions import data_file_of_slide, preview_image_of_slide, bare_preview_of_pivot_table
 from lib.group_name import group_name_from_path
 from lib.data_frame.data_frame_io import export_data_frame
 from lib.data_frame.validate_file import validate_file
@@ -9,13 +9,14 @@ from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
 from lib.pivot_table.read_excel import read_excel
 from lib.pivot_table.create_default_filters import create_default_filters
 from lib.pivot_table.plot_pivot_table import plot_from_components
+from lib.pivot_table.render_preview_of_pivot_table import render_preview_of_pivot_table
 
 from models.pivot_table.self import PivotTable
 from models.pivot_table.aggregate_function_type import AggregateFunctionType
 from models.pivot_table.filter_function_type import FilterFunctionType
 from models.pivot_table.data_source import DataSource
 from models.slide.slide_category import SlideCategory
-from models.report import Report
+from models.report.self import Report
 
 from uuid import uuid4
 
@@ -64,15 +65,17 @@ def add_pivot_table_to_report(report: Report, local_request: flask.Request, inde
         aggregate_function=default_aggregate_function, 
         )
     
-    preview_filepath = preview_image_of_slide(root_directory=report.root_directory, slide_id=slide_identifier)
+    bare_preview_filepath = bare_preview_of_pivot_table(root_directory=report.root_directory, slide_id=slide_identifier)
     plot_from_components(
         data=data, 
         title=default_title, 
         outer_chart=default_filters[0].level,
         _filter=default_filter_function, 
         aggregate=default_aggregate_function, 
-        filepath=preview_filepath
+        filepath=bare_preview_filepath
         )
+    
+    preview_filepath = preview_image_of_slide(root_directory=report.root_directory, slide_id=slide_identifier)
 
     pivot_table = PivotTable(
         aggregate_function=default_aggregate_function,
@@ -80,13 +83,16 @@ def add_pivot_table_to_report(report: Report, local_request: flask.Request, inde
         data=data,
         filter_function=default_filter_function,
         identifier=slide_identifier,
+        preview=None,
+        bare_preview=bare_preview_filepath,
         last_edit=pd.Timestamp.now(),
-        name=default_title,
+        title=default_title,
         filters=default_filters,
         filters_order=[ _filter.level for _filter in default_filters ],
-        preview=preview_filepath,
         source=data_source,
     )
+
+    render_preview_of_pivot_table(pivot_table=pivot_table, root_directory=report.root_directory)
 
     if index is None:
         report.slides.append(pivot_table)

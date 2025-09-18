@@ -2,7 +2,7 @@ from control_variables import PATH_OF_PPTX_TEMPLATE
 
 from lib.directory_definitions import temporary_rendered_file_of_report, preview_image_of_slide
 
-from models.report import Report
+from models.report.self import Report
 
 from render.drawable_area import DrawableArea
 
@@ -14,13 +14,7 @@ from spire.presentation import Presentation as SpirePresentation
 
 import os
 
-def fresh_slide(presentation: Presentation) -> Slide:
-    slide = presentation.slides.add_slide(presentation.slides[0].slide_layout)
-    for placeholder in slide.placeholders:
-        slide.placeholders.element.remove(placeholder.element)
-    return slide
-
-def render_previews(report: Report):
+def render_previews_of_report(report: Report):
     template_path = PATH_OF_PPTX_TEMPLATE()
     temporary_path = temporary_rendered_file_of_report(root_directory=report.root_directory)
 
@@ -31,9 +25,15 @@ def render_previews(report: Report):
         width=presentation.slide_width.emu, 
         height=presentation.slide_height.emu
         ).with_padding(horizontal=Cm(2).emu, vertical=Cm(4).emu)
+
+    def fresh_slide() -> Slide:
+        slide = presentation.slides.add_slide(presentation.slides[0].slide_layout)
+        for placeholder in slide.placeholders:
+            slide.placeholders.element.remove(placeholder.element)
+        return slide
     
     for slide in report.slides:
-        pptx_slide = fresh_slide(presentation=presentation)
+        pptx_slide = fresh_slide()
         slide.render(slide=pptx_slide, drawable_area=base_area)
     
     presentation.save(temporary_path)

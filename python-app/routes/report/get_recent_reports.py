@@ -2,8 +2,9 @@ from lib.with_flask import with_flask
 from lib.directory_definitions import get_reports_directory
 
 from lib.report.get_id_of_report import get_id_of_report
+from lib.report.get_preview_of_report import get_preview_of_report
 
-from models.report import Report
+from models.report.self import Report
 
 from control_variables import REPORTS_CHUNK_SIZE
 
@@ -46,7 +47,7 @@ def get_recent_reports():
     return {
         "reports": [
             {
-                "preview": next((slide.preview for slide in report.slides if slide.preview is not None), None),
+                "preview": get_preview_of_report(report=report),
                 "name": report.report_name,
                 "identifier": report.identifier,
             }

@@ -2,7 +2,7 @@ from lib.descriptive_error import DescriptiveError
 
 from models.image_slide.self import ImageSlide
 from models.pivot_table.self import PivotTable
-from models.report import Report
+from models.report.self import Report
 
 from uuid import uuid4
 

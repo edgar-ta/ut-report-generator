@@ -63,6 +63,12 @@ def preview_image_of_slide(root_directory: str, slide_id: str) -> str:
         f"preview-{str(uuid4())}.png"
         )
 
+def bare_preview_of_pivot_table(root_directory:str, slide_id: str) -> str:
+    return os.path.join(
+        base_directory_of_slide(root_directory=root_directory, slide_id=slide_id), 
+        f"bare-preview-{str(uuid4())}.png"
+        )
+
 def data_file_of_slide(root_directory: str, slide_id: str) -> str:
     return os.path.join(
         base_directory_of_slide(root_directory=root_directory, slide_id=slide_id), 

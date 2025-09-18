@@ -4,7 +4,7 @@ from lib.file_extension import check_file_extension
 from lib.directory_definitions import root_directory_of_report
 from lib.format_for_create import format_for_create
 
-from models.report import Report
+from models.report.self import Report
 
 from control_variables import ZIP_COMPRESSION_LEVEL
 
