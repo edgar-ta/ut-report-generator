@@ -2,18 +2,13 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
 
 class PivotMetadataPane extends StatelessWidget {
-  const PivotMetadataPane({
-    super.key,
-    required this.files,
-    required this.onFileRemoved,
-    required this.onFileAdded,
-  });
+  const PivotMetadataPane({super.key, required this.files, required this.bloc});
 
   final List<String> files;
-  final Future<void> Function(String) onFileRemoved;
-  final Future<void> Function(String) onFileAdded;
+  final PivotTableBloc bloc;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +37,7 @@ class PivotMetadataPane extends StatelessWidget {
                         label: Text(filename),
                         deleteButtonTooltipMessage: "Eliminar",
                         onDeleted: () async {
-                          await onFileRemoved(path);
+                          await bloc.onFileRemoved(path);
                         },
                       );
                     }).toList(),
@@ -56,7 +51,7 @@ class PivotMetadataPane extends StatelessWidget {
                       );
                   if (result != null) {
                     var file = result.files[0].path!;
-                    await onFileAdded(file);
+                    await bloc.onFileAdded(file);
                   }
                 },
                 label: Text("Añadir archivo"),

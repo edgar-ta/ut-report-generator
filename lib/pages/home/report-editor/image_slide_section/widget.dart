@@ -7,6 +7,7 @@ import 'package:ut_report_generator/pages/home/report-editor/slide/tabbed_menu.d
 
 class ImageSlideSection extends StatefulWidget {
   final ImageSlide initialSlide;
+
   const ImageSlideSection({super.key, required this.initialSlide});
 
   @override
@@ -16,24 +17,6 @@ class ImageSlideSection extends StatefulWidget {
 class _ImageSlideSectionState extends State<ImageSlideSection> {
   @override
   Widget build(BuildContext context) {
-    return SlideFrame(
-      menuWidth: 512,
-      menuContent: TabbedMenu(
-        editTabBuilder: (context) {
-          return Column(
-            children: [
-              ...widget.initialSlide.parameters.entries.map((entry) {
-                final (key, value) = (entry.key, entry.value);
-                return TextField(decoration: InputDecoration(label: Text(key)));
-              }),
-            ],
-          );
-        },
-        metadataTabBuilder: (context) {
-          return Text("fs");
-        },
-      ),
-      child: Image.file(File(widget.initialSlide.preview)),
-    );
+    return Image.file(File(widget.initialSlide.preview));
   }
 }

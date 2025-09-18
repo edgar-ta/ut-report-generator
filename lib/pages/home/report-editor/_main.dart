@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
+import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
 import 'package:ut_report_generator/components/file_selector/widget.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report/self.dart';
@@ -18,11 +19,16 @@ import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget
 import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/widget.dart';
+import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/pivot_edit_pane.dart';
+import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/pivot_metadata_pane.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/widget.dart';
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
 import 'package:ut_report_generator/pages/home/report-editor/slide/shimmer_slide.dart';
+import 'package:ut_report_generator/pages/home/report-editor/slide/slide_frame.dart';
+import 'package:ut_report_generator/pages/home/report-editor/slide/tabbed_menu.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
+import 'package:ut_report_generator/utils/design_constants.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 import 'package:ut_report_generator/api/report/self.dart' as report_api;
 import 'package:ut_report_generator/api/pivot_table/self.dart'
@@ -37,21 +43,48 @@ class ReportEditor extends StatefulWidget {
   State<ReportEditor> createState() => _ReportEditorState();
 }
 
-class _ReportEditorState extends State<ReportEditor> {
+class _ReportEditorState extends State<ReportEditor>
+    with SingleTickerProviderStateMixin {
   late TextEditingController reportNameController;
   ReportClass? report;
   final ScrollController _scrollController = ScrollController();
   final fabKey = GlobalKey<ExpandableFabState>();
 
+  int openSlideMenuIndex = -1;
+  final OverlayPortalController _portalController = OverlayPortalController();
+  late final AnimationController _portalAnimationController;
+  late final Animation _portalOpacityAnimation;
+  late final Animation _portalOffsetAnimation;
+
   @override
   void initState() {
     super.initState();
+    _portalAnimationController = AnimationController(
+      duration: Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _portalOpacityAnimation = Tween(begin: 0.toDouble(), end: 0.5).animate(
+      CurvedAnimation(
+        parent: _portalAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+    _portalOffsetAnimation = Tween(
+      begin: -MENU_WIDTH,
+      end: 0.toDouble(),
+    ).animate(
+      CurvedAnimation(
+        parent: _portalAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
     _loadReport();
   }
 
   @override
   void dispose() {
     super.dispose();
+    _portalAnimationController.dispose();
     _scrollController.dispose();
   }
 
@@ -234,42 +267,135 @@ class _ReportEditorState extends State<ReportEditor> {
     );
   }
 
+  void _openSlideMenu(int index) {
+    if (openSlideMenuIndex == -1) {
+      _portalController.show();
+      _portalAnimationController.forward();
+    }
+    setState(() {
+      openSlideMenuIndex = index;
+    });
+  }
+
+  void _closeSlideMenu() {
+    _portalAnimationController.reverse();
+    _portalController.hide();
+
+    setState(() {
+      openSlideMenuIndex = -1;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    return OverlayPortal(
+      controller: _portalController,
+      overlayChildBuilder: (context) {
+        if (openSlideMenuIndex == -1 || report == null) return const SizedBox();
+
+        final slide = report!.slides[openSlideMenuIndex];
+
+        return AnimatedBuilder(
+          animation: _portalAnimationController,
+          builder: (context, child) {
+            return Stack(
+              children: [
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: _closeSlideMenu,
+                    child: Opacity(
+                      opacity: _portalOpacityAnimation.value,
+                      child: Container(color: Colors.black54),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  bottom: 0,
+                  width: MENU_WIDTH,
+                  right: _portalOffsetAnimation.value,
+                  child: child ?? SizedBox.shrink(),
+                ),
+              ],
+            );
+          },
+          child: Material(
+            elevation: 8,
+            child: Builder(
+              builder: (context) {
+                if (slide is PivotTable) {
+                  final bloc = PivotTableBloc(
+                    reportIdentifier: report!.identifier,
+                    initialPivotTable: slide,
+                    setPivotTable: (callback) {
+                      setState(() {
+                        report!.slides[openSlideMenuIndex] = callback(slide);
+                      });
+                    },
+                  );
+                  return TabbedMenu(
+                    editTabBuilder:
+                        (_) => PivotEditPane(
+                          title: slide.title,
+                          bloc: bloc,
+                          filters: slide.filters,
+                        ),
+                    metadataTabBuilder:
+                        (_) => PivotMetadataPane(
+                          files: slide.source.files,
+                          bloc: bloc,
+                        ),
+                  );
+                }
+                if (slide is ImageSlide) {
+                  return TabbedMenu(
+                    editTabBuilder: (_) => Text("Editar imagen"),
+                    metadataTabBuilder: (_) => Text("Metadatos"),
+                  );
+                }
+                return const Text("Tipo de slide inválido");
+              },
+            ),
+          ),
+        );
+      },
+      child: _buildReportContent(),
+    );
+  }
+
+  Widget _buildReportContent() {
+    if (report == null) return const ShimmerSlide();
+
     return SingleChildScrollView(
       controller: _scrollController,
-      child: AnimatedSwitcher(
-        duration: const Duration(
-          milliseconds: 500,
-        ), // duración de la transición
-        switchInCurve: Curves.easeInOut,
-        switchOutCurve: Curves.easeInOut,
-        child:
-            report != null
-                ? Column(
-                  spacing: 32,
-                  key: ValueKey('content_loaded'),
-                  children:
-                      report!.slides.indexed.map((data) {
-                        final (index, slide) = data;
-                        if (slide is PivotTable) {
-                          return PivotTableSection(
-                            report: report!.identifier,
-                            pivotTable: slide,
-                            updatePivotTable: (callback) {
-                              setState(() {
-                                report!.slides[index] = callback(slide);
-                              });
-                            },
-                          );
-                        }
-                        if (slide is ImageSlide) {
-                          return ImageSlideSection(initialSlide: slide);
-                        }
-                        return const Text("Tipo de slide inválido");
-                      }).toList(),
-                )
-                : const ShimmerSlide(key: ValueKey('shimmer')),
+      child: Column(
+        children:
+            report!.slides.indexed.map((data) {
+              final (index, slide) = data;
+              if (slide is PivotTable) {
+                return SlideFrame(
+                  isMenuOpen: openSlideMenuIndex == index,
+                  openMenu: () => _openSlideMenu(index),
+                  child: PivotTableSection(
+                    report: report!.identifier,
+                    pivotTable: slide,
+                    updatePivotTable: (callback) {
+                      setState(() {
+                        report!.slides[index] = callback(slide);
+                      });
+                    },
+                  ),
+                );
+              }
+              if (slide is ImageSlide) {
+                return SlideFrame(
+                  isMenuOpen: openSlideMenuIndex == index,
+                  openMenu: () => _openSlideMenu(index),
+                  child: ImageSlideSection(initialSlide: slide),
+                );
+              }
+              return const Text("Tipo de slide inválido");
+            }).toList(),
       ),
     );
   }

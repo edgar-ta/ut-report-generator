@@ -4,14 +4,14 @@ import 'package:ut_report_generator/utils/design_constants.dart';
 
 class SlideFrame extends StatefulWidget {
   final Widget child;
-  final double menuWidth;
-  final Widget menuContent;
+  final bool isMenuOpen;
+  final void Function() openMenu;
 
   const SlideFrame({
     super.key,
     required this.child,
-    required this.menuWidth,
-    required this.menuContent,
+    required this.isMenuOpen,
+    required this.openMenu,
   });
 
   @override
@@ -19,18 +19,7 @@ class SlideFrame extends StatefulWidget {
 }
 
 class _SlideFrameState extends State<SlideFrame> {
-  bool _menuOpen = false;
   bool _isHovering = false;
-
-  void _toggleMenu() {
-    setState(() => _menuOpen = !_menuOpen);
-  }
-
-  void _closeMenu() {
-    if (_menuOpen) {
-      setState(() => _menuOpen = false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,49 +32,18 @@ class _SlideFrameState extends State<SlideFrame> {
       color: Colors.white,
       child: Stack(
         children: [
-          // Contenido principal con scroll
           Positioned.fill(child: widget.child),
 
-          // Overlay oscuro -> cubre también el FAB de la app
-          if (_menuOpen)
-            GestureDetector(
-              onTap: _closeMenu,
-              child: Container(
-                color: Colors.black54,
-                height: screenHeight,
-                width: screenWidth,
-              ),
-            ),
-
-          // Menú deslizable
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            top: 0,
-            bottom: 0,
-            right: _menuOpen ? 0 : -widget.menuWidth,
-            child: AnimatedOpacity(
-              opacity: _menuOpen ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              child: Container(
-                width: widget.menuWidth,
-                color: Colors.white,
-                child: widget.menuContent,
-              ),
-            ),
-          ),
-
-          // Botón de menú (flecha)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             top: screenHeight / 2 - 24,
-            right: _menuOpen ? widget.menuWidth : 0,
+            right: widget.isMenuOpen ? MENU_WIDTH : 0,
             child: MouseRegion(
               onEnter: (_) => setState(() => _isHovering = true),
               onExit: (_) => setState(() => _isHovering = false),
               child: GestureDetector(
-                onTap: _toggleMenu,
+                onTap: widget.openMenu,
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -96,8 +54,7 @@ class _SlideFrameState extends State<SlideFrame> {
                             : Colors.transparent,
                   ),
                   child: AnimatedRotation(
-                    turns:
-                        _menuOpen ? 0.0 : 0.5, // 0 -> derecha, 0.5 -> izquierda
+                    turns: widget.isMenuOpen ? 0.0 : 0.5,
                     duration: const Duration(milliseconds: 300),
                     child: const Icon(
                       Icons.arrow_back_ios_new,

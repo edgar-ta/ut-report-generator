@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/utils/design_constants.dart';
 
 class TabbedMenu extends StatefulWidget {
   final WidgetBuilder editTabBuilder;
@@ -32,31 +33,34 @@ class _TabbedMenuState extends State<TabbedMenu>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TabBar(
-          controller: _controller,
-          tabs: const [
-            Tab(
-              icon: Icon(Icons.edit), // Ícono para Edición
-              text: "Edición",
-            ),
-            Tab(
-              icon: Icon(Icons.info_outline), // Ícono para Metadatos
-              text: "Metadatos",
-            ),
-          ],
-        ),
-        Expanded(
-          child: TabBarView(
+    return SizedBox(
+      width: MENU_WIDTH,
+      child: Column(
+        children: [
+          TabBar(
             controller: _controller,
-            children: [
-              Builder(builder: widget.editTabBuilder),
-              Builder(builder: widget.metadataTabBuilder),
+            tabs: const [
+              Tab(
+                icon: Icon(Icons.edit), // Ícono para Edición
+                text: "Edición",
+              ),
+              Tab(
+                icon: Icon(Icons.info_outline), // Ícono para Metadatos
+                text: "Metadatos",
+              ),
             ],
           ),
-        ),
-      ],
+          Expanded(
+            child: TabBarView(
+              controller: _controller,
+              children: [
+                Builder(builder: widget.editTabBuilder),
+                Builder(builder: widget.metadataTabBuilder),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

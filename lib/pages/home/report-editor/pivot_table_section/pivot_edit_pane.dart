@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
 import 'package:ut_report_generator/components/invisible_text_field.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
@@ -14,42 +15,15 @@ import 'package:ut_report_generator/api/pivot_table/filter/self.dart'
 import 'package:ut_report_generator/utils/copy_with_added.dart';
 
 class PivotEditPane extends StatefulWidget {
-  final String report;
-  final PivotTable pivotTable;
-  final void Function(PivotTable Function(PivotTable)) setPivotTable;
-
-  final TextEditingController nameController;
+  final PivotTableBloc bloc;
+  final String title;
   final List<DataFilter> filters;
-
-  final Future<void> Function(String option, int filterIndex) onOptionAdded;
-  final Future<void> Function(String option, int filterIndex) onOptionSwitched;
-  final Future<void> Function(String option, int filterIndex) onOptionRemoved;
-  final Future<void> Function(int filterIndex) onFilterDeleted;
-  final Future<void> Function(int filterIndex) toggleSelectionMode;
-  final Future<void> Function(int firstFilter, int secondFilter)
-  swapChartingModes;
-  final Future<void> Function(int filterIndex) setChart;
-  final Future<void> Function(int filterIndex) setSuperChart;
-  final Future<void> Function() unsetSuperChart;
-  final Future<void> Function(int newIndex, int oldIndex) onFiltersReordered;
 
   PivotEditPane({
     super.key,
-    required this.report,
-    required this.pivotTable,
-    required this.setPivotTable,
-    required this.nameController,
+    required this.title,
+    required this.bloc,
     required this.filters,
-    required this.onOptionAdded,
-    required this.onOptionRemoved,
-    required this.onOptionSwitched,
-    required this.onFilterDeleted,
-    required this.onFiltersReordered,
-    required this.toggleSelectionMode,
-    required this.swapChartingModes,
-    required this.setChart,
-    required this.setSuperChart,
-    required this.unsetSuperChart,
   });
 
   @override
@@ -64,7 +38,9 @@ class _PivotEditPaneState extends State<PivotEditPane> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          InvisibleTextField(controller: widget.nameController),
+          InvisibleTextField(
+            controller: TextEditingController(text: widget.title),
+          ),
           FilterSelector(
             title: "Filtros",
             availableFilters:
@@ -77,50 +53,14 @@ class _PivotEditPaneState extends State<PivotEditPane> {
                     )
                     .toList(),
             onFilterSelected: (level) {
-              widget.setPivotTable(
-                (pivotTable) => pivotTable.copyWith(
-                  filters: copyWithAdded(
-                    pivotTable.filters,
-                    DataFilter(
-                      level: level,
-                      selectedValues: [],
-                      possibleValues: [],
-                      // This has to match the default mode in the backend
-                      // in order to improve UI consistency
-                      selectionMode: SelectionMode.many,
-                      chartingMode: ChartingMode.none,
-                    ),
-                  ),
-                ),
-              );
-              filter_api
-                  .createDataFilter(
-                    report: widget.report,
-                    pivotTable: widget.pivotTable.identifier,
-                    level: level,
-                  )
-                  .then((newFilter) {
-                    widget.setPivotTable(
-                      (pivotTable) => pivotTable.copyWith(
-                        filters:
-                            pivotTable.filters
-                                .map(
-                                  (filter) =>
-                                      filter.level == level
-                                          ? newFilter
-                                          : filter,
-                                )
-                                .toList(),
-                      ),
-                    );
-                  });
+              widget.bloc.onFilterSelected(level);
             },
           ),
           ReorderableListView(
             shrinkWrap: true,
             buildDefaultDragHandles: false,
             onReorder: (oldIndex, newIndex) {
-              widget.onFiltersReordered(oldIndex, newIndex);
+              widget.bloc.onFiltersReordered(oldIndex, newIndex);
             },
             children:
                 widget.filters.indexed.map((data) {
@@ -134,11 +74,11 @@ class _PivotEditPaneState extends State<PivotEditPane> {
 
                       if (HardwareKeyboard.instance.isControlPressed) {
                         if (filter.chartingMode == ChartingMode.superChart) {
-                          await widget.unsetSuperChart();
+                          await widget.bloc.unsetSuperChart();
                           return;
                         }
                         if (filter.chartingMode == ChartingMode.none) {
-                          await widget.setSuperChart(index);
+                          await widget.bloc.setSuperChart(index);
                           return;
                         }
 
@@ -146,30 +86,30 @@ class _PivotEditPaneState extends State<PivotEditPane> {
                           (element) =>
                               element.chartingMode == ChartingMode.superChart,
                         );
-                        await widget.swapChartingModes(
+                        await widget.bloc.swapChartingModes(
                           index,
                           superChartFilterIndex,
                         );
                       } else {
                         if (filter.chartingMode == ChartingMode.none) {
-                          await widget.setChart(index);
+                          await widget.bloc.setChart(index);
                         }
                       }
                     },
                     toggleSelectionMode: () async {
-                      widget.toggleSelectionMode(index);
+                      widget.bloc.toggleSelectionMode(index);
                     },
                     selectAsOne: (value) async {
-                      widget.onOptionSwitched(value, index);
+                      widget.bloc.onOptionSwitched(value, index);
                     },
                     selectAsMany: (value) async {
-                      widget.onOptionAdded(value, index);
+                      widget.bloc.onOptionAdded(value, index);
                     },
                     deselectAsMany: (value) async {
-                      widget.onOptionRemoved(value, index);
+                      widget.bloc.onOptionRemoved(value, index);
                     },
                     onDelete: () async {
-                      widget.onFilterDeleted(index);
+                      widget.bloc.onFilterDeleted(index);
                     },
                   );
                 }).toList(),
