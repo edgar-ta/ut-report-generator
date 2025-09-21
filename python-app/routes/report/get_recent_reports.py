@@ -10,6 +10,7 @@ from control_variables import REPORTS_CHUNK_SIZE
 
 from flask import request
 from itertools import dropwhile
+from pandas import Timestamp
 
 import os
 
@@ -18,11 +19,15 @@ def get_recent_reports():
     reference_report: str | None = getattr(request.json, 'report', None)
     
     os.makedirs(get_reports_directory(), exist_ok=True)
-    reports_directories = sorted((
-        full_directory_name 
-        for directory_name in os.listdir(get_reports_directory()) 
-        if os.path.isdir((full_directory_name := os.path.join(get_reports_directory(), directory_name))) 
-    ), key=os.path.getatime)
+    reports_directories = sorted(
+        (
+            full_directory_name 
+            for directory_name in os.listdir(get_reports_directory()) 
+            if os.path.isdir((full_directory_name := os.path.join(get_reports_directory(), directory_name))) 
+        ), 
+        key=os.path.getmtime,
+        reverse=True
+    )
 
     if reference_report is not None:
         reports_directories = list(dropwhile(
@@ -50,6 +55,7 @@ def get_recent_reports():
                 "preview": get_preview_of_report(report=report),
                 "name": report.report_name,
                 "identifier": report.identifier,
+                'last_open': Timestamp.fromtimestamp(os.path.getmtime(report.root_directory)).isoformat(),
             }
             for report in reports
         ],

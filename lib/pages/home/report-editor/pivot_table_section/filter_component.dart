@@ -126,32 +126,35 @@ class _FilterComponentState extends State<FilterComponent> {
                       child:
                           (widget.filter.selectionMode == SelectionMode.many &&
                                   _areChipsShown)
-                              ? Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children:
-                                    widget.filter.possibleValues
-                                        .map(
-                                          (value) => FilterChip(
-                                            label: Text(value),
-                                            onSelected: (selected) async {
-                                              if (selected) {
-                                                await widget.selectAsMany(
-                                                  value,
-                                                );
-                                              } else {
-                                                await widget.deselectAsMany(
-                                                  value,
-                                                );
-                                              }
-                                            },
-                                            selected: widget
-                                                .filter
-                                                .selectedValues
-                                                .contains(value),
-                                          ),
-                                        )
-                                        .toList(),
+                              ? Padding(
+                                padding: EdgeInsets.only(bottom: 8),
+                                child: Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children:
+                                      widget.filter.possibleValues
+                                          .map(
+                                            (value) => FilterChip(
+                                              label: Text(value),
+                                              onSelected: (selected) async {
+                                                if (selected) {
+                                                  await widget.selectAsMany(
+                                                    value,
+                                                  );
+                                                } else {
+                                                  await widget.deselectAsMany(
+                                                    value,
+                                                  );
+                                                }
+                                              },
+                                              selected: widget
+                                                  .filter
+                                                  .selectedValues
+                                                  .contains(value),
+                                            ),
+                                          )
+                                          .toList(),
+                                ),
                               )
                               : SizedBox.shrink(),
                     ),

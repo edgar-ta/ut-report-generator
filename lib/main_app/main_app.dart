@@ -24,6 +24,7 @@ class MainApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ScaffoldController(),
       child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
         title: "UT Report Generator",
         routerConfig: router,
       ),

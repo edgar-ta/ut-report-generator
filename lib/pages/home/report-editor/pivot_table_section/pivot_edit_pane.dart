@@ -33,88 +33,92 @@ class PivotEditPane extends StatefulWidget {
 class _PivotEditPaneState extends State<PivotEditPane> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          InvisibleTextField(
-            controller: TextEditingController(text: widget.title),
-          ),
-          FilterSelector(
-            title: "Filtros",
-            availableFilters:
-                PivotTableLevel.values
-                    .where(
-                      (level) =>
-                          !widget.filters
-                              .map((filter) => filter.level)
-                              .contains(level),
-                    )
-                    .toList(),
-            onFilterSelected: (level) {
-              widget.bloc.onFilterSelected(level);
-            },
-          ),
-          ReorderableListView(
-            shrinkWrap: true,
-            buildDefaultDragHandles: false,
-            onReorder: (oldIndex, newIndex) {
-              widget.bloc.onFiltersReordered(oldIndex, newIndex);
-            },
-            children:
-                widget.filters.indexed.map((data) {
-                  final (index, filter) = data;
-                  return FilterComponent(
-                    key: ValueKey(filter.level),
-                    index: index,
-                    filter: filter,
-                    onChartingModeClicked: () async {
-                      // There must always be a chart mode filter
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            InvisibleTextField(
+              controller: TextEditingController(text: widget.title),
+            ),
+            FilterSelector(
+              title: "Filtros",
+              availableFilters:
+                  PivotTableLevel.values
+                      .where(
+                        (level) =>
+                            !widget.filters
+                                .map((filter) => filter.level)
+                                .contains(level),
+                      )
+                      .toList(),
+              onFilterSelected: (level) {
+                widget.bloc.onFilterSelected(level);
+              },
+            ),
+            ReorderableListView(
+              shrinkWrap: true,
+              buildDefaultDragHandles: false,
+              onReorder: (oldIndex, newIndex) {
+                widget.bloc.onFiltersReordered(oldIndex, newIndex);
+              },
+              children:
+                  widget.filters.indexed.map((data) {
+                    final (index, filter) = data;
+                    return FilterComponent(
+                      key: ValueKey(filter.level),
+                      index: index,
+                      filter: filter,
+                      onChartingModeClicked: () async {
+                        // There must always be a chart mode filter
 
-                      if (HardwareKeyboard.instance.isControlPressed) {
-                        if (filter.chartingMode == ChartingMode.superChart) {
-                          await widget.bloc.unsetSuperChart();
-                          return;
-                        }
-                        if (filter.chartingMode == ChartingMode.none) {
-                          await widget.bloc.setSuperChart(index);
-                          return;
-                        }
+                        if (HardwareKeyboard.instance.isControlPressed) {
+                          if (filter.chartingMode == ChartingMode.superChart) {
+                            await widget.bloc.unsetSuperChart();
+                            return;
+                          }
+                          if (filter.chartingMode == ChartingMode.none) {
+                            await widget.bloc.setSuperChart(index);
+                            return;
+                          }
 
-                        final superChartFilterIndex = widget.filters.indexWhere(
-                          (element) =>
-                              element.chartingMode == ChartingMode.superChart,
-                        );
-                        await widget.bloc.swapChartingModes(
-                          index,
-                          superChartFilterIndex,
-                        );
-                      } else {
-                        if (filter.chartingMode == ChartingMode.none) {
-                          await widget.bloc.setChart(index);
+                          final superChartFilterIndex = widget.filters
+                              .indexWhere(
+                                (element) =>
+                                    element.chartingMode ==
+                                    ChartingMode.superChart,
+                              );
+                          await widget.bloc.swapChartingModes(
+                            index,
+                            superChartFilterIndex,
+                          );
+                        } else {
+                          if (filter.chartingMode == ChartingMode.none) {
+                            await widget.bloc.setChart(index);
+                          }
                         }
-                      }
-                    },
-                    toggleSelectionMode: () async {
-                      widget.bloc.toggleSelectionMode(index);
-                    },
-                    selectAsOne: (value) async {
-                      widget.bloc.onOptionSwitched(value, index);
-                    },
-                    selectAsMany: (value) async {
-                      widget.bloc.onOptionAdded(value, index);
-                    },
-                    deselectAsMany: (value) async {
-                      widget.bloc.onOptionRemoved(value, index);
-                    },
-                    onDelete: () async {
-                      widget.bloc.onFilterDeleted(index);
-                    },
-                  );
-                }).toList(),
-          ),
-        ],
+                      },
+                      toggleSelectionMode: () async {
+                        widget.bloc.toggleSelectionMode(index);
+                      },
+                      selectAsOne: (value) async {
+                        widget.bloc.onOptionSwitched(value, index);
+                      },
+                      selectAsMany: (value) async {
+                        widget.bloc.onOptionAdded(value, index);
+                      },
+                      deselectAsMany: (value) async {
+                        widget.bloc.onOptionRemoved(value, index);
+                      },
+                      onDelete: () async {
+                        widget.bloc.onFilterDeleted(index);
+                      },
+                    );
+                  }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
 import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
 import 'package:ut_report_generator/components/file_selector/widget.dart';
+import 'package:ut_report_generator/components/invisible_text_field.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
@@ -107,6 +108,13 @@ class _ReportEditorState extends State<ReportEditor>
       setState(() {
         this.report = report;
         reportNameController = TextEditingController(text: report.reportName);
+        reportNameController.addListener(() {
+          setState(() {
+            this.report = this.report!.copyWith(
+              reportName: reportNameController.value.text,
+            );
+          });
+        });
       });
 
       context.read<ScaffoldController>().setFabBuilder(
@@ -132,7 +140,6 @@ class _ReportEditorState extends State<ReportEditor>
           ),
           childrenAnimation: ExpandableFabAnimation.none,
           children: [
-            // Botón para añadir Tabla dinámica
             FloatingActionButton.small(
               heroTag: "add_pivot_table",
               onPressed: () {
@@ -186,13 +193,12 @@ class _ReportEditorState extends State<ReportEditor>
 
       context.read<ScaffoldController>().setAppBarBuilder(
         commonAppbar(
-          title: InputComponent(
-            label: "Nombre del reporte",
-            hint: "Ingrese el nombre del reporte",
-            controller: reportNameController,
-          ),
           actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.threed_rotation)),
+            IconButton(
+              color: Colors.white,
+              onPressed: () {},
+              icon: Icon(Icons.threed_rotation, color: Colors.white),
+            ),
           ],
           leading: IconButton(
             onPressed: () {
@@ -201,7 +207,7 @@ class _ReportEditorState extends State<ReportEditor>
                 ..setFabBuilder(null);
               context.pop();
             },
-            icon: Icon(Icons.arrow_back),
+            icon: Icon(Icons.arrow_back, color: Colors.white),
           ),
         ),
       );
@@ -371,33 +377,42 @@ class _ReportEditorState extends State<ReportEditor>
     return SingleChildScrollView(
       controller: _scrollController,
       child: Column(
-        children:
-            report!.slides.indexed.map((data) {
-              final (index, slide) = data;
-              if (slide is PivotTable) {
-                return SlideFrame(
-                  isMenuOpen: openSlideMenuIndex == index,
-                  openMenu: () => _openSlideMenu(index),
-                  child: PivotTableSection(
-                    report: report!.identifier,
-                    pivotTable: slide,
-                    updatePivotTable: (callback) {
-                      setState(() {
-                        report!.slides[index] = callback(slide);
-                      });
-                    },
-                  ),
-                );
-              }
-              if (slide is ImageSlide) {
-                return SlideFrame(
-                  isMenuOpen: openSlideMenuIndex == index,
-                  openMenu: () => _openSlideMenu(index),
-                  child: ImageSlideSection(initialSlide: slide),
-                );
-              }
-              return const Text("Tipo de slide inválido");
-            }).toList(),
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 32),
+            child: InvisibleTextField(
+              controller: reportNameController,
+              style: TextStyle(fontSize: 36),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          ...report!.slides.indexed.map((data) {
+            final (index, slide) = data;
+            if (slide is PivotTable) {
+              return SlideFrame(
+                isMenuOpen: openSlideMenuIndex == index,
+                openMenu: () => _openSlideMenu(index),
+                child: PivotTableSection(
+                  report: report!.identifier,
+                  pivotTable: slide,
+                  updatePivotTable: (callback) {
+                    setState(() {
+                      report!.slides[index] = callback(slide);
+                    });
+                  },
+                ),
+              );
+            }
+            if (slide is ImageSlide) {
+              return SlideFrame(
+                isMenuOpen: openSlideMenuIndex == index,
+                openMenu: () => _openSlideMenu(index),
+                child: ImageSlideSection(initialSlide: slide),
+              );
+            }
+            return const Text("Tipo de slide inválido");
+          }),
+        ],
       ),
     );
   }

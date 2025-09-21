@@ -28,7 +28,6 @@ class Report:
             report_name: str, 
             creation_date: pandas.Timestamp, 
             last_edit: pandas.Timestamp,
-            last_open: pandas.Timestamp,
             slides: list[ImageSlide | PivotTable],
             visualization_mode: VisualizationMode,
             version: str
@@ -37,7 +36,6 @@ class Report:
         self.report_name = report_name
         self.creation_date = creation_date
         self.last_edit = last_edit
-        self.last_open = last_open
         self.slides = slides
         self.visualization_mode = visualization_mode
         self.version = version
@@ -54,7 +52,6 @@ class Report:
             "report_name": self.report_name,
             "creation_date": self.creation_date.isoformat(),
             "last_edit": self.last_edit.isoformat(),
-            "last_open": self.last_open.isoformat(),
             "slides": [slide.to_dict() for slide in self.slides],
             "visualization_mode": self.visualization_mode.value,
             "version": self.version
@@ -74,7 +71,6 @@ class Report:
             report_name=metadata["report_name"],
             creation_date=pandas.Timestamp(metadata["creation_date"]),
             last_edit=pandas.Timestamp(metadata["last_edit"]),
-            last_open=pandas.Timestamp(metadata["last_open"]),
             slides=[
                     image_slide_from_json(json=slide) 
                     if SlideCategory(slide["category"]) == SlideCategory.IMAGE_SLIDE
@@ -104,7 +100,6 @@ class Report:
             report_name="Mi reporte",
             creation_date=pandas.Timestamp.now(),
             last_edit=pandas.Timestamp.now(),
-            last_open=pandas.Timestamp.now(),
             slides=[],
             visualization_mode=visualization_mode,
             version=CURRENT_PROJECT_VERSION

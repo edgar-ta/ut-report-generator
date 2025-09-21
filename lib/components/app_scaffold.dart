@@ -23,57 +23,49 @@ class _AppScaffoldState extends State<AppScaffold> {
     final appBarBuilder = context.watch<ScaffoldController>().appBarBuilder;
     final fabBuilder = context.watch<ScaffoldController>().fabBuilder;
 
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: APP_BAR_HEIGHT),
-          child: Scaffold(
-            floatingActionButtonLocation: ExpandableFab.location,
-            floatingActionButton:
-                fabBuilder != null ? fabBuilder(context) : SizedBox.shrink(),
-            appBar:
-                appBarBuilder != null
-                    ? appBarBuilder(context)
-                    : commonAppbar()(context),
-            body: Column(
+    return Scaffold(
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton:
+          fabBuilder != null ? fabBuilder(context) : SizedBox.shrink(),
+      appBar:
+          appBarBuilder != null
+              ? appBarBuilder(context)
+              : commonAppbar()(context),
+      body: Column(
+        children: [
+          Expanded(
+            child: Row(
               children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      NavigationRail(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.surfaceContainer,
-                        destinations: [
-                          NavigationRailDestination(
-                            icon: Icon(Icons.house),
-                            label: Text("Inicio"),
-                          ),
-                          NavigationRailDestination(
-                            icon: Icon(Icons.person),
-                            label: Text("Perfil"),
-                          ),
-                          NavigationRailDestination(
-                            icon: Icon(Icons.bug_report),
-                            label: Text("Reportar errores"),
-                          ),
-                        ],
-                        selectedIndex: widget.child.currentIndex,
-                        onDestinationSelected: (index) {
-                          widget.child.goBranch(index);
-                        },
-                      ),
-                      VerticalDivider(thickness: 1, width: 1),
-                      Expanded(child: widget.child),
-                    ],
-                  ),
+                NavigationRail(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainer,
+                  destinations: [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.house),
+                      label: Text("Inicio"),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.person),
+                      label: Text("Perfil"),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.bug_report),
+                      label: Text("Reportar errores"),
+                    ),
+                  ],
+                  selectedIndex: widget.child.currentIndex,
+                  onDestinationSelected: (index) {
+                    widget.child.goBranch(index);
+                  },
                 ),
-                FooterComponent(),
+                VerticalDivider(thickness: 1, width: 1),
+                Expanded(child: widget.child),
               ],
             ),
           ),
-        ),
-        Positioned(top: 0, left: 0, right: 0, child: HeaderComponent()),
-      ],
+          FooterComponent(),
+        ],
+      ),
     );
   }
 }

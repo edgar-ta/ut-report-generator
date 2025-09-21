@@ -37,40 +37,6 @@ class _PivotTableSectionState extends State<PivotTableSection> {
 
   @override
   Widget build(BuildContext context) {
-    // return SlideFrame(
-    //   menuContent: TabbedMenu(
-    //     editTabBuilder: (_) {
-    //       return PivotEditPane(
-    //         report: widget.report,
-    //         pivotTable: widget.pivotTable,
-    //         setPivotTable: widget.updatePivotTable,
-    //         nameController: titleController,
-    //         filters: widget.pivotTable.filters,
-    //         onOptionAdded: _onOptionAdded,
-    //         onOptionRemoved: _onOptionRemoved,
-    //         onOptionSwitched: _onOptionSwitched,
-    //         onFilterDeleted: _onFilterDeleted,
-    //         onFiltersReordered: _onFiltersReordered,
-    //         toggleSelectionMode: _toggleSelectionMode,
-    //         swapChartingModes: _swapChartingModes,
-    //         setChart: _setChart,
-    //         setSuperChart: _setSuperChart,
-    //         unsetSuperChart: _unsetSuperChart,
-    //       );
-    //     },
-    //     metadataTabBuilder: (_) {
-    //       return PivotMetadataPane(
-    //         files: widget.pivotTable.source.files,
-    //         onFileRemoved: _onFileRemoved,
-    //         onFileAdded: _onFileAdded,
-    //       );
-    //     },
-    //   ),
-    //   child: PivotTableChart(
-    //     data: widget.pivotTable.data,
-    //     chartName: widget.pivotTable.title,
-    //   ),
-    // );
     return PivotTableChart(
       data: widget.pivotTable.data,
       chartName: widget.pivotTable.title,

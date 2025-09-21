@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ut_report_generator/utils/design_constants.dart';
 
 class ReportCardSkeleton extends StatefulWidget {
   const ReportCardSkeleton({super.key});
@@ -35,68 +36,66 @@ class _ReportCardSkeletonState extends State<ReportCardSkeleton>
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 16 / 9,
-      child: AnimatedBuilder(
-        animation: _shimmerPosition,
-        builder: (context, _) {
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.grey.shade300,
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Base shimmer background
-                Positioned.fill(
-                  child: ShaderMask(
-                    shaderCallback: (bounds) {
-                      return LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        stops: const [0.4, 0.5, 0.6],
-                        colors: [
-                          Colors.grey.shade300,
-                          Colors.grey.shade100,
-                          Colors.grey.shade300,
-                        ],
-                        transform: GradientTranslation(
-                          _shimmerPosition.value * bounds.width,
-                        ),
-                      ).createShader(bounds);
-                    },
-                    blendMode: BlendMode.srcIn,
-                    child: Container(color: Colors.white),
-                  ),
+    return AnimatedBuilder(
+      animation: _shimmerPosition,
+      builder: (context, _) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey.shade300,
+          ),
+          height: SLIDESHOW_PREVIEW_HEIGHT,
+          width: SLIDESHOW_PREVIEW_HEIGHT * 16 / 9,
+          clipBehavior: Clip.hardEdge,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Base shimmer background
+              Positioned.fill(
+                child: ShaderMask(
+                  shaderCallback: (bounds) {
+                    return LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      stops: const [0.4, 0.5, 0.6],
+                      colors: [
+                        Colors.grey.shade300,
+                        Colors.grey.shade100,
+                        Colors.grey.shade300,
+                      ],
+                      transform: GradientTranslation(
+                        _shimmerPosition.value * bounds.width,
+                      ),
+                    ).createShader(bounds);
+                  },
+                  blendMode: BlendMode.srcIn,
+                  child: Container(color: Colors.white),
                 ),
+              ),
 
-                // Bottom placeholder bar for the report name
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Container(
-                    height: 28,
-                    color: Colors.black.withOpacity(0.2),
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        height: 14,
-                        width: 120,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                  height: 28,
+                  color: Colors.black.withOpacity(0.2),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      height: 14,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

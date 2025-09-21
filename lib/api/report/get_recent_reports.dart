@@ -1,58 +1,10 @@
 import 'package:ut_report_generator/api/send_request.dart';
+import 'package:ut_report_generator/models/response/recent_reports_response.dart';
 
-Future<RecentReports_Response> recentReports({String? identifier}) {
+Future<RecentReportsResponse> recentReports({String? identifier}) {
   return sendRequest(
     route: "report/get_recent",
     body: {"report": identifier},
-    callback: RecentReports_Response.fromJson,
+    callback: RecentReportsResponse.fromJson,
   );
-}
-
-// ignore: camel_case_types
-class RecentReports_ReportPreview {
-  String? preview;
-  String name;
-  String identifier;
-
-  RecentReports_ReportPreview({
-    required this.preview,
-    required this.name,
-    required this.identifier,
-  });
-
-  factory RecentReports_ReportPreview.fromJson(Map<String, dynamic> json) {
-    return RecentReports_ReportPreview(
-      preview: json['preview'] as String?,
-      name: json['name'] as String,
-      identifier: json['identifier'] as String,
-    );
-  }
-}
-
-// ignore: camel_case_types
-class RecentReports_Response {
-  List<RecentReports_ReportPreview> reports;
-  bool hasMore;
-  String? lastReport;
-
-  RecentReports_Response({
-    required this.reports,
-    required this.hasMore,
-    required this.lastReport,
-  });
-
-  factory RecentReports_Response.fromJson(Map<String, dynamic> json) {
-    return RecentReports_Response(
-      reports:
-          (json['reports'] as List<dynamic>)
-              .map(
-                (item) => RecentReports_ReportPreview.fromJson(
-                  item as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      hasMore: json['has_more'] as bool,
-      lastReport: json['last_report'] as String?,
-    );
-  }
 }

@@ -1,24 +1,28 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:relative_time/relative_time.dart';
+import 'package:ut_report_generator/utils/design_constants.dart';
 
-class ReportCard extends StatefulWidget {
+class ReportPreviewCard extends StatefulWidget {
   final String name;
-  final String? preview;
+  final String preview;
   final VoidCallback? onTap;
+  final String lastOpen;
 
-  const ReportCard({
+  const ReportPreviewCard({
     super.key,
     required this.name,
     required this.preview,
+    required this.lastOpen,
     this.onTap,
   });
 
   @override
-  State<ReportCard> createState() => _ReportCardState();
+  State<ReportPreviewCard> createState() => _ReportPreviewCardState();
 }
 
-class _ReportCardState extends State<ReportCard> {
+class _ReportPreviewCardState extends State<ReportPreviewCard> {
   bool _isHovered = false;
 
   @override
@@ -29,64 +33,82 @@ class _ReportCardState extends State<ReportCard> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        child: AnimatedScale(
-          scale: _isHovered ? 1.03 : 1.0,
+        child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           curve: Curves.easeOut,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            curve: Curves.easeOut,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              boxShadow:
-                  _isHovered
-                      ? [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                      : [],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Stack(
-                  fit: StackFit.expand,
+          height: SLIDESHOW_PREVIEW_HEIGHT,
+          width: SLIDESHOW_PREVIEW_HEIGHT * 16 / 9,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            boxShadow:
+                _isHovered
+                    ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                    : [],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: AnimatedScale(
+                  scale: _isHovered ? 1.05 : 1,
+                  duration: Duration(milliseconds: 200),
+                  child: Image.file(File(widget.preview), fit: BoxFit.cover),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    widget.preview != null
-                        ? Image.file(File(widget.preview!), fit: BoxFit.cover)
-                        : Image.network(
-                          "https://canvasjs.com/wp-content/uploads/images/gallery/javascript-charts/overview/javascript-charts-graphs-index-data-label.png",
-                        ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        color: Colors.black.withOpacity(0.6),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 6,
-                        ),
-                        child: Text(
-                          widget.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            overflow: TextOverflow.ellipsis,
+                    Text(
+                      widget.name,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          WidgetSpan(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 4),
+                              child: Icon(
+                                Icons.timelapse,
+                                size: 14,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryFixedVariant,
+                              ),
+                            ),
                           ),
-                          maxLines: 1,
+                          TextSpan(text: "Abierto ${widget.lastOpen}"),
+                        ],
+                        style: TextStyle(
+                          color:
+                              Theme.of(
+                                context,
+                              ).colorScheme.onPrimaryFixedVariant,
+                          fontSize: 12,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

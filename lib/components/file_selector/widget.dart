@@ -193,7 +193,7 @@ class _FileSelectorState extends State<FileSelector> {
                   allowMultiple: true,
                   allowedExtensions: [
                     ".xls",
-                  ], // ⚠️ puede que necesites fileType: FileType.custom
+                  ],
                 );
                 if (result != null) {
                   var files = result.files.map((file) => file.path!).toList();
