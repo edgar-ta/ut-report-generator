@@ -1,6 +1,7 @@
 from models.slide.self import Slide
 from models.slide.slide_category import SlideCategory
 from models.image_slide.image_slide_kind import ImageSlideKind
+from models.image_slide.image_slide_parameter import ImageSlideParameter
 
 from render.drawable_area import DrawableArea
 
@@ -15,12 +16,14 @@ class ImageSlide(Slide):
         return {
             **super().to_dict(),
             'kind': self.kind.value,
-            'parameters': self.parameters_dict
+            'parameters': {
+                key: value.to_dict() for (key, value) in self.parameters_dict.items()
+            }
         }
 
     @property
     @abstractmethod
-    def parameters_dict(self) -> dict[str, any]:
+    def parameters_dict(self) -> dict[str, ImageSlideParameter]:
         pass
 
     @abstractmethod

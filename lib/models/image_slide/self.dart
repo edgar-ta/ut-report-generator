@@ -1,10 +1,11 @@
 import 'package:ut_report_generator/models/image_slide/image_slide_kind.dart';
+import 'package:ut_report_generator/models/image_slide/image_slide_parameter.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
 
 class ImageSlide extends Slide {
   ImageSlideKind kind;
-  Map<String, dynamic> parameters;
+  Map<String, ImageSlideParameter> parameters;
 
   ImageSlide({
     required super.identifier,
@@ -18,7 +19,13 @@ class ImageSlide extends Slide {
 
   @override
   Map<String, dynamic> toMap() {
-    return {...super.toMap(), 'kind': kind.name, 'parameters': parameters};
+    return {
+      ...super.toMap(),
+      'kind': kind.name,
+      'parameters': parameters.map(
+        (key, value) => MapEntry(key, value.toMap()),
+      ),
+    };
   }
 
   factory ImageSlide.fromJson(Map<String, dynamic> json) {
@@ -29,7 +36,9 @@ class ImageSlide extends Slide {
       lastEdit: DateTime.parse(json["last_edit"]),
       preview: json["preview"],
       kind: ImageSlideKind.values.byName(json["kind"]),
-      parameters: json["parameters"],
+      parameters: (json["parameters"] as Map<String, dynamic>).map(
+        (key, value) => MapEntry(key, ImageSlideParameter.fromJson(value)),
+      ),
     );
   }
 }
