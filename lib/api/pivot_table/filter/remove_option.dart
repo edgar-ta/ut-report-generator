@@ -1,5 +1,5 @@
 import 'package:ut_report_generator/api/send_request.dart';
-import 'package:ut_report_generator/api/pivot_table/edit_pivot_table_response.dart';
+import 'package:ut_report_generator/models/response/edit_pivot_table_response.dart';
 
 Future<EditPivotTable_Response> removeOptionFromFilter({
   required String report,

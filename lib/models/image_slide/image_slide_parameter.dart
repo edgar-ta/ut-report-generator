@@ -20,4 +20,16 @@ class ImageSlideParameter {
       type: json['type'],
     );
   }
+
+  ImageSlideParameter copyWith({
+    String? readableName,
+    String? value,
+    String? type,
+  }) {
+    return ImageSlideParameter(
+      readableName: readableName ?? this.readableName,
+      value: value ?? this.value,
+      type: type ?? this.type,
+    );
+  }
 }

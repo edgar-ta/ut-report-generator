@@ -1,5 +1,6 @@
 from models.image_slide.self import ImageSlide
 from models.image_slide.image_slide_kind import ImageSlideKind
+from models.image_slide.image_slide_parameter import ImageSlideParameter
 
 from render.grid_layout.self import grid_layout
 from render.grid_layout.grid_layout_item import GridLayoutItem
@@ -32,9 +33,9 @@ class CoverPageSlide(ImageSlide):
     @property
     def parameters_dict(self):
         return {
-            'professor_name': self.professor_name,
-            'period': self.period,
-            'date': self.date
+            'professor_name': ImageSlideParameter(self.professor_name, 'Profesor', 'str'),
+            'period': ImageSlideParameter(self.period, 'Cuatrimestre', 'str'),
+            'date': ImageSlideParameter(self.date, 'Fecha', 'str')
         }
     
     def render(self, slide, drawable_area):

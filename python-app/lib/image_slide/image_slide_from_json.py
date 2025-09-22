@@ -15,9 +15,10 @@ def image_slide_from_json(json: dict[str, any]) -> ImageSlide:
 
     match kind:
         case ImageSlideKind.COVER_PAGE:
-            return CoverPageSlide(
+            value = CoverPageSlide(
                 professor_name=parameters['professor_name'].value,
                 period=parameters['period'].value,
                 date=parameters['date'].value,
                 **slide
                 )
+            return value

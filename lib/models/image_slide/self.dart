@@ -41,4 +41,24 @@ class ImageSlide extends Slide {
       ),
     );
   }
+
+  ImageSlide copyWith({
+    String? identifier,
+    String? title,
+    DateTime? creationDate,
+    DateTime? lastEdit,
+    String? preview,
+    ImageSlideKind? kind,
+    Map<String, ImageSlideParameter>? parameters,
+  }) {
+    return ImageSlide(
+      identifier: identifier ?? this.identifier,
+      title: title ?? this.title,
+      creationDate: creationDate ?? this.creationDate,
+      lastEdit: lastEdit ?? this.lastEdit,
+      preview: preview ?? this.preview,
+      kind: kind ?? this.kind,
+      parameters: parameters ?? this.parameters,
+    );
+  }
 }

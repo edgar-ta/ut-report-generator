@@ -14,12 +14,12 @@ import 'package:ut_report_generator/api/pivot_table/filter/self.dart'
     as filter_api;
 import 'package:ut_report_generator/utils/copy_with_added.dart';
 
-class PivotEditPane extends StatefulWidget {
+class PivotTableEditPane extends StatefulWidget {
   final PivotTableBloc bloc;
   final String title;
   final List<DataFilter> filters;
 
-  PivotEditPane({
+  PivotTableEditPane({
     super.key,
     required this.title,
     required this.bloc,
@@ -27,10 +27,10 @@ class PivotEditPane extends StatefulWidget {
   });
 
   @override
-  State<PivotEditPane> createState() => _PivotEditPaneState();
+  State<PivotTableEditPane> createState() => _PivotTableEditPaneState();
 }
 
-class _PivotEditPaneState extends State<PivotEditPane> {
+class _PivotTableEditPaneState extends State<PivotTableEditPane> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(

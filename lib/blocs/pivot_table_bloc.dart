@@ -1,4 +1,4 @@
-import 'package:ut_report_generator/api/pivot_table/edit_pivot_table_response.dart';
+import 'package:ut_report_generator/models/response/edit_pivot_table_response.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';

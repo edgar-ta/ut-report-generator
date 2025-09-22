@@ -4,6 +4,7 @@ from lib.descriptive_error import DescriptiveError
 from models.report.self import Report
 from models.pivot_table.self import PivotTable
 from models.pivot_table.data_filter.self import DataFilter
+from models.image_slide.self import ImageSlide
 
 import flask
 
@@ -30,3 +31,12 @@ def entities_for_editing_filter(request: flask.Request, get_option: bool = True)
 
     option: str = get_or_panic(request.json, 'option', 'La opción a añadir no está presente en la solicitud')
     return (report, pivot_table, _filter, option)
+
+def entities_for_editing_image_slide(request: flask.Request) -> tuple[Report, ImageSlide]:
+    report: Report = get_or_panic(request.json, 'report', 'El identificador del reporte no está presente en la solicitud')
+    image_slide: ImageSlide = get_or_panic(request.json, 'image_slide', 'El identificador de la diapositiva de imagen no está presente en la solicitud')
+
+    report = Report.from_identifier(identifier=report)
+    image_slide = report[image_slide]
+
+    return (report, image_slide)

@@ -1,28 +1,20 @@
 import 'package:ut_report_generator/api/send_request.dart';
+import 'package:ut_report_generator/models/response/edit_image_slide_response.dart';
 
-Future<EditSlide_Response> editSlide({
-  required String reportDirectory,
-  required String slideId,
-  required dynamic arguments,
+Future<EditImageSlide_Response> editSlide({
+  required String report,
+  required String imageSlide,
+  required String parameterName,
+  required String parameterValue,
 }) {
   return sendRequest(
-    route: "edit_slide",
+    route: "image_slide/edit",
     body: {
-      "report_directory": reportDirectory,
-      "slide_id": slideId,
-      "arguments": arguments,
+      "report": report,
+      "image_slide": imageSlide,
+      "parameter_name": parameterName,
+      "parameter_value": parameterValue,
     },
-    callback: EditSlide_Response.fromJson,
+    callback: EditImageSlide_Response.fromJson,
   );
-}
-
-// ignore: camel_case_types
-class EditSlide_Response {
-  String preview;
-
-  EditSlide_Response({required this.preview});
-
-  static EditSlide_Response fromJson(Map<String, dynamic> json) {
-    return EditSlide_Response(preview: json['preview'] as String);
-  }
 }

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
+import 'package:ut_report_generator/blocs/image_slide_bloc.dart';
 import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
 import 'package:ut_report_generator/components/file_selector/widget.dart';
 import 'package:ut_report_generator/components/invisible_text_field.dart';
@@ -19,8 +20,9 @@ import 'package:ut_report_generator/components/fullscreen_loading_overlay/loadin
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
 import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
+import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/image_slide_edit_pane.dart';
 import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/widget.dart';
-import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/pivot_edit_pane.dart';
+import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/pivot_table_edit_pane.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/pivot_metadata_pane.dart';
 import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/widget.dart';
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
@@ -343,7 +345,7 @@ class _ReportEditorState extends State<ReportEditor>
                   );
                   return TabbedMenu(
                     editTabBuilder:
-                        (_) => PivotEditPane(
+                        (_) => PivotTableEditPane(
                           title: slide.title,
                           bloc: bloc,
                           filters: slide.filters,
@@ -356,8 +358,24 @@ class _ReportEditorState extends State<ReportEditor>
                   );
                 }
                 if (slide is ImageSlide) {
+                  final bloc = ImageSlideBloc(
+                    reportIdentifier: report!.identifier,
+                    initialImageSlide: slide,
+                    setImageSlide: (callback) {
+                      setState(() {
+                        report!.slides[openSlideMenuIndex] = callback(
+                          report!.slides[openSlideMenuIndex] as ImageSlide,
+                        );
+                      });
+                    },
+                  );
                   return TabbedMenu(
-                    editTabBuilder: (_) => Text("Editar imagen"),
+                    editTabBuilder:
+                        (_) => ImageSlideEditPane(
+                          title: slide.title,
+                          parameters: slide.parameters,
+                          bloc: bloc,
+                        ),
                     metadataTabBuilder: (_) => Text("Metadatos"),
                   );
                 }

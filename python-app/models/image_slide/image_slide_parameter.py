@@ -3,7 +3,7 @@ class ImageSlideParameter():
         self.value = value
         self.readable_name = readable_name
         self.type = _type
-    
+
     def to_dict(self) -> dict[str, any]:
         return {
             'value': self.value,

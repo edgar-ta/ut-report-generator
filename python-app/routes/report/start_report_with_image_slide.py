@@ -3,9 +3,8 @@ from control_variables import PATH_OF_PPTX_TEMPLATE
 from lib.with_flask import with_flask
 from lib.descriptive_error import DescriptiveError
 from lib.format_for_create import format_for_create
-from lib.image_slide.add_image_slide_to_report import add_image_slide_to_report
 from lib.directory_definitions import base_directory_of_slide
-from lib.report.render_previews_of_report import render_previews_of_report
+from lib.slide.render_preview import render_preview
 
 from models.report.self import Report
 from models.report.visualization_mode import VisualizationMode
@@ -40,7 +39,7 @@ def start_report_with_image_slide():
     os.makedirs(base_directory_of_slide(root_directory=report.root_directory, slide_id=cover_page.identifier))
     report.slides.append(cover_page)
 
-    render_previews_of_report(report=report)
+    render_preview(root_directory=report.root_directory, slides=report.slides)
     report.save()
 
     return report.to_dict(), 200

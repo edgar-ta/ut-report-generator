@@ -13,13 +13,14 @@ class ImageSlide(Slide):
         self.kind = kind
     
     def to_dict(self):
-        return {
+        value = {
             **super().to_dict(),
             'kind': self.kind.value,
             'parameters': {
                 key: value.to_dict() for (key, value) in self.parameters_dict.items()
             }
         }
+        return value
 
     @property
     @abstractmethod

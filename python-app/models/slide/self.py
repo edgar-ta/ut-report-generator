@@ -12,7 +12,7 @@ class Slide(ABC):
             identifier: str, 
             creation_date: Timestamp,
             last_edit: Timestamp,
-            preview: str,
+            preview: str | None,
             category: SlideCategory,
             ) -> None:
         self.title = title
