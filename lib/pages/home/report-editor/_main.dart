@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:relative_time/relative_time.dart';
 import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
 import 'package:ut_report_generator/blocs/image_slide_bloc.dart';
@@ -20,6 +21,7 @@ import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
 import 'package:ut_report_generator/components/input_component.dart';
+import 'package:ut_report_generator/models/report/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/image_slide_edit_pane.dart';
 import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/widget.dart';
@@ -198,10 +200,29 @@ class _ReportEditorState extends State<ReportEditor>
       context.read<ScaffoldController>().setAppBarBuilder(
         commonAppbar(
           actions: [
-            IconButton(
-              color: Colors.white,
-              onPressed: () {},
-              icon: Icon(Icons.threed_rotation, color: Colors.white),
+            PopupMenuButton(
+              icon: const Icon(
+                Icons.import_export_outlined,
+                color: Colors.white,
+              ),
+              onSelected: (_) {},
+              itemBuilder:
+                  (BuildContext context) => <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: "pdf",
+                      child: ListTile(
+                        leading: Icon(Icons.picture_as_pdf),
+                        title: Text('Exportar PDF'),
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: "zip",
+                      child: ListTile(
+                        leading: Icon(Icons.archive),
+                        title: Text('Exportar ZIP'),
+                      ),
+                    ),
+                  ],
             ),
           ],
           leading: IconButton(
@@ -414,12 +435,35 @@ class _ReportEditorState extends State<ReportEditor>
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 32),
-            child: InvisibleTextField(
-              controller: reportNameController,
-              style: TextStyle(fontSize: 36),
-              textAlign: TextAlign.center,
-              onChanged: bloc.renameReport,
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 16,
+              children: [
+                Text(
+                  "Creado ${report!.creationDate.relativeTimeLocale(Locale("es", "MX"))}",
+                ),
+                InvisibleTextField(
+                  controller: reportNameController,
+                  style: TextStyle(fontSize: 36),
+                  textAlign: TextAlign.center,
+                  onChanged: bloc.renameReport,
+                ),
+                SegmentedButton(
+                  onSelectionChanged: (_) {},
+                  segments: [
+                    ButtonSegment(
+                      value: VisualizationMode.asReport,
+                      icon: Icon(Icons.report),
+                    ),
+                    ButtonSegment(
+                      value: VisualizationMode.chartsOnly,
+                      icon: Icon(Icons.bar_chart),
+                    ),
+                  ],
+                  selected: {report!.visualizationMode},
+                ),
+              ],
             ),
           ),
           ...report!.slides.indexed.map((data) {
