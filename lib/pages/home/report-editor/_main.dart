@@ -8,6 +8,7 @@ import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
 import 'package:ut_report_generator/blocs/image_slide_bloc.dart';
 import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
+import 'package:ut_report_generator/blocs/report_bloc.dart';
 import 'package:ut_report_generator/components/file_selector/widget.dart';
 import 'package:ut_report_generator/components/invisible_text_field.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
@@ -297,6 +298,15 @@ class _ReportEditorState extends State<ReportEditor>
 
   @override
   Widget build(BuildContext context) {
+    final reportBloc = ReportBloc(
+      initialReport: report!,
+      setReport: (callback) {
+        setState(() {
+          report = callback(report!);
+        });
+      },
+    );
+
     return OverlayPortal(
       controller: _portalController,
       overlayChildBuilder: (context) {
@@ -392,11 +402,11 @@ class _ReportEditorState extends State<ReportEditor>
           ),
         );
       },
-      child: _buildReportContent(),
+      child: _buildReportContent(reportBloc),
     );
   }
 
-  Widget _buildReportContent() {
+  Widget _buildReportContent(ReportBloc bloc) {
     if (report == null) return const ShimmerSlide();
 
     return SingleChildScrollView(
@@ -409,6 +419,7 @@ class _ReportEditorState extends State<ReportEditor>
               controller: reportNameController,
               style: TextStyle(fontSize: 36),
               textAlign: TextAlign.center,
+              onChanged: bloc.renameReport,
             ),
           ),
           ...report!.slides.indexed.map((data) {

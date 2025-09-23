@@ -4,12 +4,14 @@ class InvisibleTextField extends StatefulWidget {
   final TextEditingController? controller;
   final TextStyle? style;
   final TextAlign? textAlign;
+  final void Function(String)? onChanged;
 
   const InvisibleTextField({
     super.key,
     this.controller,
     this.style,
     this.textAlign,
+    this.onChanged,
   });
 
   @override
@@ -68,6 +70,7 @@ class _InvisibleTextFieldState extends State<InvisibleTextField> {
           decoration: const InputDecoration(border: InputBorder.none),
           style: widget.style,
           textAlign: widget.textAlign ?? TextAlign.start,
+          onChanged: widget.onChanged,
         ),
       ),
     );

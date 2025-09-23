@@ -8,6 +8,11 @@ from models.image_slide.self import ImageSlide
 
 import flask
 
+def entities_for_editing_report(request: flask.Request) -> Report:
+    report: Report = get_or_panic(request.json, 'report', 'El identificador del reporte no está presente en la solicitud')
+    report = Report.from_identifier(identifier=report)
+    return report
+
 def entities_for_editing_pivot_table(request: flask.Request) -> tuple[Report, PivotTable]:
     report: Report = get_or_panic(request.json, 'report', 'El identificador del reporte no está presente en la solicitud')
     pivot_table: PivotTable = get_or_panic(request.json, 'pivot_table', 'El identificador de la tabla dinámica no está presente en la solicitud')

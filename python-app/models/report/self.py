@@ -93,11 +93,12 @@ class Report:
     @classmethod
     def from_nothing(cls, visualization_mode: VisualizationMode) -> "Report":
         report_id = cls.new_report_id()
+        report_name = "Mi reporte"
 
         report = Report(
             identifier=report_id,
-            root_directory=root_directory_of_report(report_id),
-            report_name="Mi reporte",
+            root_directory=root_directory_of_report(report_id=report_id, report_name=report_name),
+            report_name=report_name,
             creation_date=pandas.Timestamp.now(),
             last_edit=pandas.Timestamp.now(),
             slides=[],
