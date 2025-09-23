@@ -6,7 +6,7 @@ import 'package:ut_report_generator/api/report/get_report.dart';
 import 'package:ut_report_generator/api/report/get_recent_reports.dart';
 import 'package:ut_report_generator/models/response/recent_reports_response.dart';
 import 'package:ut_report_generator/models/response/report_preview.dart';
-import 'package:ut_report_generator/pages/home/recent_reports/report_card.dart';
+import 'package:ut_report_generator/pages/home/recent_reports/report_preview_card.dart';
 import 'package:ut_report_generator/pages/home/recent_reports/report_card_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';

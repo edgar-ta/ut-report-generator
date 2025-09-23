@@ -28,6 +28,7 @@ import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section
 import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
 import 'package:ut_report_generator/pages/home/report-editor/slide/shimmer_slide.dart';
 import 'package:ut_report_generator/pages/home/report-editor/slide/slide_frame.dart';
+import 'package:ut_report_generator/pages/home/report-editor/slide/slide_metadata_pane.dart';
 import 'package:ut_report_generator/pages/home/report-editor/slide/tabbed_menu.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
@@ -376,7 +377,13 @@ class _ReportEditorState extends State<ReportEditor>
                           parameters: slide.parameters,
                           bloc: bloc,
                         ),
-                    metadataTabBuilder: (_) => Text("Metadatos"),
+                    metadataTabBuilder:
+                        (_) => SlideMetadataPane(
+                          identifier: slide.identifier,
+                          creationDate: slide.creationDate,
+                          preview: slide.preview,
+                          category: slide.category,
+                        ),
                   );
                 }
                 return const Text("Tipo de slide inválido");

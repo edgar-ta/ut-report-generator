@@ -55,7 +55,14 @@ class _TabbedMenuState extends State<TabbedMenu>
               controller: _controller,
               children: [
                 Builder(builder: widget.editTabBuilder),
-                Builder(builder: widget.metadataTabBuilder),
+                Builder(
+                  builder: (context) {
+                    return Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: widget.metadataTabBuilder(context),
+                    );
+                  },
+                ),
               ],
             ),
           ),
