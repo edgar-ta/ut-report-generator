@@ -1,6 +1,6 @@
 from lib.get_metadata import get_metadata
 from lib.descriptive_error import DescriptiveError
-from lib.directory_definitions import metadata_file_of_report, slides_directory_of_report, root_directory_of_report, rendered_file_of_report, export_file_of_report, export_directory_of_report, data_directory_of_report, get_reports_directory
+from lib.directory_definitions import metadata_file_of_report, slides_directory_of_report, root_directory_of_report, compiled_file_of_report, export_file_of_report, export_directory_of_report, data_directory_of_report, get_reports_directory
 from lib.image_slide.image_slide_from_json import image_slide_from_json
 from lib.pivot_table.pivot_table_from_json import pivot_table_from_json
 
@@ -119,14 +119,6 @@ class Report:
         for slide in self.slides:
             slide.makedirs(exist_ok=exist_ok)
 
-    def new_render(self) -> None:
-        '''
-        It shall create a new PowerPoint presentation based on the report depending
-        on whether its last edit timestamp is greater than the time the last
-        PowerPoint was created (if there is any PowerPoint)
-        '''
-        pass
-
     def add_slide(self, slide: Slide) -> None:
         self.slides.append(slide)
     
@@ -158,7 +150,7 @@ class Report:
     
     @property
     def rendered_file(self) -> str:
-        return rendered_file_of_report(root_directory=self.root_directory, report_name=self.report_name)
+        return compiled_file_of_report(root_directory=self.root_directory, report_name=self.report_name)
     
     @property
     def export_file(self) -> str:

@@ -1,9 +1,9 @@
 import 'package:ut_report_generator/api/file_response.dart';
 import 'package:ut_report_generator/api/send_request.dart';
 
-Future<RenderReport_Response> renderReport({required String identifier}) {
+Future<RenderReport_Response> compileReport({required String identifier}) {
   return sendRequest(
-    route: "report/render",
+    route: "report/compile",
     body: {"report": identifier},
     callback: RenderReport_Response.fromJson,
   );

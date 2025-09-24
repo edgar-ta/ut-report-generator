@@ -263,7 +263,7 @@ class _ReportEditorState extends State<ReportEditor>
   }
 
   Future<report_api.RenderReport_Response> _renderReport() {
-    return report_api.renderReport(identifier: report!.identifier);
+    return report_api.compileReport(identifier: report!.identifier);
   }
 
   Future<report_api.ExportReport_Response> _exportReport() {

@@ -1,6 +1,6 @@
 from control_variables import PATH_OF_PPTX_TEMPLATE
 
-from lib.directory_definitions import temporary_rendered_file_of_report, preview_image_of_slide
+from lib.directory_definitions import temporary_compiled_file_of_report, preview_image_of_slide
 
 from models.pivot_table.self import PivotTable
 from models.report.self import Report
@@ -17,7 +17,7 @@ import os
 
 def render_preview_of_pivot_table(pivot_table: PivotTable, root_directory: str):
     template_path = PATH_OF_PPTX_TEMPLATE()
-    temporary_path = temporary_rendered_file_of_report(root_directory=root_directory)
+    temporary_path = temporary_compiled_file_of_report(root_directory=root_directory)
 
     presentation = Presentation(template_path)
     

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:ut_report_generator/api/file_response.dart';
-import 'package:ut_report_generator/api/report/render_report.dart';
+import 'package:ut_report_generator/api/report/compile_report.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 import 'package:open_dir/open_dir.dart';
 import 'package:path/path.dart';
