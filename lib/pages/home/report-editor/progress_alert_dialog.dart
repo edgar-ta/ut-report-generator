@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
-import 'package:ut_report_generator/api/file_response.dart';
+import 'package:ut_report_generator/models/response/file_response.dart';
 import 'package:ut_report_generator/api/report/compile_report.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 import 'package:open_dir/open_dir.dart';
@@ -107,10 +107,7 @@ class _ProgressAlertDialogState<ResponseType extends FileResponse>
         if (isSuccess)
           TextButton(
             onPressed: () async {
-              // await OpenDir().openNativeDir(
-              //   path: dirname(response!.outputFile),
-              // );
-              OpenFile.open(response!.outputFile);
+              OpenFile.open(response!.filepath);
             },
             child: const Text("Ver archivo"),
           ),

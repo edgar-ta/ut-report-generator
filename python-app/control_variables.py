@@ -1,10 +1,5 @@
-from lib.image_slide.image_slide_controller import ImageSlideController
-
 import zipfile
 import os
-
-AVAILABLE_SLIDE_CONTROLLERS: list[type[ImageSlideController]] = [
-]
 
 CURRENT_FILE_PATH = os.path.abspath(__file__)
 CURRENT_DIRECTORY_PATH = os.path.dirname(CURRENT_FILE_PATH)
