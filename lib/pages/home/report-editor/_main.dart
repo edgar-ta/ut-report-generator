@@ -365,9 +365,9 @@ class _ReportEditorState extends State<ReportEditor>
               builder: (context) {
                 if (slide is PivotTable) {
                   final bloc = PivotTableBloc(
-                    reportIdentifier: report!.identifier,
-                    initialPivotTable: slide,
-                    setPivotTable: (callback) {
+                    report: report!.identifier,
+                    initialSlide: slide,
+                    setSlide: (callback) {
                       setState(() {
                         report!.slides[openSlideMenuIndex] = callback(
                           report!.slides[openSlideMenuIndex] as PivotTable,
@@ -391,9 +391,9 @@ class _ReportEditorState extends State<ReportEditor>
                 }
                 if (slide is ImageSlide) {
                   final bloc = ImageSlideBloc(
-                    reportIdentifier: report!.identifier,
-                    initialImageSlide: slide,
-                    setImageSlide: (callback) {
+                    report: report!.identifier,
+                    initialSlide: slide,
+                    setSlide: (callback) {
                       setState(() {
                         report!.slides[openSlideMenuIndex] = callback(
                           report!.slides[openSlideMenuIndex] as ImageSlide,

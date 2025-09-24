@@ -1,5 +1,6 @@
 from routes.hello_world import hello_world
 
+import routes.slide as slide
 import routes.pivot_table as pivot_table
 import routes.image_slide as image_slide
 import routes.report as report
@@ -19,6 +20,7 @@ hello_world(app)
 app.register_blueprint(report.blueprint)
 app.register_blueprint(pivot_table.blueprint)
 app.register_blueprint(image_slide.blueprint)
+app.register_blueprint(slide.blueprint)
 
 T = TypeVar("T")
 def item_or(_list: list[T], index: int, default: T) -> T:

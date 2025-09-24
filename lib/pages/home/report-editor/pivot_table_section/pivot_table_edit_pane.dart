@@ -41,6 +41,7 @@ class _PivotTableEditPaneState extends State<PivotTableEditPane> {
           children: [
             InvisibleTextField(
               controller: TextEditingController(text: widget.title),
+              onChanged: widget.bloc.rename,
             ),
             FilterSelector(
               title: "Filtros",

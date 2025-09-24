@@ -28,14 +28,16 @@ class _ImageSlideEditPaneState extends State<ImageSlideEditPane> {
       padding: const EdgeInsets.all(16),
       child: Column(
         spacing: 16,
-        children:
-            widget.parameters.entries.map((data) {
-              final (key, value) = (data.key, data.value);
-              return ParameterWidget(
-                parameter: value,
-                editParameter: (value) => widget.bloc.editParameter(key, value),
-              );
-            }).toList(),
+        children: [
+          TextField(onChanged: widget.bloc.rename),
+          ...widget.parameters.entries.map((data) {
+            final (key, value) = (data.key, data.value);
+            return ParameterWidget(
+              parameter: value,
+              editParameter: (value) => widget.bloc.editParameter(key, value),
+            );
+          }),
+        ],
       ),
     );
   }

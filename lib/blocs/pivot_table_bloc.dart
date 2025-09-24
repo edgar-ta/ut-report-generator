@@ -1,3 +1,4 @@
+import 'package:ut_report_generator/blocs/slide_bloc.dart';
 import 'package:ut_report_generator/models/response/edit_pivot_table_response.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
@@ -7,24 +8,20 @@ import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/api/pivot_table/self.dart' as pivot_table;
 import 'package:ut_report_generator/api/pivot_table/filter/self.dart'
     as filter_api;
+import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
 import 'package:ut_report_generator/utils/copy_with_replacement.dart';
 import 'package:ut_report_generator/utils/copy_without.dart';
 
-class PivotTableBloc {
-  final String reportIdentifier;
-  final PivotTable initialPivotTable;
-  final void Function(PivotTable Function(PivotTable pivotTable) callback)
-  setPivotTable;
-
+class PivotTableBloc extends SlideBloc<PivotTable> {
   PivotTableBloc({
-    required this.reportIdentifier,
-    required this.initialPivotTable,
-    required this.setPivotTable,
+    required super.report,
+    required super.initialSlide,
+    required super.setSlide,
   });
 
   void _updateAfterEdition(EditPivotTable_Response response) {
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         data: response.data,
         filters: response.filters,
@@ -36,7 +33,7 @@ class PivotTableBloc {
   Future<void> onFileRemoved(String file) async {
     // @todo
     // route missing
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         source: pivotTable.source.copyWith(
           files: copyWithout(pivotTable.source.files, file),
@@ -46,20 +43,20 @@ class PivotTableBloc {
 
     await pivot_table
         .removeFile(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           fileName: file,
         )
         .then(_updateAfterEdition);
   }
 
   Future<void> onFileAdded(String file) async {
-    if (this.initialPivotTable.source.files.contains(file)) {
+    if (this.initialSlide.source.files.contains(file)) {
       // Very naïve duplication checking that I'm not really sure I need
       return;
     }
 
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         source: pivotTable.source.copyWith(
           files: copyWithAdded(pivotTable.source.files, file),
@@ -69,15 +66,15 @@ class PivotTableBloc {
 
     await pivot_table
         .addFile(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           fileName: file,
         )
         .then(_updateAfterEdition);
   }
 
   Future<void> onOptionAdded(String option, int filterIndex) async {
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters: copyWithReplacement(
           pivotTable.filters,
@@ -91,8 +88,8 @@ class PivotTableBloc {
 
     await filter_api
         .addOptionToFilter(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           filter: filterIndex,
           option: option,
         )
@@ -103,12 +100,11 @@ class PivotTableBloc {
   // option is the last one in the filter, the user shouldn't be allowed to delete
   // it
   Future<void> onOptionRemoved(String option, int filterIndex) async {
-    if (this.initialPivotTable.filters[filterIndex].selectedValues.length ==
-        1) {
+    if (this.initialSlide.filters[filterIndex].selectedValues.length == 1) {
       return;
     }
 
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters: copyWithReplacement(
           pivotTable.filters,
@@ -122,8 +118,8 @@ class PivotTableBloc {
 
     await filter_api
         .removeOptionFromFilter(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           filter: filterIndex,
           option: option,
         )
@@ -131,7 +127,7 @@ class PivotTableBloc {
   }
 
   Future<void> onOptionSwitched(String option, int filterIndex) async {
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters: copyWithReplacement(
           pivotTable.filters,
@@ -143,8 +139,8 @@ class PivotTableBloc {
 
     await filter_api
         .switchOptionInFilter(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           filter: filterIndex,
           option: option,
         )
@@ -154,17 +150,17 @@ class PivotTableBloc {
   Future<void> onFilterDeleted(int filterIndex) async {
     Future<void> Function() callback = () async {};
 
-    if (this.initialPivotTable.filters[filterIndex].chartingMode ==
+    if (this.initialSlide.filters[filterIndex].chartingMode ==
         ChartingMode.chart) {
-      if (this.initialPivotTable.filters.length == 1) {
+      if (this.initialSlide.filters.length == 1) {
         return;
       }
 
-      var newChartIndex = this.initialPivotTable.filters.indexWhere(
+      var newChartIndex = this.initialSlide.filters.indexWhere(
         (filter) => filter.chartingMode == ChartingMode.none,
       );
       if (newChartIndex == -1) {
-        newChartIndex = this.initialPivotTable.filters.indexWhere(
+        newChartIndex = this.initialSlide.filters.indexWhere(
           (filter) => filter.chartingMode != ChartingMode.chart,
         );
       }
@@ -172,7 +168,7 @@ class PivotTableBloc {
       callback = () => setChart(newChartIndex);
     }
 
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters: copyWithout(
           pivotTable.filters,
@@ -184,8 +180,8 @@ class PivotTableBloc {
     await callback()
         .then(
           (_) => filter_api.deleteFilter(
-            report: this.reportIdentifier,
-            pivotTable: this.initialPivotTable.identifier,
+            report: this.report,
+            pivotTable: this.initialSlide.identifier,
             filter: filterIndex,
           ),
         )
@@ -193,7 +189,7 @@ class PivotTableBloc {
   }
 
   Future<void> onFiltersReordered(int oldIndex, int newIndex) async {
-    this.setPivotTable((pivotTable) {
+    this.setSlide((pivotTable) {
       var filters = [...pivotTable.filters];
       if (newIndex > oldIndex) {
         newIndex -= 1;
@@ -204,18 +200,18 @@ class PivotTableBloc {
     });
 
     await pivot_table.reorderFilter(
-      report: this.reportIdentifier,
-      pivotTable: this.initialPivotTable.identifier,
+      report: this.report,
+      pivotTable: this.initialSlide.identifier,
       oldIndex: oldIndex,
       newIndex: newIndex,
     );
   }
 
   Future<void> toggleSelectionMode(int filterIndex) async {
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters: copyWithReplacement(
-          this.initialPivotTable.filters,
+          this.initialSlide.filters,
           filterIndex,
           (filter) => filter.copyWith(
             selectionMode:
@@ -236,8 +232,8 @@ class PivotTableBloc {
     // @todo Also, create an API for this
     await filter_api
         .toggleSelectionMode(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           filter: filterIndex,
         )
         .then(_updateAfterEdition);
@@ -250,7 +246,7 @@ class PivotTableBloc {
     var chartIndex = firstFilterIndex;
     var superChartIndex = secondFilterIndex;
 
-    this.setPivotTable((pivotTable) {
+    this.setSlide((pivotTable) {
       final firstFilterMode = pivotTable.filters[firstFilterIndex].chartingMode;
       final secondFilterMode =
           pivotTable.filters[secondFilterIndex].chartingMode;
@@ -271,18 +267,18 @@ class PivotTableBloc {
         (filter) => filter.copyWith(chartingMode: firstFilterMode),
       );
 
-      return this.initialPivotTable.copyWith(filters: filters);
+      return this.initialSlide.copyWith(filters: filters);
     });
 
     pivot_table
         .setCharts(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           chart: superChartIndex,
           superChart: chartIndex,
         )
         .then((data) {
-          this.setPivotTable((pivotTable) => pivotTable.copyWith(data: data));
+          this.setSlide((pivotTable) => pivotTable.copyWith(data: data));
         });
   }
 
@@ -290,7 +286,7 @@ class PivotTableBloc {
   // if other than the filter edited, is left untouched and all other filters
   // acquire the charting mode `none`
   Future<void> setChart(int filterIndex) async {
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters:
             pivotTable.filters.indexed.map((data) {
@@ -308,17 +304,17 @@ class PivotTableBloc {
 
     await pivot_table
         .setCharts(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           chart: filterIndex,
         )
         .then((data) {
-          this.setPivotTable((pivotTable) => pivotTable.copyWith(data: data));
+          this.setSlide((pivotTable) => pivotTable.copyWith(data: data));
         });
   }
 
   Future<void> setSuperChart(int filterIndex) async {
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters:
             pivotTable.filters.indexed.map((data) {
@@ -336,17 +332,17 @@ class PivotTableBloc {
 
     await pivot_table
         .setCharts(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           superChart: filterIndex,
         )
         .then((data) {
-          this.setPivotTable((pivotTable) => pivotTable.copyWith(data: data));
+          this.setSlide((pivotTable) => pivotTable.copyWith(data: data));
         });
   }
 
   Future<void> unsetSuperChart() async {
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters:
             pivotTable.filters.indexed.map((data) {
@@ -361,17 +357,17 @@ class PivotTableBloc {
 
     await pivot_table
         .setCharts(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           superChart: -1,
         )
         .then((data) {
-          this.setPivotTable((pivotTable) => pivotTable.copyWith(data: data));
+          this.setSlide((pivotTable) => pivotTable.copyWith(data: data));
         });
   }
 
   Future<void> onFilterSelected(PivotTableLevel level) async {
-    this.setPivotTable(
+    this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters: copyWithAdded(
           pivotTable.filters,
@@ -389,12 +385,12 @@ class PivotTableBloc {
     );
     filter_api
         .createDataFilter(
-          report: this.reportIdentifier,
-          pivotTable: this.initialPivotTable.identifier,
+          report: this.report,
+          pivotTable: this.initialSlide.identifier,
           level: level,
         )
         .then((newFilter) {
-          this.setPivotTable(
+          this.setSlide(
             (pivotTable) => pivotTable.copyWith(
               filters:
                   pivotTable.filters
