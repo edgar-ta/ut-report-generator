@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
-import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/pivot_table_chart.dart';
+import 'package:ut_report_generator/pages/home/report_editor/pivot_table_section/pivot_table_chart.dart';
 
 class PivotTableSection extends StatefulWidget {
   final String report;

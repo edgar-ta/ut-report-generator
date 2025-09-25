@@ -3,7 +3,7 @@ import 'package:ut_report_generator/blocs/image_slide_bloc.dart';
 import 'package:ut_report_generator/models/image_slide/image_slide_parameter.dart';
 import 'dart:async';
 
-import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/parameter_widget.dart';
+import 'package:ut_report_generator/pages/home/report_editor/image_slide_section/parameter_widget.dart';
 
 class ImageSlideEditPane extends StatefulWidget {
   final String title;

@@ -20,6 +20,7 @@ dependencies:
   image_picker: ^1.2.0
   open_dir: ^0.0.2+1
   open_file: ^3.5.10
+  path: ^1.9.1
   provider: ^6.1.5
   relative_time: ^5.0.0
   shimmer: ^3.0.0

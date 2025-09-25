@@ -1,6 +1,7 @@
 from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_report
 from lib.report.compile_slides import compile_slides
+from lib.report.get_preview_of_report import get_preview_of_report
 from lib.directory_definitions import compiled_file_of_report
 
 from models.response.file_response import FileResponse
@@ -20,5 +21,6 @@ def compile_report():
     report.save()
     return FileResponse(
         message='El reporte fue compilado de forma correcta',
-        filepath=filepath
+        filepath=filepath,
+        preview=get_preview_of_report(report=report)
     ).to_dict(), 200

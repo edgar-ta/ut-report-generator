@@ -5,6 +5,7 @@ import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_time/relative_time.dart';
+import 'package:ut_report_generator/components/export_box/entry.dart';
 import 'package:ut_report_generator/models/response/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
 import 'package:ut_report_generator/blocs/image_slide_bloc.dart';
@@ -23,17 +24,17 @@ import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget
 import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/models/report/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
-import 'package:ut_report_generator/pages/home/report-editor/export_box.dart';
-import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/image_slide_edit_pane.dart';
-import 'package:ut_report_generator/pages/home/report-editor/image_slide_section/widget.dart';
-import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/pivot_table_edit_pane.dart';
-import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/pivot_metadata_pane.dart';
-import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/widget.dart';
-import 'package:ut_report_generator/pages/home/report-editor/progress_alert_dialog.dart';
-import 'package:ut_report_generator/pages/home/report-editor/slide/shimmer_slide.dart';
-import 'package:ut_report_generator/pages/home/report-editor/slide/slide_frame.dart';
-import 'package:ut_report_generator/pages/home/report-editor/slide/slide_metadata_pane.dart';
-import 'package:ut_report_generator/pages/home/report-editor/slide/tabbed_menu.dart';
+import 'package:ut_report_generator/components/export_box/widget.dart';
+import 'package:ut_report_generator/pages/home/report_editor/image_slide_section/image_slide_edit_pane.dart';
+import 'package:ut_report_generator/pages/home/report_editor/image_slide_section/widget.dart';
+import 'package:ut_report_generator/pages/home/report_editor/pivot_table_section/pivot_table_edit_pane.dart';
+import 'package:ut_report_generator/pages/home/report_editor/pivot_table_section/pivot_metadata_pane.dart';
+import 'package:ut_report_generator/pages/home/report_editor/pivot_table_section/widget.dart';
+import 'package:ut_report_generator/pages/home/report_editor/progress_alert_dialog.dart';
+import 'package:ut_report_generator/pages/home/report_editor/slide/shimmer_slide.dart';
+import 'package:ut_report_generator/pages/home/report_editor/slide/slide_frame.dart';
+import 'package:ut_report_generator/pages/home/report_editor/slide/slide_metadata_pane.dart';
+import 'package:ut_report_generator/pages/home/report_editor/slide/tabbed_menu.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
@@ -62,7 +63,7 @@ class _ReportEditorState extends State<ReportEditor>
   late final AnimationController _portalAnimationController;
   late final Animation _portalOpacityAnimation;
   late final Animation _portalOffsetAnimation;
-  final List<ExportBox> _exports = [];
+  final List<ExportBoxEntry> _exports = [];
 
   @override
   void initState() {
@@ -260,15 +261,13 @@ class _ReportEditorState extends State<ReportEditor>
 
   void _compileReport() {
     setState(() {
-      final index = _exports.length;
+      final identifier = DateTime.now().toIso8601String();
       _exports.add(
-        ExportBox(
-          future: report_api.compileReport(report: _report!.identifier),
-          remove: () {
-            setState(() {
-              _exports.removeAt(index);
-            });
-          },
+        ExportBoxEntry(
+          identifier: identifier,
+          process: Future.delayed(Duration(seconds: 2), () {
+            return report_api.compileReport(report: _report!.identifier);
+          }),
         ),
       );
     });
@@ -498,7 +497,32 @@ class _ReportEditorState extends State<ReportEditor>
             ],
           ),
         ),
-        Positioned(bottom: 16, left: 16, child: Column(children: _exports)),
+        Positioned(
+          bottom: 16,
+          left: 16,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 6,
+            children:
+                _exports
+                    .map(
+                      (entry) => ExportBox(
+                        key: ValueKey(entry.identifier),
+                        entry: entry,
+                        retry: () {},
+                        remove: () {
+                          setState(() {
+                            _exports.removeWhere(
+                              (innerEntry) =>
+                                  innerEntry.identifier == entry.identifier,
+                            );
+                          });
+                        },
+                      ),
+                    )
+                    .toList(),
+          ),
+        ),
       ],
     );
   }
