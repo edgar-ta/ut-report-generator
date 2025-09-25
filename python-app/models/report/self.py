@@ -97,7 +97,7 @@ class Report:
 
         report = Report(
             identifier=report_id,
-            root_directory=root_directory_of_report(report_id=report_id, report_name=report_name),
+            root_directory=root_directory_of_report(report_id=report_id),
             report_name=report_name,
             creation_date=pandas.Timestamp.now(),
             last_edit=pandas.Timestamp.now(),

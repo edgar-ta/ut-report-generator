@@ -10,11 +10,8 @@ import os
 def get_reports_directory() -> str:
     return os.path.join(CURRENT_DIRECTORY_PATH, "reports")
 
-def root_directory_of_report(report_id: str, report_name: str | None = None) -> str:
-    directory_name = report_id
-    if report_name is not None:
-        directory_name = f'{kebab_case(report_name)}-{report_id}'
-    return os.path.join(get_reports_directory(), directory_name)
+def root_directory_of_report(report_id: str) -> str:
+    return os.path.join(get_reports_directory(), report_id)
 
 def metadata_file_of_report(root_directory: str) -> str:
     return os.path.join(root_directory, "metadata.json")
