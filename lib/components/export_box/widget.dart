@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -10,11 +11,16 @@ class ExportBox extends StatefulWidget {
   void Function() remove;
   void Function() retry;
 
+  Duration timeout;
+  Duration interactionTimeout;
+
   ExportBox({
     super.key,
     required this.entry,
     required this.remove,
     required this.retry,
+    this.timeout = const Duration(seconds: 15),
+    this.interactionTimeout = const Duration(seconds: 10),
   });
 
   @override
@@ -22,7 +28,39 @@ class ExportBox extends StatefulWidget {
 }
 
 class _ExportBoxState extends State<ExportBox> {
-  void openDirectory(String path) {
+  Timer? removeAfterTimeout;
+  Timer? removeAfterInteraction;
+  bool isHovered = false;
+
+  void _startTimeout() {
+    if (removeAfterTimeout != null) return;
+    _restartTimeout();
+  }
+
+  void _restartTimeout() {
+    removeAfterTimeout = Timer(widget.timeout, () {
+      removeAfterTimeout = null;
+      _startRemoveAfterInteraction();
+    });
+  }
+
+  void _startRemoveAfterInteraction() {
+    if (removeAfterTimeout != null) return;
+    _cancelRemoveAfterInteraction();
+    removeAfterInteraction = Timer(widget.interactionTimeout, () {
+      if (!isHovered) {
+        widget.remove();
+      }
+    });
+  }
+
+  void _cancelRemoveAfterInteraction() {
+    if (removeAfterInteraction != null) {
+      removeAfterInteraction!.cancel();
+    }
+  }
+
+  void _openDirectory(String path) {
     Process.run("explorer", [path], workingDirectory: path);
   }
 
@@ -71,82 +109,104 @@ class _ExportBoxState extends State<ExportBox> {
   }
 
   Widget _errorState() {
-    return SizedBox(
-      key: ValueKey("error"),
-      width: 256,
-      child: Card(
-        elevation: 3,
-        clipBehavior: Clip.hardEdge,
-        margin: const EdgeInsets.all(0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        child: Row(
-          children: [
-            SizedBox.square(
-              dimension: 48,
-              child: Icon(Icons.error, color: Colors.blueGrey[300]),
-            ),
-            Expanded(child: Text("Algo salió mal")),
-            IconButton(onPressed: widget.retry, icon: Icon(Icons.replay)),
-            IconButton(onPressed: widget.remove, icon: Icon(Icons.close)),
-          ],
+    _startTimeout();
+    return MouseRegion(
+      onEnter: (_) {
+        isHovered = true;
+        _cancelRemoveAfterInteraction();
+      },
+      onExit: (_) {
+        isHovered = false;
+        _startRemoveAfterInteraction();
+      },
+      child: SizedBox(
+        key: ValueKey("error"),
+        width: 256,
+        child: Card(
+          elevation: 3,
+          clipBehavior: Clip.hardEdge,
+          margin: const EdgeInsets.all(0),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          child: Row(
+            children: [
+              SizedBox.square(
+                dimension: 48,
+                child: Icon(Icons.error, color: Colors.blueGrey[300]),
+              ),
+              Expanded(child: Text("Algo salió mal")),
+              IconButton(onPressed: widget.retry, icon: Icon(Icons.replay)),
+              IconButton(onPressed: widget.remove, icon: Icon(Icons.close)),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _normalState(AsyncSnapshot<FileResponse> snapshot) {
+    _startTimeout();
     final response = snapshot.data!;
     final directory = File(response.filepath).parent.absolute.path;
     final filename = path.split(response.filepath).last;
-    return SizedBox(
-      key: ValueKey("normal"),
-      width: 256,
-      child: Card(
-        elevation: 3,
-        clipBehavior: Clip.hardEdge,
-        margin: const EdgeInsets.all(0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        child: Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  openDirectory(directory);
-                },
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: Row(
-                    spacing: 6,
-                    children: [
-                      if (response.preview != null)
-                        SizedBox.square(
-                          dimension: 48,
-                          child: Image.file(
-                            File(response.preview!),
-                            fit: BoxFit.cover,
+    return MouseRegion(
+      onEnter: (_) {
+        isHovered = true;
+        _cancelRemoveAfterInteraction();
+      },
+      onExit: (_) {
+        isHovered = false;
+        _startRemoveAfterInteraction();
+      },
+      child: SizedBox(
+        key: ValueKey("normal"),
+        width: 256,
+        child: Card(
+          elevation: 3,
+          clipBehavior: Clip.hardEdge,
+          margin: const EdgeInsets.all(0),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _openDirectory(directory);
+                  },
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Row(
+                      spacing: 6,
+                      children: [
+                        if (response.preview != null)
+                          SizedBox.square(
+                            dimension: 48,
+                            child: Image.file(
+                              File(response.preview!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        Expanded(
+                          child: Text(
+                            filename,
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      Expanded(
-                        child: Text(
-                          filename,
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            IconButton(
-              onPressed: () {
-                widget.remove();
-              },
-              icon: Icon(Icons.close),
-            ),
-          ],
+              IconButton(
+                onPressed: () {
+                  widget.remove();
+                },
+                icon: Icon(Icons.close),
+              ),
+            ],
+          ),
         ),
       ),
     );

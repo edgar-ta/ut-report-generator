@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:ut_report_generator/components/export_box/entry.dart';
+import 'package:ut_report_generator/components/slideshow_header.dart';
 import 'package:ut_report_generator/models/response/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
 import 'package:ut_report_generator/blocs/image_slide_bloc.dart';
@@ -64,6 +65,7 @@ class _ReportEditorState extends State<ReportEditor>
   late final Animation _portalOpacityAnimation;
   late final Animation _portalOffsetAnimation;
   final List<ExportBoxEntry> _exports = [];
+  final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey();
 
   @override
   void initState() {
@@ -434,40 +436,7 @@ class _ReportEditorState extends State<ReportEditor>
           controller: _scrollController,
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 16,
-                  children: [
-                    Text(
-                      "Creado ${_report!.creationDate.relativeTimeLocale(Locale("es", "MX"))}",
-                    ),
-                    InvisibleTextField(
-                      controller: TextEditingController(
-                        text: _report!.reportName,
-                      ),
-                      style: TextStyle(fontSize: 36),
-                      textAlign: TextAlign.center,
-                      onChanged: bloc.renameReport,
-                    ),
-                    SegmentedButton(
-                      onSelectionChanged: (_) {},
-                      segments: [
-                        ButtonSegment(
-                          value: VisualizationMode.asReport,
-                          icon: Icon(Icons.report),
-                        ),
-                        ButtonSegment(
-                          value: VisualizationMode.chartsOnly,
-                          icon: Icon(Icons.bar_chart),
-                        ),
-                      ],
-                      selected: {_report!.visualizationMode},
-                    ),
-                  ],
-                ),
-              ),
+              SlideshowHeader(report: _report!, bloc: bloc),
               ..._report!.slides.indexed.map((data) {
                 final (index, slide) = data;
                 if (slide is PivotTable) {
@@ -500,27 +469,51 @@ class _ReportEditorState extends State<ReportEditor>
         Positioned(
           bottom: 16,
           left: 16,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 6,
-            children:
-                _exports
-                    .map(
-                      (entry) => ExportBox(
-                        key: ValueKey(entry.identifier),
-                        entry: entry,
-                        retry: () {},
-                        remove: () {
-                          setState(() {
-                            _exports.removeWhere(
-                              (innerEntry) =>
-                                  innerEntry.identifier == entry.identifier,
-                            );
-                          });
-                        },
-                      ),
-                    )
-                    .toList(),
+          child: AnimatedList(
+            key: _animatedListKey,
+            itemBuilder: (context, index, animation) {
+              final entry
+              return AnimatedBuilder(
+                animation: animation,
+                builder: (context, widget) {
+                  return Opacity(opacity: animation.value, child: widget);
+                },
+                child: ExportBox(
+                  key: ValueKey(entry.identifier),
+                  entry: entry,
+                  retry: () {},
+                  remove: () {
+                    setState(() {
+                      _exports.removeWhere(
+                        (innerEntry) =>
+                            innerEntry.identifier == entry.identifier,
+                      );
+                    });
+                  },
+                ),
+              );
+            },
+            initialItemCount: 0,
+            // crossAxisAlignment: CrossAxisAlignment.start,
+            // spacing: 6,
+            // children:
+            //     _exports
+            //         .map(
+            //           (entry) => ExportBox(
+            //             key: ValueKey(entry.identifier),
+            //             entry: entry,
+            //             retry: () {},
+            //             remove: () {
+            //               setState(() {
+            //                 _exports.removeWhere(
+            //                   (innerEntry) =>
+            //                       innerEntry.identifier == entry.identifier,
+            //                 );
+            //               });
+            //             },
+            //           ),
+            //         )
+            //         .toList(),
           ),
         ),
       ],
