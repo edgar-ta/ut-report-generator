@@ -467,53 +467,48 @@ class _ReportEditorState extends State<ReportEditor>
           ),
         ),
         Positioned(
+          top: 16,
           bottom: 16,
           left: 16,
+          width: 64,
           child: AnimatedList(
             key: _animatedListKey,
+            shrinkWrap: true,
             itemBuilder: (context, index, animation) {
-              final entry
-              return AnimatedBuilder(
-                animation: animation,
-                builder: (context, widget) {
-                  return Opacity(opacity: animation.value, child: widget);
+              final entry = _exports[index];
+              return ExportBox(
+                key: ValueKey(entry.identifier),
+                entry: entry,
+                retry: () {},
+                remove: () {
+                  setState(() {
+                    _exports.removeWhere(
+                      (innerEntry) => innerEntry.identifier == entry.identifier,
+                    );
+                  });
                 },
-                child: ExportBox(
-                  key: ValueKey(entry.identifier),
-                  entry: entry,
-                  retry: () {},
-                  remove: () {
-                    setState(() {
-                      _exports.removeWhere(
-                        (innerEntry) =>
-                            innerEntry.identifier == entry.identifier,
-                      );
-                    });
-                  },
-                ),
               );
+              // return AnimatedBuilder(
+              //   animation: animation,
+              //   builder: (context, widget) {
+              //     return Opacity(opacity: animation.value, child: widget);
+              //   },
+              //   child: ExportBox(
+              //     key: ValueKey(entry.identifier),
+              //     entry: entry,
+              //     retry: () {},
+              //     remove: () {
+              //       setState(() {
+              //         _exports.removeWhere(
+              //           (innerEntry) =>
+              //               innerEntry.identifier == entry.identifier,
+              //         );
+              //       });
+              //     },
+              //   ),
+              // );
             },
             initialItemCount: 0,
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            // spacing: 6,
-            // children:
-            //     _exports
-            //         .map(
-            //           (entry) => ExportBox(
-            //             key: ValueKey(entry.identifier),
-            //             entry: entry,
-            //             retry: () {},
-            //             remove: () {
-            //               setState(() {
-            //                 _exports.removeWhere(
-            //                   (innerEntry) =>
-            //                       innerEntry.identifier == entry.identifier,
-            //                 );
-            //               });
-            //             },
-            //           ),
-            //         )
-            //         .toList(),
           ),
         ),
       ],

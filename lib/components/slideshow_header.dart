@@ -30,7 +30,7 @@ class _SlideshowHeaderState extends State<SlideshowHeader> {
   void _onReportNameChanged(String text) {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 250), () {
-      widget.bloc.renameReport(text);
+      widget.bloc.rename(text);
     });
   }
 
@@ -59,7 +59,9 @@ class _SlideshowHeaderState extends State<SlideshowHeader> {
             onChanged: _onReportNameChanged,
           ),
           SegmentedButton(
-            onSelectionChanged: (_) {},
+            onSelectionChanged: (_) async {
+              await widget.bloc.toggleMode();
+            },
             segments: [
               ButtonSegment(
                 value: VisualizationMode.asReport,
