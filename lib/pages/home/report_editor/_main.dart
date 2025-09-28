@@ -264,12 +264,22 @@ class _ReportEditorState extends State<ReportEditor>
   void _compileReport() {
     setState(() {
       final identifier = DateTime.now().toIso8601String();
+      _animatedListKey.currentState!.insertItem(0);
       _exports.add(
         ExportBoxEntry(
           identifier: identifier,
           process: Future.delayed(Duration(seconds: 2), () {
             return report_api.compileReport(report: _report!.identifier);
           }),
+          setState: (callback) {
+            setState(() {
+              final index = _exports.indexWhere(
+                (export) => export.identifier == identifier,
+              );
+              _exports[index] = callback();
+            });
+          },
+          status: ExportBoxEntryStatus.pending,
         ),
       );
     });
@@ -469,46 +479,43 @@ class _ReportEditorState extends State<ReportEditor>
         Positioned(
           top: 16,
           bottom: 16,
+          width: EXPORT_BOX_WIDTH,
           left: 16,
-          width: 64,
           child: AnimatedList(
             key: _animatedListKey,
-            shrinkWrap: true,
             itemBuilder: (context, index, animation) {
               final entry = _exports[index];
               return ExportBox(
+                timeout: Duration(seconds: 3),
+                interactionTimeout: Duration(seconds: 1),
                 key: ValueKey(entry.identifier),
                 entry: entry,
                 retry: () {},
                 remove: () {
                   setState(() {
-                    _exports.removeWhere(
+                    final index = _exports.indexWhere(
                       (innerEntry) => innerEntry.identifier == entry.identifier,
                     );
+                    _animatedListKey.currentState!.removeItem(index, (
+                      context,
+                      animation,
+                    ) {
+                      return AnimatedBuilder(
+                        animation: animation,
+                        builder: (context, child) {
+                          return Opacity(
+                            opacity: animation.value,
+                            child: child,
+                          );
+                        },
+                        child: ExportBox(entry: entry),
+                      );
+                    });
                   });
                 },
               );
-              // return AnimatedBuilder(
-              //   animation: animation,
-              //   builder: (context, widget) {
-              //     return Opacity(opacity: animation.value, child: widget);
-              //   },
-              //   child: ExportBox(
-              //     key: ValueKey(entry.identifier),
-              //     entry: entry,
-              //     retry: () {},
-              //     remove: () {
-              //       setState(() {
-              //         _exports.removeWhere(
-              //           (innerEntry) =>
-              //               innerEntry.identifier == entry.identifier,
-              //         );
-              //       });
-              //     },
-              //   ),
-              // );
             },
-            initialItemCount: 0,
+            initialItemCount: _exports.length,
           ),
         ),
       ],

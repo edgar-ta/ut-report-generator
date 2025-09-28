@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 import 'package:ut_report_generator/components/export_box/entry.dart';
 import 'package:ut_report_generator/models/response/file_response.dart';
+import 'package:ut_report_generator/utils/design_constants.dart';
 
 class ExportBox extends StatefulWidget {
   ExportBoxEntry entry;
-  void Function() remove;
-  void Function() retry;
+  void Function()? remove;
+  void Function()? retry;
 
   Duration timeout;
   Duration interactionTimeout;
@@ -17,8 +18,8 @@ class ExportBox extends StatefulWidget {
   ExportBox({
     super.key,
     required this.entry,
-    required this.remove,
-    required this.retry,
+    this.remove,
+    this.retry,
     this.timeout = const Duration(seconds: 15),
     this.interactionTimeout = const Duration(seconds: 10),
   });
@@ -49,7 +50,7 @@ class _ExportBoxState extends State<ExportBox> {
     _cancelRemoveAfterInteraction();
     removeAfterInteraction = Timer(widget.interactionTimeout, () {
       if (!isHovered) {
-        widget.remove();
+        widget.remove?.call();
       }
     });
   }
@@ -66,26 +67,27 @@ class _ExportBoxState extends State<ExportBox> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: widget.entry.process,
-      builder: (context, snapshot) {
-        return AnimatedSwitcher(
-          duration: Duration(milliseconds: 250),
-          child:
-              !snapshot.hasError && !snapshot.hasData
-                  ? _loadingState()
-                  : (snapshot.hasError
-                      ? _errorState()
-                      : _normalState(snapshot)),
-        );
-      },
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 250),
+      child: Builder(
+        builder: (context) {
+          switch (widget.entry.status) {
+            case ExportBoxEntryStatus.pending:
+              return _loadingState();
+            case ExportBoxEntryStatus.success:
+              return _successState(widget.entry.response!);
+            case ExportBoxEntryStatus.error:
+              return _errorState();
+          }
+        },
+      ),
     );
   }
 
   Widget _loadingState() {
     return SizedBox(
       key: ValueKey("loading"),
-      width: 256,
+      width: EXPORT_BOX_WIDTH,
       child: Card(
         elevation: 3,
         clipBehavior: Clip.hardEdge,
@@ -121,7 +123,7 @@ class _ExportBoxState extends State<ExportBox> {
       },
       child: SizedBox(
         key: ValueKey("error"),
-        width: 256,
+        width: EXPORT_BOX_WIDTH,
         child: Card(
           elevation: 3,
           clipBehavior: Clip.hardEdge,
@@ -143,9 +145,8 @@ class _ExportBoxState extends State<ExportBox> {
     );
   }
 
-  Widget _normalState(AsyncSnapshot<FileResponse> snapshot) {
+  Widget _successState(FileResponse response) {
     _startTimeout();
-    final response = snapshot.data!;
     final directory = File(response.filepath).parent.absolute.path;
     final filename = path.split(response.filepath).last;
     return MouseRegion(
@@ -159,7 +160,7 @@ class _ExportBoxState extends State<ExportBox> {
       },
       child: SizedBox(
         key: ValueKey("normal"),
-        width: 256,
+        width: EXPORT_BOX_WIDTH,
         child: Card(
           elevation: 3,
           clipBehavior: Clip.hardEdge,
@@ -201,7 +202,7 @@ class _ExportBoxState extends State<ExportBox> {
               ),
               IconButton(
                 onPressed: () {
-                  widget.remove();
+                  widget.remove?.call();
                 },
                 icon: Icon(Icons.close),
               ),
