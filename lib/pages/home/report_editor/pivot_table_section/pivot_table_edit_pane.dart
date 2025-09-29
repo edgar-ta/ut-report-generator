@@ -8,8 +8,8 @@ import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
-import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/filter_component.dart';
-import 'package:ut_report_generator/pages/home/report-editor/pivot_table_section/filter_selector.dart';
+import 'package:ut_report_generator/pages/home/report_editor/pivot_table_section/filter_component.dart';
+import 'package:ut_report_generator/pages/home/report_editor/pivot_table_section/filter_selector.dart';
 import 'package:ut_report_generator/api/pivot_table/filter/self.dart'
     as filter_api;
 import 'package:ut_report_generator/utils/copy_with_added.dart';

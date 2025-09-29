@@ -1,6 +1,6 @@
 from lib.get_metadata import get_metadata
 from lib.descriptive_error import DescriptiveError
-from lib.directory_definitions import metadata_file_of_report, slides_directory_of_report, root_directory_of_report, rendered_file_of_report, export_file_of_report, export_directory_of_report, data_directory_of_report, get_reports_directory
+from lib.directory_definitions import metadata_file_of_report, slides_directory_of_report, root_directory_of_report, compiled_file_of_report, exported_file_of_report, temporary_export_directory_of_report, data_directory_of_report, get_reports_directory
 from lib.image_slide.image_slide_from_json import image_slide_from_json
 from lib.pivot_table.pivot_table_from_json import pivot_table_from_json
 
@@ -97,7 +97,7 @@ class Report:
 
         report = Report(
             identifier=report_id,
-            root_directory=root_directory_of_report(report_id=report_id, report_name=report_name),
+            root_directory=root_directory_of_report(report_id=report_id),
             report_name=report_name,
             creation_date=pandas.Timestamp.now(),
             last_edit=pandas.Timestamp.now(),
@@ -119,14 +119,6 @@ class Report:
         for slide in self.slides:
             slide.makedirs(exist_ok=exist_ok)
 
-    def new_render(self) -> None:
-        '''
-        It shall create a new PowerPoint presentation based on the report depending
-        on whether its last edit timestamp is greater than the time the last
-        PowerPoint was created (if there is any PowerPoint)
-        '''
-        pass
-
     def add_slide(self, slide: Slide) -> None:
         self.slides.append(slide)
     
@@ -134,8 +126,9 @@ class Report:
         last_edits = [ slide.last_edit for slide in self.slides ]
         last_edits.append(self.last_edit)
         self.last_edit = max(last_edits)
+        metadata_file = metadata_file_of_report(root_directory=self.root_directory)
 
-        with open(self.metadata_file, "w") as json_file:
+        with open(metadata_file, "w") as json_file:
             json.dump(self.to_dict(), json_file, indent=4)
 
     def __getitem__(self, key: str) -> Slide:
@@ -147,30 +140,6 @@ class Report:
     @classmethod
     def get_reports_directory(cls) -> str:
         return os.path.join(CURRENT_DIRECTORY_PATH, "reports")
-
-    @cached_property
-    def slides_directory(self) -> str:
-        return slides_directory_of_report(self.root_directory)
-    
-    @cached_property
-    def metadata_file(self) -> str:
-        return metadata_file_of_report(self.root_directory)
-    
-    @property
-    def rendered_file(self) -> str:
-        return rendered_file_of_report(root_directory=self.root_directory, report_name=self.report_name)
-    
-    @property
-    def export_file(self) -> str:
-        return export_file_of_report(root_directory=self.root_directory, report_name=self.report_name)
-    
-    @cached_property
-    def export_directory(self) -> str:
-        return export_directory_of_report(root_directory=self.root_directory)
-    
-    @cached_property
-    def data_directory(self) -> str:
-        return data_directory_of_report(root_directory=self.root_directory)
     
     @classmethod
     def new_report_id(cls) -> str:

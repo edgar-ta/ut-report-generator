@@ -1,13 +1,11 @@
-import 'package:ut_report_generator/api/report/render_report.dart';
+import 'package:ut_report_generator/api/report/compile_report.dart';
 import 'package:ut_report_generator/api/send_request.dart';
+import 'package:ut_report_generator/models/response/file_response.dart';
 
-Future<ExportReport_Response> exportReport({required String identifier}) {
+Future<FileResponse> exportReport({required String report}) {
   return sendRequest(
     route: "report/export",
-    body: {"report": identifier},
-    callback: ExportReport_Response.fromJson,
+    body: {"report": report},
+    callback: FileResponse.fromJson,
   );
 }
-
-// ignore: camel_case_types
-typedef ExportReport_Response = RenderReport_Response;
