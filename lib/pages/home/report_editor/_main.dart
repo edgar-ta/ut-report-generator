@@ -202,8 +202,13 @@ class _ReportEditorState extends State<ReportEditor>
                 color: Colors.white,
               ),
               tooltip: "Exportar reporte",
-              onSelected: (_) {
-                _compileReport();
+              onSelected: (value) {
+                if (value == "pdf") {
+                  _compileReport();
+                }
+                if (value == "zip") {
+                  _exportReport();
+                }
               },
               itemBuilder:
                   (BuildContext context) => <PopupMenuEntry<String>>[
@@ -285,26 +290,28 @@ class _ReportEditorState extends State<ReportEditor>
     });
   }
 
-  Widget _optionComponent<ResponseType extends FileResponse>({
-    required void Function() close,
-    required Future<ResponseType> Function() callback,
-    required String label,
-    required IconData icon,
-    required String alertTitle,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: () {
-        close();
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ProgressAlertDialog(callback: callback, title: alertTitle);
+  void _exportReport() {
+    setState(() {
+      final identifier = DateTime.now().toIso8601String();
+      _animatedListKey.currentState!.insertItem(_exports.length);
+      _exports.add(
+        ExportBoxEntry(
+          identifier: identifier,
+          process: Future.delayed(Duration(seconds: 2), () {
+            return report_api.exportReport(report: _report!.identifier);
+          }),
+          setState: (callback) {
+            setState(() {
+              final index = _exports.indexWhere(
+                (export) => export.identifier == identifier,
+              );
+              _exports[index] = callback();
+            });
           },
-        );
-      },
-      label: Text(label),
-      icon: Icon(icon),
-    );
+          status: ExportBoxEntryStatus.pending,
+        ),
+      );
+    });
   }
 
   void _openSlideMenu(int index) {
@@ -493,10 +500,10 @@ class _ReportEditorState extends State<ReportEditor>
                 retry: () {},
                 remove: () {
                   setState(() {
-                    final index = _exports.indexWhere(
+                    final innerIndex = _exports.indexWhere(
                       (innerEntry) => innerEntry.identifier == entry.identifier,
                     );
-                    _animatedListKey.currentState!.removeItem(index, (
+                    _animatedListKey.currentState!.removeItem(innerIndex, (
                       context,
                       animation,
                     ) {
@@ -511,6 +518,7 @@ class _ReportEditorState extends State<ReportEditor>
                         child: ExportBox(entry: entry),
                       );
                     });
+                    _exports.removeAt(innerIndex);
                   });
                 },
               );

@@ -23,11 +23,11 @@ def temporary_compiled_file_of_report(root_directory: str) -> str:
     file_name = str(uuid4())
     return os.path.join(root_directory, f"temporary-{file_name}.pptx")
 
-def export_file_of_report(root_directory: str, report_name: str) -> str:
+def exported_file_of_report(root_directory: str, report_name: str) -> str:
     return os.path.join(root_directory, f"{report_name}.zip")
 
-def export_directory_of_report(root_directory: str) -> str:
-    return os.path.join(root_directory, "export")
+def temporary_export_directory_of_report(root_directory: str) -> str:
+    return os.path.join(root_directory, "temporary-export")
 
 def slides_directory_of_report(root_directory: str) -> str:
     return os.path.join(root_directory, "slides")

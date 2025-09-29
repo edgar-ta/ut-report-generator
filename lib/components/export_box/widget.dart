@@ -88,6 +88,7 @@ class _ExportBoxState extends State<ExportBox> {
     return SizedBox(
       key: ValueKey("loading"),
       width: EXPORT_BOX_WIDTH,
+      height: EXPORT_BOX_HEIGHT,
       child: Card(
         elevation: 3,
         clipBehavior: Clip.hardEdge,
@@ -96,7 +97,7 @@ class _ExportBoxState extends State<ExportBox> {
         child: Row(
           children: [
             SizedBox.square(
-              dimension: 48,
+              dimension: EXPORT_BOX_HEIGHT,
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: CircularProgressIndicator(),
@@ -124,6 +125,7 @@ class _ExportBoxState extends State<ExportBox> {
       child: SizedBox(
         key: ValueKey("error"),
         width: EXPORT_BOX_WIDTH,
+        height: EXPORT_BOX_HEIGHT,
         child: Card(
           elevation: 3,
           clipBehavior: Clip.hardEdge,
@@ -132,7 +134,7 @@ class _ExportBoxState extends State<ExportBox> {
           child: Row(
             children: [
               SizedBox.square(
-                dimension: 48,
+                dimension: EXPORT_BOX_HEIGHT,
                 child: Icon(Icons.error, color: Colors.blueGrey[300]),
               ),
               Expanded(child: Text("Algo salió mal")),
@@ -161,6 +163,7 @@ class _ExportBoxState extends State<ExportBox> {
       child: SizedBox(
         key: ValueKey("normal"),
         width: EXPORT_BOX_WIDTH,
+        height: EXPORT_BOX_HEIGHT,
         child: Card(
           elevation: 3,
           clipBehavior: Clip.hardEdge,
@@ -180,7 +183,7 @@ class _ExportBoxState extends State<ExportBox> {
                       children: [
                         if (response.preview != null)
                           SizedBox.square(
-                            dimension: 48,
+                            dimension: EXPORT_BOX_HEIGHT,
                             child: Image.file(
                               File(response.preview!),
                               fit: BoxFit.cover,

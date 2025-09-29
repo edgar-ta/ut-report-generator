@@ -84,7 +84,7 @@ class _RecentReportsState extends State<RecentReports> {
                       child: Stack(
                         children: [
                           _reportPreviewSkeletons(isLoading),
-                          isSuccess
+                          isSuccess && response!.reports.isNotEmpty
                               ? _reportPreviews(isSuccess, response!, (
                                 callback,
                               ) {

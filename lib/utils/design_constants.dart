@@ -9,3 +9,4 @@ double slideHeight(BuildContext context) {
 
 const double SLIDESHOW_PREVIEW_HEIGHT = 160;
 const double EXPORT_BOX_WIDTH = 256;
+const double EXPORT_BOX_HEIGHT = 48;

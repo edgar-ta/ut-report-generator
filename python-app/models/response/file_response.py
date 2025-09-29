@@ -1,7 +1,7 @@
 from models.response.success_response import SuccessResponse
 
 class FileResponse(SuccessResponse):
-    def __init__(self, message, filepath: str, preview: str | None):
+    def __init__(self, message, filepath: str, preview: str | None = None):
         super().__init__(message)
         self.filepath = filepath
         self.preview = preview
