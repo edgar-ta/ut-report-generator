@@ -19,13 +19,13 @@ import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 
-Future<ReportClass> _createNewVisualization(List<File> files) async {
+Future<Slideshow> _createNewVisualization(List<File> files) async {
   return startReport_withPivotTable(
     files.map((file) => file.absolute.path).toList(),
   );
 }
 
-Future<ReportClass> _importReportFromZip(List<File> files) async {
+Future<Slideshow> _importReportFromZip(List<File> files) async {
   return importReport(identifier: files[0].absolute.path);
 }
 

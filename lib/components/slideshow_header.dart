@@ -10,8 +10,8 @@ import 'package:ut_report_generator/models/report/visualization_mode.dart';
 class SlideshowHeader extends StatefulWidget {
   const SlideshowHeader({super.key, required this.report, required this.bloc});
 
-  final ReportClass report;
-  final ReportBloc bloc;
+  final Slideshow report;
+  final SlideshowEditorBloc bloc;
 
   @override
   State<SlideshowHeader> createState() => _SlideshowHeaderState();
@@ -60,12 +60,12 @@ class _SlideshowHeaderState extends State<SlideshowHeader> {
           ),
           SegmentedButton(
             onSelectionChanged: (_) async {
-              await widget.bloc.toggleMode();
+              await widget.bloc.toggleSlideshowMode();
             },
             segments: [
               ButtonSegment(
                 value: VisualizationMode.asReport,
-                icon: Icon(Icons.report),
+                icon: Icon(Icons.edit_document),
               ),
               ButtonSegment(
                 value: VisualizationMode.chartsOnly,

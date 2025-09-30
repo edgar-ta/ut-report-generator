@@ -1,21 +1,15 @@
 from lib.with_flask import with_flask
-from lib.get_or_panic import get_or_panic
 from lib.format_for_create import format_for_create
-from lib.directory_definitions import preview_image_of_slide
+from lib.get_entities_from_request import entities_for_editing_report
 
 from lib.pivot_table.add_pivot_table_to_report import add_pivot_table_to_report
-from lib.pivot_table.plot_pivot_table import plot_from_entities
-
-from models.report.self import Report
 
 from flask import request
 
 @with_flask("/create", methods=["POST"])
 def create_pivot_table():
-    report = get_or_panic(request.json, "report", "La id del reporte no fue incluida en la petición")
-    report = Report.from_identifier(identifier=report)
-
+    report = entities_for_editing_report(request=request)
     pivot_table = add_pivot_table_to_report(report=report, local_request=request, index=request.json.get('index'))
     report.save()
 
-    return format_for_create(pivot_table), 200
+    return pivot_table.to_dict(), 200

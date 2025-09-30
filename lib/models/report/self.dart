@@ -4,14 +4,14 @@ import 'package:ut_report_generator/models/report/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
 
-class ReportClass {
+class Slideshow {
   String identifier;
   String reportName;
   DateTime creationDate;
   List<Slide> slides;
   VisualizationMode visualizationMode;
 
-  ReportClass({
+  Slideshow({
     required this.identifier,
     required this.reportName,
     required this.creationDate,
@@ -19,8 +19,8 @@ class ReportClass {
     required this.visualizationMode,
   });
 
-  factory ReportClass.fromJson(Map<String, dynamic> json) {
-    return ReportClass(
+  factory Slideshow.fromJson(Map<String, dynamic> json) {
+    return Slideshow(
       identifier: json['identifier'] as String,
       reportName: json['report_name'] as String,
       creationDate: DateTime.parse(json['creation_date']),
@@ -40,14 +40,14 @@ class ReportClass {
     );
   }
 
-  ReportClass copyWith({
+  Slideshow copyWith({
     String? identifier,
     String? reportName,
     DateTime? creationDate,
     List<Slide>? slides,
     VisualizationMode? visualizationMode,
   }) {
-    return ReportClass(
+    return Slideshow(
       identifier: identifier ?? this.identifier,
       reportName: reportName ?? this.reportName,
       creationDate: creationDate ?? this.creationDate,

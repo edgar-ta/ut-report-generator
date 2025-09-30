@@ -40,7 +40,7 @@ final router = GoRouter(
                   path: 'report-editor',
                   builder: (context, state) {
                     final reportCallback =
-                        state.extra as Future<ReportClass> Function();
+                        state.extra as Future<Slideshow> Function();
                     return ReportEditor(reportCallback: reportCallback);
                   },
                 ),

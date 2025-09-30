@@ -90,35 +90,6 @@ class Report:
             
         raise DescriptiveError(http_error_code=400, message=f'La id especificada ({identifier}) no corresponde a ningún reporte')
 
-    @classmethod
-    def from_nothing(cls, visualization_mode: VisualizationMode) -> "Report":
-        report_id = cls.new_report_id()
-        report_name = "Mi reporte"
-
-        report = Report(
-            identifier=report_id,
-            root_directory=root_directory_of_report(report_id=report_id),
-            report_name=report_name,
-            creation_date=pandas.Timestamp.now(),
-            last_edit=pandas.Timestamp.now(),
-            slides=[],
-            visualization_mode=visualization_mode,
-            version=CURRENT_PROJECT_VERSION
-        )
-        return report
-    
-    def makedirs(self, exist_ok: bool = True) -> None:
-        '''
-        Creates the directories that the reports needs in order
-        to work (i. e., the root, the slides and data directory)
-        '''
-        os.makedirs(self.root_directory, exist_ok=exist_ok)
-        os.makedirs(self.slides_directory, exist_ok=exist_ok)
-        os.makedirs(self.data_directory, exist_ok=exist_ok)
-
-        for slide in self.slides:
-            slide.makedirs(exist_ok=exist_ok)
-
     def add_slide(self, slide: Slide) -> None:
         self.slides.append(slide)
     
@@ -140,7 +111,3 @@ class Report:
     @classmethod
     def get_reports_directory(cls) -> str:
         return os.path.join(CURRENT_DIRECTORY_PATH, "reports")
-    
-    @classmethod
-    def new_report_id(cls) -> str:
-        return str(uuid.uuid4())

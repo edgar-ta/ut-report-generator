@@ -5,6 +5,6 @@ class SuccessResponse {
   SuccessResponse({required this.message});
 
   factory SuccessResponse.fromJson(Map<String, dynamic> json) {
-    return SuccessResponse(message: json['preview']);
+    return SuccessResponse(message: json['message']);
   }
 }

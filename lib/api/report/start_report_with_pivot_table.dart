@@ -13,4 +13,4 @@ Future<StartReport_Response> startReport_withPivotTable(
 }
 
 // ignore: camel_case_types
-typedef StartReport_Response = ReportClass;
+typedef StartReport_Response = Slideshow;
