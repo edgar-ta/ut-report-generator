@@ -1,9 +1,10 @@
 import 'package:ut_report_generator/components/export_box/widget.dart';
 import 'package:ut_report_generator/models/response/file_response.dart';
+import 'package:ut_report_generator/utils/future_status.dart';
 
 class ExportBoxEntry {
   String identifier;
-  ExportBoxEntryStatus status;
+  FutureStatus status;
   Future<FileResponse> process;
   FileResponse? response;
   void Function(ExportBoxEntry Function()) setState;
@@ -17,15 +18,11 @@ class ExportBoxEntry {
     process
         .then((response) {
           setState(
-            () =>
-                (this..response = response)
-                  ..status = ExportBoxEntryStatus.success,
+            () => (this..response = response)..status = FutureStatus.success,
           );
         })
         .catchError((error) {
-          setState(() => this..status = ExportBoxEntryStatus.error);
+          setState(() => this..status = FutureStatus.error);
         });
   }
 }
-
-enum ExportBoxEntryStatus { pending, success, error }

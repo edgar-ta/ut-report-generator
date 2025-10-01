@@ -1,23 +1,24 @@
 // ignore: camel_case_types
 import 'package:ut_report_generator/models/response/report_preview.dart';
 
-class RecentReportsResponse {
-  List<ReportPreview> reports;
+class RecentSlideshowsResponse {
+  List<SlideshowPreview> reports;
   bool hasMore;
   String? lastReport;
 
-  RecentReportsResponse({
+  RecentSlideshowsResponse({
     required this.reports,
     required this.hasMore,
     required this.lastReport,
   });
 
-  factory RecentReportsResponse.fromJson(Map<String, dynamic> json) {
-    return RecentReportsResponse(
+  factory RecentSlideshowsResponse.fromJson(Map<String, dynamic> json) {
+    return RecentSlideshowsResponse(
       reports:
           (json['reports'] as List<dynamic>)
               .map(
-                (item) => ReportPreview.fromJson(item as Map<String, dynamic>),
+                (item) =>
+                    SlideshowPreview.fromJson(item as Map<String, dynamic>),
               )
               .toList(),
       hasMore: json['has_more'] as bool,

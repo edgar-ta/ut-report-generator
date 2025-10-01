@@ -40,6 +40,7 @@ import 'package:ut_report_generator/pages/home/report_editor/slide/tabbed_menu.d
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
+import 'package:ut_report_generator/utils/future_status.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 import 'package:ut_report_generator/api/report/self.dart' as report_api;
 import 'package:ut_report_generator/api/pivot_table/self.dart'
@@ -47,8 +48,13 @@ import 'package:ut_report_generator/api/pivot_table/self.dart'
 
 class ReportEditor extends StatefulWidget {
   final Future<Slideshow> Function() reportCallback;
+  final Future<void> Function() callbackWhenReturning;
 
-  ReportEditor({super.key, required this.reportCallback});
+  ReportEditor({
+    super.key,
+    required this.reportCallback,
+    required this.callbackWhenReturning,
+  });
 
   @override
   State<ReportEditor> createState() => _ReportEditorState();
@@ -245,11 +251,12 @@ class _ReportEditorState extends State<ReportEditor>
             ),
           ],
           leading: IconButton(
-            onPressed: () {
+            onPressed: () async {
               context.read<ScaffoldController>()
                 ..setAppBarBuilder(null)
                 ..setFabBuilder(null);
               context.pop();
+              await widget.callbackWhenReturning();
             },
             icon: Icon(Icons.arrow_back, color: Colors.white),
           ),
@@ -278,7 +285,7 @@ class _ReportEditorState extends State<ReportEditor>
               _exports[index] = callback();
             });
           },
-          status: ExportBoxEntryStatus.pending,
+          status: FutureStatus.pending,
         ),
       );
     });
@@ -302,7 +309,7 @@ class _ReportEditorState extends State<ReportEditor>
               _exports[index] = callback();
             });
           },
-          status: ExportBoxEntryStatus.pending,
+          status: FutureStatus.pending,
         ),
       );
     });

@@ -2,21 +2,21 @@ import 'dart:ui';
 
 import 'package:relative_time/relative_time.dart';
 
-class ReportPreview {
+class SlideshowPreview {
   String preview;
   String name;
   String identifier;
   DateTime lastOpen;
 
-  ReportPreview({
+  SlideshowPreview({
     required this.preview,
     required this.name,
     required this.identifier,
     required this.lastOpen,
   });
 
-  factory ReportPreview.fromJson(Map<String, dynamic> json) {
-    return ReportPreview(
+  factory SlideshowPreview.fromJson(Map<String, dynamic> json) {
+    return SlideshowPreview(
       preview: json['preview'] as String,
       name: json['name'] as String,
       identifier: json['identifier'] as String,

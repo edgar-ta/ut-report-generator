@@ -25,6 +25,7 @@ import 'package:ut_report_generator/pages/home/report_editor/slide/slide_metadat
 import 'package:ut_report_generator/pages/home/report_editor/slide/tabbed_menu.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 import 'package:ut_report_generator/api/report/self.dart' as report_api;
+import 'package:ut_report_generator/utils/future_status.dart';
 
 class LoadedSlideshowEditor extends StatefulWidget {
   Slideshow initialSlideshow;
@@ -150,7 +151,7 @@ class _LoadedSlideshowEditorState extends State<LoadedSlideshowEditor>
               _exports[index] = callback();
             });
           },
-          status: ExportBoxEntryStatus.pending,
+          status: FutureStatus.pending,
         ),
       );
     });
@@ -176,7 +177,7 @@ class _LoadedSlideshowEditorState extends State<LoadedSlideshowEditor>
               _exports[index] = callback();
             });
           },
-          status: ExportBoxEntryStatus.pending,
+          status: FutureStatus.pending,
         ),
       );
     });

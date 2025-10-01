@@ -2,71 +2,45 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:relative_time/relative_time.dart';
-import 'package:ut_report_generator/api/report/get_report.dart';
-import 'package:ut_report_generator/api/report/get_recent_reports.dart';
-import 'package:ut_report_generator/models/response/recent_reports_response.dart';
+import 'package:ut_report_generator/api/report/get_slideshow.dart';
+import 'package:ut_report_generator/api/report/get_recent_slideshows.dart';
+import 'package:ut_report_generator/components/recent_slideshows/state.dart';
+import 'package:ut_report_generator/models/response/recent_slideshows_response.dart';
 import 'package:ut_report_generator/models/response/report_preview.dart';
-import 'package:ut_report_generator/pages/home/recent_reports/report_preview_card.dart';
-import 'package:ut_report_generator/pages/home/recent_reports/report_card_skeleton.dart';
+import 'package:ut_report_generator/components/recent_slideshows/slideshow_preview_card.dart';
+import 'package:ut_report_generator/components/recent_slideshows/slideshow_preview_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
+import 'package:ut_report_generator/utils/future_status.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 
-class RecentReports extends StatefulWidget {
-  const RecentReports({super.key});
+class RecentSlideshows extends StatefulWidget {
+  RecentSlideshowsState state;
+  void Function(SlideshowPreview) openPreview;
+  Future<void> Function() retry;
+
+  RecentSlideshows({
+    super.key,
+    required this.state,
+    required this.openPreview,
+    required this.retry,
+  });
 
   @override
-  State<RecentReports> createState() => _RecentReportsState();
+  State<RecentSlideshows> createState() => _RecentSlideshowsState();
 }
 
-class _RecentReportsState extends State<RecentReports> {
-  RecentReportsResponse? response;
-  Object? exception;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchRecentReports();
-  }
-
-  Future<void> _fetchRecentReports() async {
-    setState(() {
-      response = null;
-      exception = null;
-    });
-
-    return await waitAtLeast(
-      Duration(seconds: 10),
-      recentReports(identifier: null)
-          .then((value) {
-            setState(() {
-              response = value;
-              exception = null;
-            });
-          })
-          .catchError((error) {
-            setState(() {
-              response = null;
-              exception = error;
-            });
-          }),
-    );
-  }
-
+class _RecentSlideshowsState extends State<RecentSlideshows> {
   @override
   Widget build(BuildContext context) {
-    var isError = exception != null;
-    var isSuccess = response != null;
-    var isLoading = exception == null && response == null;
-
     return Container(
       padding: const EdgeInsets.all(16.0),
       color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: SizedBox(
         height: SLIDESHOW_PREVIEW_HEIGHT + 50,
         child:
-            isError
-                ? _errorState()
+            widget.state.status == FutureStatus.error
+                ? _errorState(widget.retry)
                 : Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -79,32 +53,35 @@ class _RecentReportsState extends State<RecentReports> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    (SizedBox(
+                    SizedBox(
                       height: SLIDESHOW_PREVIEW_HEIGHT,
                       child: Stack(
                         children: [
-                          _reportPreviewSkeletons(isLoading),
-                          isSuccess && response!.reports.isNotEmpty
-                              ? _reportPreviews(isSuccess, response!, (
-                                callback,
-                              ) {
-                                setState(() {
-                                  response = callback(response!);
-                                });
-                              })
-                              : EmptyReportsPlaceholder(),
+                          _loadingState(
+                            widget.state.status == FutureStatus.pending ? 1 : 0,
+                          ),
+                          if (widget.state.response != null)
+                            widget.state.response!.reports.isNotEmpty
+                                ? _successState(
+                                  widget.state.status == FutureStatus.success
+                                      ? 1
+                                      : 0,
+                                  widget.state.response!,
+                                  widget.openPreview,
+                                )
+                                : EmptyReportsPlaceholder(),
                         ],
                       ),
-                    )),
+                    ),
                   ],
                 ),
       ),
     );
   }
 
-  _reportPreviewSkeletons(bool isLoading) {
+  _loadingState(double opacity) {
     return AnimatedOpacity(
-      opacity: isLoading ? 1 : 0,
+      opacity: opacity,
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeOut,
       child: IgnorePointer(
@@ -113,21 +90,20 @@ class _RecentReportsState extends State<RecentReports> {
           scrollDirection: Axis.horizontal,
           clipBehavior: Clip.none,
           itemCount: 3,
-          itemBuilder: (context, index) => const ReportCardSkeleton(),
+          itemBuilder: (context, index) => const SlideshowPreviewSkeleton(),
           separatorBuilder: (_, __) => const SizedBox(width: 16),
         ),
       ),
     );
   }
 
-  _reportPreviews(
-    bool isSuccess,
-    RecentReportsResponse response,
-    void Function(RecentReportsResponse Function(RecentReportsResponse))
-    setResponse,
+  _successState(
+    double opacity,
+    RecentSlideshowsResponse response,
+    void Function(SlideshowPreview) openPreview,
   ) {
     return AnimatedOpacity(
-      opacity: isSuccess ? 1 : 0,
+      opacity: opacity,
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeOut,
       child: ScrollConfiguration(
@@ -141,23 +117,13 @@ class _RecentReportsState extends State<RecentReports> {
           clipBehavior: Clip.none,
           itemBuilder: (context, index) {
             final report = response.reports[index];
-            return ReportPreviewCard(
+            return SlideshowPreviewCard(
               key: ValueKey(report.identifier),
               name: report.name,
               preview: report.preview,
               lastOpen: report.lastOpen.relativeTimeLocale(Locale('es', 'MX')),
               onTap: () {
-                if (!mounted) return;
-                setResponse((response) {
-                  final report = response.reports.removeAt(index);
-                  report.lastOpen = DateTime.now();
-                  response.reports.insert(0, report);
-                  return response;
-                });
-                context.go(
-                  "/home/report-editor",
-                  extra: () => getReport(identifier: report.identifier),
-                );
+                openPreview(report);
               },
             );
           },
@@ -167,13 +133,13 @@ class _RecentReportsState extends State<RecentReports> {
     );
   }
 
-  _errorState() {
+  _errorState(Future<void> Function() retry) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text("No se pudieron obtener los reportes recientes"),
         Text("(×_×)"),
-        TextButton(onPressed: _fetchRecentReports, child: Text("Reintentar")),
+        TextButton(onPressed: retry, child: Text("Reintentar")),
       ],
     );
   }

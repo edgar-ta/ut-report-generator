@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 
-class ReportPreviewCard extends StatefulWidget {
+class SlideshowPreviewCard extends StatefulWidget {
   final String name;
   final String preview;
   final VoidCallback? onTap;
   final String lastOpen;
 
-  const ReportPreviewCard({
+  const SlideshowPreviewCard({
     super.key,
     required this.name,
     required this.preview,
@@ -19,10 +19,10 @@ class ReportPreviewCard extends StatefulWidget {
   });
 
   @override
-  State<ReportPreviewCard> createState() => _ReportPreviewCardState();
+  State<SlideshowPreviewCard> createState() => _SlideshowPreviewCardState();
 }
 
-class _ReportPreviewCardState extends State<ReportPreviewCard> {
+class _SlideshowPreviewCardState extends State<SlideshowPreviewCard> {
   bool _isHovered = false;
 
   @override

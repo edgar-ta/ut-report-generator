@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 
-class ReportCardSkeleton extends StatefulWidget {
-  const ReportCardSkeleton({super.key});
+class SlideshowPreviewSkeleton extends StatefulWidget {
+  const SlideshowPreviewSkeleton({super.key});
 
   @override
-  State<ReportCardSkeleton> createState() => _ReportCardSkeletonState();
+  State<SlideshowPreviewSkeleton> createState() =>
+      _SlideshowPreviewSkeletonState();
 }
 
-class _ReportCardSkeletonState extends State<ReportCardSkeleton>
+class _SlideshowPreviewSkeletonState extends State<SlideshowPreviewSkeleton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _shimmerPosition;

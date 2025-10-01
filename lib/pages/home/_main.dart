@@ -9,15 +9,22 @@ import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/api/report/import_report.dart';
 import 'package:ut_report_generator/api/report/start_report_with_image_slide.dart';
 import 'package:ut_report_generator/api/report/start_report_with_pivot_table.dart';
+import 'package:ut_report_generator/components/recent_slideshows/slideshow_preview_card.dart';
+import 'package:ut_report_generator/components/recent_slideshows/state.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
 import 'package:ut_report_generator/main_app/route_observer.dart';
-import 'package:ut_report_generator/pages/home/file_picker_button2.dart';
-import 'package:ut_report_generator/pages/home/recent_reports/widget.dart';
+import 'package:ut_report_generator/components/file_picker_button2.dart';
+import 'package:ut_report_generator/components/recent_slideshows/widget.dart';
 import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
 import 'package:provider/provider.dart';
+import 'package:ut_report_generator/models/response/report_preview.dart';
+import 'package:ut_report_generator/models/slideshow_editor_request.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
+import 'package:ut_report_generator/utils/future_status.dart';
+import 'package:ut_report_generator/api/report/self.dart' as slideshow_api;
+import 'package:ut_report_generator/utils/wait_at_least.dart';
 
 Future<Slideshow> _createNewVisualization(List<File> files) async {
   return startReport_withPivotTable(
@@ -56,10 +63,62 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with RouteAware {
+class _HomePageState extends State<HomePage> {
   PossibleOption selectedValue = PossibleOption.createNewVisualization;
+  final RecentSlideshowsState _recentSlideshowsState = RecentSlideshowsState(
+    status: FutureStatus.pending,
+    response: null,
+  );
 
-  Future<void> _openReportEditor(PossibleOption possibleOption) async {
+  Future<void> _loadRecentSlideshows() async {
+    await waitAtLeast(
+      Duration(seconds: 5),
+      slideshow_api
+          .getRecentSlideshows(identifier: null)
+          .then((value) {
+            setState(() {
+              _recentSlideshowsState.response = value;
+              _recentSlideshowsState.status = FutureStatus.success;
+            });
+          })
+          .catchError((error) {
+            setState(() {
+              _recentSlideshowsState.response = null;
+              _recentSlideshowsState.status = FutureStatus.error;
+            });
+          }),
+    );
+  }
+
+  Future<void> _retryToLoadRecentSlideshows() async {
+    setState(() {
+      _recentSlideshowsState.response = null;
+      _recentSlideshowsState.status = FutureStatus.pending;
+    });
+    await _loadRecentSlideshows();
+  }
+
+  Future<void> _openSlideshowPreview(SlideshowPreview preview) async {
+    if (!mounted) return;
+    setState(() {
+      _recentSlideshowsState.response!.reports.removeWhere(
+        (innerPreview) => innerPreview.identifier == preview.identifier,
+      );
+      _recentSlideshowsState.response!.reports.insert(
+        0,
+        preview..lastOpen = DateTime.now(),
+      );
+    });
+    _openSlideshowEditor(
+      SlideshowEditorRequest(
+        startCallback:
+            () => slideshow_api.getSlideshow(identifier: preview.identifier),
+        callbackWhenReturning: _loadRecentSlideshows,
+      ),
+    );
+  }
+
+  Future<void> _startSlideshowWizard(PossibleOption possibleOption) async {
     if (possibleOption == PossibleOption.createNewReport) {
       if (!mounted) return;
       context.go(
@@ -86,32 +145,28 @@ class _HomePageState extends State<HomePage> with RouteAware {
     if (result != null) {
       var files = result.files.map((file) => File(file.path!)).toList();
       if (!mounted) return;
-      context.go("/home/report-editor", extra: () => callback(files));
+      _openSlideshowEditor(
+        SlideshowEditorRequest(
+          startCallback: () => callback(files),
+          callbackWhenReturning: _loadRecentSlideshows,
+        ),
+      );
     }
   }
 
-  bool _subscribed = false;
+  Future<void> _openSlideshowEditor(SlideshowEditorRequest request) async {
+    await context.push("/home/report-editor", extra: request);
+  }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_subscribed) {
-      routeObserver.subscribe(this, ModalRoute.of(context)!);
-      _subscribed = true;
-    }
+  void initState() {
+    super.initState();
+    _loadRecentSlideshows();
   }
 
   @override
   void dispose() {
-    routeObserver.unsubscribe(this);
     super.dispose();
-  }
-
-  @override
-  void didPopNext() {
-    context.read<ScaffoldController>()
-      ..setFabBuilder(null)
-      ..setAppBarBuilder(null);
   }
 
   @override
@@ -161,7 +216,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
                               ),
                             ),
                         onTriggerPressed:
-                            (value) async => _openReportEditor(value),
+                            (value) async => _startSlideshowWizard(value),
                         triggerBuilder:
                             (option) => SizedBox(
                               width: 130,
@@ -171,13 +226,17 @@ class _HomePageState extends State<HomePage> with RouteAware {
                           setState(() {
                             selectedValue = value;
                           });
-                          _openReportEditor(value);
+                          _startSlideshowWizard(value);
                         },
                       ),
                     ],
                   ),
                 ),
-                RecentReports(),
+                RecentSlideshows(
+                  state: _recentSlideshowsState,
+                  retry: _retryToLoadRecentSlideshows,
+                  openPreview: _openSlideshowPreview,
+                ),
               ],
             ),
           ),

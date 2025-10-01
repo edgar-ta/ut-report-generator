@@ -6,6 +6,7 @@ import 'package:path/path.dart' as path;
 import 'package:ut_report_generator/components/export_box/entry.dart';
 import 'package:ut_report_generator/models/response/file_response.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
+import 'package:ut_report_generator/utils/future_status.dart';
 
 class ExportBox extends StatefulWidget {
   ExportBoxEntry entry;
@@ -72,11 +73,11 @@ class _ExportBoxState extends State<ExportBox> {
       child: Builder(
         builder: (context) {
           switch (widget.entry.status) {
-            case ExportBoxEntryStatus.pending:
+            case FutureStatus.pending:
               return _loadingState();
-            case ExportBoxEntryStatus.success:
+            case FutureStatus.success:
               return _successState(widget.entry.response!);
-            case ExportBoxEntryStatus.error:
+            case FutureStatus.error:
               return _errorState();
           }
         },
