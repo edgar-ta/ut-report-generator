@@ -27,10 +27,7 @@ class _AppScaffoldState extends State<AppScaffold> {
       floatingActionButtonLocation: ExpandableFab.location,
       floatingActionButton:
           fabBuilder != null ? fabBuilder(context) : SizedBox.shrink(),
-      appBar:
-          appBarBuilder != null
-              ? appBarBuilder(context)
-              : commonAppbar()(context),
+      appBar: appBarBuilder != null ? appBarBuilder(context) : CommonAppbar(),
       body: Column(
         children: [
           Expanded(

@@ -5,7 +5,7 @@ import 'package:ut_report_generator/components/app_scaffold.dart';
 import 'package:ut_report_generator/models/slideshow_editor_request.dart';
 import 'package:ut_report_generator/pages/bug_report/_main.dart';
 import 'package:ut_report_generator/pages/home/_main.dart';
-import 'package:ut_report_generator/pages/home/report_editor/_main.dart';
+import 'package:ut_report_generator/pages/home/slideshow_editor/_main.dart';
 import 'package:ut_report_generator/main_app/route_observer.dart';
 import 'package:ut_report_generator/pages/profile/_main.dart';
 import 'package:ut_report_generator/testing_components/testing_component.dart';
@@ -41,8 +41,8 @@ final router = GoRouter(
                   path: 'report-editor',
                   builder: (context, state) {
                     final extra = state.extra as SlideshowEditorRequest;
-                    return ReportEditor(
-                      reportCallback: extra.startCallback,
+                    return SlideshowEditor(
+                      slideshowCallback: extra.startCallback,
                       callbackWhenReturning: extra.callbackWhenReturning,
                     );
                   },

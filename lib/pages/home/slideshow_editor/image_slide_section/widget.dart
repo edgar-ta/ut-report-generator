@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
-import 'package:ut_report_generator/pages/home/report_editor/slide/slide_frame.dart';
-import 'package:ut_report_generator/pages/home/report_editor/slide/tabbed_menu.dart';
+import 'package:ut_report_generator/pages/home/slideshow_editor/slide/slide_frame.dart';
+import 'package:ut_report_generator/pages/home/slideshow_editor/slide/tabbed_menu.dart';
 
 class ImageSlideSection extends StatefulWidget {
   final ImageSlide initialSlide;
