@@ -5,7 +5,7 @@ import 'package:ut_report_generator/api/image_slide/self.dart' as image_slide;
 
 class ImageSlideBloc extends SlideBloc<ImageSlide> {
   ImageSlideBloc({
-    required super.report,
+    required super.slideshow,
     required super.initialSlide,
     required super.setSlide,
   });
@@ -30,7 +30,7 @@ class ImageSlideBloc extends SlideBloc<ImageSlide> {
     );
     await image_slide
         .editSlide(
-          report: report,
+          slideshow: slideshow,
           imageSlide: initialSlide.identifier,
           parameterName: parameterName,
           parameterValue: parameterValue,

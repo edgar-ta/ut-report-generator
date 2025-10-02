@@ -2,12 +2,12 @@ import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/api/slide/self.dart' as slide_api;
 
 class SlideBloc<T extends Slide> {
-  String report;
+  String slideshow;
   T initialSlide;
   void Function(T Function(T)) setSlide;
 
   SlideBloc({
-    required this.report,
+    required this.slideshow,
     required this.initialSlide,
     required this.setSlide,
   });
@@ -16,7 +16,7 @@ class SlideBloc<T extends Slide> {
     setSlide((slide) => slide..title = title);
 
     slide_api.renameSlide(
-      report: report,
+      report: slideshow,
       slide: initialSlide.identifier,
       title: title,
     );

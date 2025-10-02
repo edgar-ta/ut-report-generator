@@ -7,9 +7,8 @@ import 'package:ut_report_generator/utils/future_status.dart';
 
 class SlideshowEditorState {
   final ScrollController scrollController;
-  final GlobalKey<ExpandableFabState> fabKey;
   /* this has to be lifted */
-  int openSlideMenuIndex;
+  final Slide? openSlide;
 
   /* this has to be lifted */
   final OverlayPortalController portalController;
@@ -22,24 +21,51 @@ class SlideshowEditorState {
   /* this has to be lifted */
   final GlobalKey<AnimatedListState> exportsListKey;
   /* this has to be lifted */
-  List<Slide> visibleSlides;
+  final List<Slide> visibleSlides;
   /* this has to be lifted */
   final GlobalKey<AnimatedListState> visibleSlidesListKey;
   /* this has to be lifted */
-  Slideshow? slideshow;
-  FutureStatus status;
+  final Slideshow? slideshow;
+  final FutureStatus status;
 
   SlideshowEditorState({
     required this.scrollController,
-    required this.fabKey,
-    required this.openSlideMenuIndex,
+    required this.openSlide,
     required this.portalController,
     required this.portalAnimationController,
     required this.exports,
     required this.exportsListKey,
     required this.visibleSlides,
     required this.visibleSlidesListKey,
-    this.slideshow,
+    required this.slideshow,
     required this.status,
   });
+
+  SlideshowEditorState copyWith({
+    ScrollController? scrollController,
+    GlobalKey<ExpandableFabState>? fabKey,
+    Slide? openSlide,
+    OverlayPortalController? portalController,
+    AnimationController? portalAnimationController,
+    List<ExportBoxEntry>? exports,
+    GlobalKey<AnimatedListState>? exportsListKey,
+    List<Slide>? visibleSlides,
+    GlobalKey<AnimatedListState>? visibleSlidesListKey,
+    Slideshow? slideshow,
+    FutureStatus? status,
+  }) {
+    return SlideshowEditorState(
+      scrollController: scrollController ?? this.scrollController,
+      openSlide: openSlide ?? this.openSlide,
+      portalController: portalController ?? this.portalController,
+      portalAnimationController:
+          portalAnimationController ?? this.portalAnimationController,
+      exports: exports ?? this.exports,
+      exportsListKey: exportsListKey ?? this.exportsListKey,
+      visibleSlides: visibleSlides ?? this.visibleSlides,
+      visibleSlidesListKey: visibleSlidesListKey ?? this.visibleSlidesListKey,
+      slideshow: slideshow ?? this.slideshow,
+      status: status ?? this.status,
+    );
+  }
 }

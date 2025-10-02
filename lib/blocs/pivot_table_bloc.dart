@@ -15,7 +15,7 @@ import 'package:ut_report_generator/utils/copy_without.dart';
 
 class PivotTableBloc extends SlideBloc<PivotTable> {
   PivotTableBloc({
-    required super.report,
+    required super.slideshow,
     required super.initialSlide,
     required super.setSlide,
   });
@@ -43,7 +43,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
 
     await pivot_table
         .removeFile(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           fileName: file,
         )
@@ -66,7 +66,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
 
     await pivot_table
         .addFile(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           fileName: file,
         )
@@ -88,7 +88,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
 
     await filter_api
         .addOptionToFilter(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           filter: filterIndex,
           option: option,
@@ -118,7 +118,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
 
     await filter_api
         .removeOptionFromFilter(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           filter: filterIndex,
           option: option,
@@ -139,7 +139,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
 
     await filter_api
         .switchOptionInFilter(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           filter: filterIndex,
           option: option,
@@ -180,7 +180,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
     await callback()
         .then(
           (_) => filter_api.deleteFilter(
-            report: this.report,
+            report: this.slideshow,
             pivotTable: this.initialSlide.identifier,
             filter: filterIndex,
           ),
@@ -200,7 +200,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
     });
 
     await pivot_table.reorderFilter(
-      report: this.report,
+      report: this.slideshow,
       pivotTable: this.initialSlide.identifier,
       oldIndex: oldIndex,
       newIndex: newIndex,
@@ -232,7 +232,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
     // @todo Also, create an API for this
     await filter_api
         .toggleSelectionMode(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           filter: filterIndex,
         )
@@ -272,7 +272,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
 
     pivot_table
         .setCharts(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           chart: superChartIndex,
           superChart: chartIndex,
@@ -304,7 +304,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
 
     await pivot_table
         .setCharts(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           chart: filterIndex,
         )
@@ -332,7 +332,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
 
     await pivot_table
         .setCharts(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           superChart: filterIndex,
         )
@@ -357,7 +357,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
 
     await pivot_table
         .setCharts(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           superChart: -1,
         )
@@ -385,7 +385,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
     );
     filter_api
         .createDataFilter(
-          report: this.report,
+          report: this.slideshow,
           pivotTable: this.initialSlide.identifier,
           level: level,
         )

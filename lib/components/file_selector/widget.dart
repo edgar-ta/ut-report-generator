@@ -2,7 +2,7 @@ import 'package:easy_sticky_header/easy_sticky_header.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/components/file_selector/file_entry.dart';
-import 'package:ut_report_generator/components/shaky-error-text/widget.dart';
+import 'package:ut_report_generator/components/shaky_error_text/widget.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
 import 'package:ut_report_generator/utils/copy_without.dart';
 
@@ -191,9 +191,7 @@ class _FileSelectorState extends State<FileSelector> {
               onPressed: () async {
                 var result = await FilePicker.platform.pickFiles(
                   allowMultiple: true,
-                  allowedExtensions: [
-                    ".xls",
-                  ],
+                  allowedExtensions: [".xls"],
                 );
                 if (result != null) {
                   var files = result.files.map((file) => file.path!).toList();

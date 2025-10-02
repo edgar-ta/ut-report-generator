@@ -2,15 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:relative_time/relative_time.dart';
-import 'package:ut_report_generator/blocs/report_bloc.dart';
+import 'package:ut_report_generator/blocs/slideshow_editor_bloc.dart';
 import 'package:ut_report_generator/components/invisible_text_field.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/models/report/visualization_mode.dart';
 
 class SlideshowHeader extends StatefulWidget {
-  const SlideshowHeader({super.key, required this.report, required this.bloc});
+  const SlideshowHeader({
+    super.key,
+    required this.slideshow,
+    required this.bloc,
+  });
 
-  final Slideshow report;
+  final Slideshow slideshow;
   final SlideshowEditorBloc bloc;
 
   @override
@@ -24,7 +28,7 @@ class _SlideshowHeaderState extends State<SlideshowHeader> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.report.reportName);
+    _controller = TextEditingController(text: widget.slideshow.reportName);
   }
 
   void _onReportNameChanged(String text) {
@@ -50,7 +54,7 @@ class _SlideshowHeaderState extends State<SlideshowHeader> {
         spacing: 16,
         children: [
           Text(
-            "Creado ${widget.report.creationDate.relativeTimeLocale(Locale("es", "MX"))}",
+            "Creado ${widget.slideshow.creationDate.relativeTimeLocale(Locale("es", "MX"))}",
           ),
           InvisibleTextField(
             controller: _controller,
@@ -72,7 +76,7 @@ class _SlideshowHeaderState extends State<SlideshowHeader> {
                 icon: Icon(Icons.bar_chart),
               ),
             ],
-            selected: {widget.report.visualizationMode},
+            selected: {widget.slideshow.visualizationMode},
           ),
         ],
       ),

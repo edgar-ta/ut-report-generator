@@ -7,13 +7,14 @@ import 'package:provider/provider.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:ut_report_generator/components/empty_slideshow_placeholder.dart';
 import 'package:ut_report_generator/components/export_box/entry.dart';
+import 'package:ut_report_generator/components/slideshow_editor_fab/widget.dart';
 import 'package:ut_report_generator/components/slideshow_editor_menu.dart';
 import 'package:ut_report_generator/components/slideshow_header.dart';
 import 'package:ut_report_generator/models/response/file_response.dart';
 import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
 import 'package:ut_report_generator/blocs/image_slide_bloc.dart';
 import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
-import 'package:ut_report_generator/blocs/report_bloc.dart';
+import 'package:ut_report_generator/blocs/slideshow_editor_bloc.dart';
 import 'package:ut_report_generator/components/file_selector/widget.dart';
 import 'package:ut_report_generator/components/invisible_text_field.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
@@ -28,6 +29,7 @@ import 'package:ut_report_generator/components/input_component.dart';
 import 'package:ut_report_generator/models/report/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/components/export_box/widget.dart';
+import 'package:ut_report_generator/models/slide_category.dart';
 import 'package:ut_report_generator/pages/home/slideshow_editor/image_slide_section/image_slide_edit_pane.dart';
 import 'package:ut_report_generator/pages/home/slideshow_editor/image_slide_section/widget.dart';
 import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/widget.dart';
@@ -71,8 +73,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
     super.initState();
     state = SlideshowEditorState(
       scrollController: ScrollController(),
-      fabKey: GlobalKey<ExpandableFabState>(),
-      openSlideMenuIndex: -1,
+      openSlide: null,
       portalController: OverlayPortalController(),
       portalAnimationController: AnimationController(
         duration: Duration(milliseconds: 500),
@@ -111,7 +112,6 @@ class _SlideshowEditorState extends State<SlideshowEditor>
   }
 
   void _addPivotTableDialog(SlideshowEditorBloc bloc) {
-    state.fabKey.currentState?.close();
     showDialog(
       context: context,
       builder: (context) {
@@ -137,16 +137,18 @@ class _SlideshowEditorState extends State<SlideshowEditor>
         .slideshowCallback()
         .then((report) {
           setState(() {
-            state.status = FutureStatus.success;
-            state.slideshow = report;
-            state.visibleSlides =
-                state.slideshow!.slides.where((slide) {
-                  if (state.slideshow!.visualizationMode ==
-                      VisualizationMode.asReport) {
-                    return true;
-                  }
-                  return slide is PivotTable;
-                }).toList();
+            state = state.copyWith(
+              status: FutureStatus.success,
+              slideshow: report,
+              visibleSlides:
+                  report.slides.where((slide) {
+                    if (report.visualizationMode ==
+                        VisualizationMode.asReport) {
+                      return true;
+                    }
+                    return slide is PivotTable;
+                  }).toList(),
+            );
           });
           context.read<ScaffoldController>()
             ..setFabBuilder(_slideshowEditorFab)
@@ -154,7 +156,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
         })
         .catchError((_) {
           setState(() {
-            state.status = FutureStatus.error;
+            state = state.copyWith(status: FutureStatus.error);
           });
         });
   }
@@ -185,7 +187,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
     });
   }
 
-  void _exportReport() {
+  void _exportSlideshow() {
     setState(() {
       final identifier = DateTime.now().toIso8601String();
       state.exportsListKey.currentState!.insertItem(state.exports.length);
@@ -209,84 +211,31 @@ class _SlideshowEditorState extends State<SlideshowEditor>
     });
   }
 
-  void _openSlideMenu(int index) {
-    if (state.openSlideMenuIndex == -1) {
-      state.portalController.show();
-      state.portalAnimationController.forward();
-    }
+  void _openSlideMenu(Slide slide) {
+    print("Opening the slide menu");
+    // if (state.openSlide == null) {
+    state.portalController.show();
+    state.portalAnimationController.forward();
+    // }
     setState(() {
-      state.openSlideMenuIndex = index;
+      state = state.copyWith(openSlide: slide);
     });
   }
 
   void _closeSlideMenu() {
     state.portalAnimationController.reverse();
     state.portalController.hide();
-
     setState(() {
-      state.openSlideMenuIndex = -1;
+      state = state.copyWith(openSlide: null);
     });
   }
 
   Widget _slideshowEditorFab(BuildContext context) {
-    return ExpandableFab(
-      key: state.fabKey,
-      openButtonBuilder: RotateFloatingActionButtonBuilder(
-        fabSize: ExpandableFabSize.regular,
-        child: const Text(
-          "Añadir",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.yellow,
-        foregroundColor: Colors.black,
-        shape: const CircleBorder(),
-      ),
-      type: ExpandableFabType.up,
-      distance: 80, // distancia de los botones hijos al FAB principal
-      overlayStyle: ExpandableFabOverlayStyle(
-        color: Colors.black.withOpacity(0.2), // fondo semitransparente
-      ),
-      childrenAnimation: ExpandableFabAnimation.none,
-      children: [
-        FloatingActionButton.small(
-          heroTag: "add_pivot_table",
-          onPressed: () {
-            final bloc = SlideshowEditorBloc(
-              initialReport: state.slideshow!,
-              setReport: (callback) {
-                state.slideshow = callback(state.slideshow!);
-              },
-            );
-            _addPivotTableDialog(bloc);
-          },
-          tooltip: "Tabla dinámica",
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.bar_chart),
-              SizedBox(height: 2),
-              Text("Tabla", style: TextStyle(fontSize: 10)),
-            ],
-          ),
-        ),
-
-        // Botón para añadir Imagen
-        FloatingActionButton.small(
-          heroTag: "add_image",
-          onPressed: () async {
-            //
-          },
-          tooltip: "Imagen",
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.image),
-              SizedBox(height: 2),
-              Text("Imagen", style: TextStyle(fontSize: 10)),
-            ],
-          ),
-        ),
-      ],
+    return SlideshowEditorFab(
+      addPivotTable: () async {
+        // _addPivotTableDialog(bloc);
+      },
+      addImageSlide: () async {},
     );
   }
 
@@ -301,7 +250,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
               _compileReport();
             }
             if (value == "zip") {
-              _exportReport();
+              _exportSlideshow();
             }
           },
           itemBuilder:
@@ -363,28 +312,50 @@ class _SlideshowEditorState extends State<SlideshowEditor>
 
   Widget _successState() {
     final reportBloc = SlideshowEditorBloc(
-      initialReport: state.slideshow!,
-      setReport: (callback) {
+      initialState: state,
+      setState: (callback) {
         setState(() {
-          state.slideshow = callback(state.slideshow!);
+          state = callback(state);
+          // state = state.copyWith(slideshow: callback(state.slideshow!));
         });
       },
     );
 
+    outterSetSlide<T extends Slide>(T slide, T Function(T) callback) {
+      setState(() {
+        state = state.copyWith(
+          slideshow: state.slideshow!.copyWith(
+            slides:
+                state.slideshow!.slides.map((innerSlide) {
+                  if (innerSlide.identifier == slide.identifier) {
+                    return callback(slide);
+                  }
+                  return innerSlide;
+                }).toList(),
+          ),
+        );
+      });
+    }
+
     return SlideshowEditorMenu(
+      slide: state.openSlide,
       portalController: state.portalController,
       animationController: state.portalAnimationController,
       imageSlideBlocBuilder:
           (imageSlide) => ImageSlideBloc(
-            report: report,
-            initialSlide: initialSlide,
-            setSlide: setSlide,
+            slideshow: state.slideshow!.identifier,
+            initialSlide: imageSlide,
+            setSlide: (callback) {
+              outterSetSlide(imageSlide, callback);
+            },
           ),
       pivotTableBlocBuilder:
           (pivotTable) => PivotTableBloc(
-            report: report,
-            initialSlide: initialSlide,
-            setSlide: setSlide,
+            slideshow: state.slideshow!.identifier,
+            initialSlide: pivotTable,
+            setSlide: (callback) {
+              outterSetSlide(pivotTable, callback);
+            },
           ),
       closeSlideMenu: _closeSlideMenu,
       child: _buildReportContent(reportBloc),
@@ -398,7 +369,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
           controller: state.scrollController,
           child: Column(
             children: [
-              SlideshowHeader(report: state.slideshow!, bloc: bloc),
+              SlideshowHeader(slideshow: state.slideshow!, bloc: bloc),
               if (state.visibleSlides.isEmpty)
                 EmptySlideshowPlaceholder(
                   onCreatePressed: () {
@@ -407,13 +378,14 @@ class _SlideshowEditorState extends State<SlideshowEditor>
                 ),
               if (state.visibleSlides.isNotEmpty)
                 AnimatedList(
+                  key: state.visibleSlidesListKey,
                   shrinkWrap: true,
                   itemBuilder: (context, index, animation) {
                     final slide = state.visibleSlides[index];
                     if (slide is PivotTable) {
                       return SlideFrame(
-                        isMenuOpen: state.openSlideMenuIndex == index,
-                        openMenu: () => _openSlideMenu(index),
+                        isMenuOpen: state.openSlide != null,
+                        openMenu: () => _openSlideMenu(slide),
                         child: PivotTableSection(
                           data: slide.data,
                           chartName: slide.title,
@@ -422,8 +394,8 @@ class _SlideshowEditorState extends State<SlideshowEditor>
                     }
                     if (slide is ImageSlide) {
                       return SlideFrame(
-                        isMenuOpen: state.openSlideMenuIndex == index,
-                        openMenu: () => _openSlideMenu(index),
+                        isMenuOpen: state.openSlide != null,
+                        openMenu: () => _openSlideMenu(slide),
                         child: ImageSlideSection(initialSlide: slide),
                       );
                     }
