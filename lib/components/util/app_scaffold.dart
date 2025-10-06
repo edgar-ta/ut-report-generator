@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:ut_report_generator/components/common_appbar.dart';
-import 'package:ut_report_generator/components/footer_component.dart';
-import 'package:ut_report_generator/components/header_component.dart';
+import 'package:ut_report_generator/components/util/common_appbar.dart';
+import 'package:ut_report_generator/components/util/footer_component.dart';
+import 'package:ut_report_generator/components/util/header_component.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 

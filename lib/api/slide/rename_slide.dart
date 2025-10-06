@@ -1,5 +1,5 @@
 import 'package:ut_report_generator/api/send_request.dart';
-import 'package:ut_report_generator/api/success_response.dart';
+import 'package:ut_report_generator/models/response/success_response.dart';
 
 Future<SuccessResponse> renameSlide({
   required String report,

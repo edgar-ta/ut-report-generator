@@ -1,20 +1,10 @@
 import 'package:ut_report_generator/api/send_request.dart';
+import 'package:ut_report_generator/models/response/hello_request_response.dart';
 
-Future<HelloRequest_Response> helloRequest() {
+Future<HelloRequestResponse> helloRequest() {
   return sendRequest(
     route: "hello",
     body: {"message": "Hello"},
-    callback: HelloRequest_Response.fromJson,
+    callback: HelloRequestResponse.fromJson,
   );
-}
-
-// ignore: camel_case_types
-class HelloRequest_Response {
-  String message;
-
-  HelloRequest_Response({required this.message});
-
-  static HelloRequest_Response fromJson(Map<String, dynamic> json) {
-    return HelloRequest_Response(message: json['message'] as String);
-  }
 }

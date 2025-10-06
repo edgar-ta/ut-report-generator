@@ -9,15 +9,14 @@ import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/api/report/import_report.dart';
 import 'package:ut_report_generator/api/report/start_report_with_image_slide.dart';
 import 'package:ut_report_generator/api/report/start_report_with_pivot_table.dart';
-import 'package:ut_report_generator/components/recent_slideshows/slideshow_preview_card.dart';
-import 'package:ut_report_generator/components/recent_slideshows/state.dart';
+import 'package:ut_report_generator/components/home/home_page_header/state.dart';
+import 'package:ut_report_generator/components/home/home_page_header/widget.dart';
+import 'package:ut_report_generator/components/home/recent_slideshows/slideshow_preview_card.dart';
+import 'package:ut_report_generator/components/home/recent_slideshows/state.dart';
 import 'package:ut_report_generator/models/report/self.dart';
-import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
-import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
 import 'package:ut_report_generator/main_app/route_observer.dart';
-import 'package:ut_report_generator/components/file_picker_button2.dart';
-import 'package:ut_report_generator/components/recent_slideshows/widget.dart';
-import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
+import 'package:ut_report_generator/components/home/file_picker_button2.dart';
+import 'package:ut_report_generator/components/home/recent_slideshows/widget.dart';
 import 'package:provider/provider.dart';
 import 'package:ut_report_generator/models/response/report_preview.dart';
 import 'package:ut_report_generator/models/slideshow_editor_request.dart';
@@ -69,12 +68,17 @@ class _HomePageState extends State<HomePage> {
     status: FutureStatus.pending,
     response: null,
   );
+  final HomePageHeaderState _homePageHeaderState = HomePageHeaderState(
+    status: FutureStatus.pending,
+    response: null,
+  );
 
   Future<void> _loadRecentSlideshows() async {
-    await waitAtLeast(
-      Duration(seconds: 5),
-      slideshow_api
-          .getRecentSlideshows(identifier: null)
+    await Future.wait([
+      waitAtLeast(
+            Duration(seconds: 1),
+            slideshow_api.getRecentSlideshows(identifier: null),
+          )
           .then((value) {
             setState(() {
               _recentSlideshowsState.response = value;
@@ -87,7 +91,20 @@ class _HomePageState extends State<HomePage> {
               _recentSlideshowsState.status = FutureStatus.error;
             });
           }),
-    );
+      waitAtLeast(Duration(seconds: 1), helloRequest())
+          .then((value) {
+            setState(() {
+              _homePageHeaderState.response = value;
+              _homePageHeaderState.status = FutureStatus.success;
+            });
+          })
+          .catchError((error) {
+            setState(() {
+              _homePageHeaderState.response = null;
+              _homePageHeaderState.status = FutureStatus.error;
+            });
+          }),
+    ]);
   }
 
   Future<void> _retryToLoadRecentSlideshows() async {
@@ -171,75 +188,52 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return FullscreenLoadingOverlay(
-      callback: helloRequest,
-      errorScreen: ErrorPage(),
-      loadingScreen: LoadingPage(
-        messages: [
-          "Conectando con el servidor",
-          "Abriendo la base de datos",
-          "Pensando",
-          "Preguntándole a ChatGPT",
-          "Calentando motores",
-        ],
-        title: "Conectando con el servidor",
-      ),
-      builder:
-          (helloRequestResponse) => Container(
-            color: Theme.of(context).colorScheme.surface,
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      child: Column(
+        children: [
+          Expanded(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 16,
               children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 16,
-                    children: [
-                      Text(
-                        helloRequestResponse.message,
-                        style: TextStyle(fontSize: 32),
+                HomePageHeader(state: _homePageHeaderState),
+                FilePickerButton2(
+                  values: PossibleOption.values,
+                  selectedValue: selectedValue,
+                  itemBuilder:
+                      (option, _) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        child: Row(
+                          spacing: 8,
+                          children: [option.icon, Text(option.displayName)],
+                        ),
                       ),
-                      FilePickerButton2(
-                        values: PossibleOption.values,
-                        selectedValue: selectedValue,
-                        itemBuilder:
-                            (option, _) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              child: Row(
-                                spacing: 8,
-                                children: [
-                                  option.icon,
-                                  Text(option.displayName),
-                                ],
-                              ),
-                            ),
-                        onTriggerPressed:
-                            (value) async => _startSlideshowWizard(value),
-                        triggerBuilder:
-                            (option) => SizedBox(
-                              width: 130,
-                              child: Text(option.displayName),
-                            ),
-                        onItemSelected: (value) async {
-                          setState(() {
-                            selectedValue = value;
-                          });
-                          _startSlideshowWizard(value);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                RecentSlideshows(
-                  state: _recentSlideshowsState,
-                  retry: _retryToLoadRecentSlideshows,
-                  openPreview: _openSlideshowPreview,
+                  onTriggerPressed:
+                      (value) async => _startSlideshowWizard(value),
+                  triggerBuilder:
+                      (option) =>
+                          SizedBox(width: 130, child: Text(option.displayName)),
+                  onItemSelected: (value) async {
+                    setState(() {
+                      selectedValue = value;
+                    });
+                    _startSlideshowWizard(value);
+                  },
                 ),
               ],
             ),
           ),
+          RecentSlideshows(
+            state: _recentSlideshowsState,
+            retry: _retryToLoadRecentSlideshows,
+            openPreview: _openSlideshowPreview,
+          ),
+        ],
+      ),
     );
   }
 }

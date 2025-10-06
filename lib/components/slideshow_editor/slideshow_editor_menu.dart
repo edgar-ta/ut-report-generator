@@ -14,22 +14,14 @@ import 'package:ut_report_generator/utils/design_constants.dart';
 class SlideshowEditorMenu extends StatefulWidget {
   SlideshowEditorMenu({
     super.key,
-    required this.child,
     this.slide,
-    required this.portalController,
-    required this.animationController,
     required this.imageSlideBlocBuilder,
     required this.pivotTableBlocBuilder,
-    required this.closeSlideMenu,
   });
 
-  Widget child;
   Slide? slide;
-  OverlayPortalController portalController;
-  AnimationController animationController;
   ImageSlideBloc Function(ImageSlide) imageSlideBlocBuilder;
   PivotTableBloc Function(PivotTable) pivotTableBlocBuilder;
-  void Function() closeSlideMenu;
 
   @override
   State<SlideshowEditorMenu> createState() => _SlideshowEditorMenuState();
@@ -38,71 +30,19 @@ class SlideshowEditorMenu extends StatefulWidget {
 class _SlideshowEditorMenuState extends State<SlideshowEditorMenu> {
   @override
   Widget build(BuildContext context) {
-    return OverlayPortal(
-      controller: widget.portalController,
-      overlayChildBuilder: (context) {
-        if (widget.slide == null) return const SizedBox();
-
-        final portalOpacityAnimation = Tween(
-          begin: 0.toDouble(),
-          end: 0.5,
-        ).animate(
-          CurvedAnimation(
-            parent: widget.animationController,
-            curve: Curves.easeInOut,
-          ),
-        );
-        final portalOffsetAnimation = Tween(
-          begin: -MENU_WIDTH,
-          end: 0.toDouble(),
-        ).animate(
-          CurvedAnimation(
-            parent: widget.animationController,
-            curve: Curves.easeInOut,
-          ),
-        );
-
-        return AnimatedBuilder(
-          animation: widget.animationController,
-          builder: (context, child) {
-            return Stack(
-              children: [
-                Positioned.fill(
-                  child: GestureDetector(
-                    onTap: widget.closeSlideMenu,
-                    child: Opacity(
-                      opacity: portalOpacityAnimation.value,
-                      child: Container(color: Colors.black54),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 0,
-                  bottom: 0,
-                  width: MENU_WIDTH,
-                  right: portalOffsetAnimation.value,
-                  child: child ?? SizedBox.shrink(),
-                ),
-              ],
-            );
-          },
-          child: Material(
-            elevation: 8,
-            child: Builder(
-              builder: (context) {
-                if (widget.slide is PivotTable) {
-                  return _pivotTableMenu(widget.slide as PivotTable);
-                }
-                if (widget.slide is ImageSlide) {
-                  return _imageSlideMenu(widget.slide as ImageSlide);
-                }
-                return const Text("Tipo de slide inválido");
-              },
-            ),
-          ),
-        );
-      },
-      child: widget.child,
+    return Material(
+      elevation: 8,
+      child: Builder(
+        builder: (context) {
+          if (widget.slide is PivotTable) {
+            return _pivotTableMenu(widget.slide as PivotTable);
+          }
+          if (widget.slide is ImageSlide) {
+            return _imageSlideMenu(widget.slide as ImageSlide);
+          }
+          return const Text("Tipo de slide inválido");
+        },
+      ),
     );
   }
 

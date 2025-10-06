@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
-import 'package:ut_report_generator/components/invisible_text_field.dart';
+import 'package:ut_report_generator/components/util/invisible_text_field.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';

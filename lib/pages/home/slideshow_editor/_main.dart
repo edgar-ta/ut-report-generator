@@ -1,54 +1,30 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:relative_time/relative_time.dart';
-import 'package:ut_report_generator/components/empty_slideshow_placeholder.dart';
-import 'package:ut_report_generator/components/export_box/entry.dart';
-import 'package:ut_report_generator/components/slideshow_editor_fab/widget.dart';
-import 'package:ut_report_generator/components/slideshow_editor_menu.dart';
-import 'package:ut_report_generator/components/slideshow_header.dart';
-import 'package:ut_report_generator/models/response/file_response.dart';
-import 'package:ut_report_generator/api/image_slide/edit_image_slide.dart';
+import 'package:ut_report_generator/components/slideshow_editor/app_subscaffold.dart';
+import 'package:ut_report_generator/components/slideshow_editor/empty_slideshow_placeholder.dart';
+import 'package:ut_report_generator/components/slideshow_editor/export_box/entry.dart';
+import 'package:ut_report_generator/components/slideshow_editor/export_box_list.dart';
+import 'package:ut_report_generator/components/slideshow_editor/slideshow_editor_fab/widget.dart';
+import 'package:ut_report_generator/components/slideshow_editor/slideshow_editor_menu.dart';
+import 'package:ut_report_generator/components/slideshow_editor/slideshow_header.dart';
 import 'package:ut_report_generator/blocs/image_slide_bloc.dart';
 import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
 import 'package:ut_report_generator/blocs/slideshow_editor_bloc.dart';
-import 'package:ut_report_generator/components/file_selector/widget.dart';
-import 'package:ut_report_generator/components/invisible_text_field.dart';
+import 'package:ut_report_generator/components/slideshow_editor/file_selector/widget.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report/self.dart';
-import 'package:ut_report_generator/models/image_slide/self.dart';
-import 'package:ut_report_generator/models/image_slide/image_slide_kind.dart';
-import 'package:ut_report_generator/components/common_appbar.dart';
-import 'package:ut_report_generator/components/fullscreen_loading_overlay/error_page.dart';
-import 'package:ut_report_generator/components/fullscreen_loading_overlay/loading_page.dart';
-import 'package:ut_report_generator/components/fullscreen_loading_overlay/widget.dart';
-import 'package:ut_report_generator/components/input_component.dart';
+import 'package:ut_report_generator/components/util/common_appbar.dart';
 import 'package:ut_report_generator/models/report/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
-import 'package:ut_report_generator/components/export_box/widget.dart';
-import 'package:ut_report_generator/models/slide_category.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/image_slide_section/image_slide_edit_pane.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/image_slide_section/widget.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/widget.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/pivot_table_edit_pane.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/pivot_metadata_pane.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/progress_alert_dialog.dart';
+import 'package:ut_report_generator/components/slideshow_editor/export_box/widget.dart';
 import 'package:ut_report_generator/pages/home/slideshow_editor/slide/shimmer_slide.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/slide/slide_frame.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/slide/slide_metadata_pane.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/slide/tabbed_menu.dart';
 import 'package:ut_report_generator/pages/home/slideshow_editor/state.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
-import 'package:ut_report_generator/utils/copy_with_added.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 import 'package:ut_report_generator/utils/future_status.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 import 'package:ut_report_generator/api/report/self.dart' as report_api;
-import 'package:ut_report_generator/api/pivot_table/self.dart'
-    as pivot_table_api;
 
 class SlideshowEditor extends StatefulWidget {
   final Future<Slideshow> Function() slideshowCallback;
@@ -74,11 +50,6 @@ class _SlideshowEditorState extends State<SlideshowEditor>
     state = SlideshowEditorState(
       scrollController: ScrollController(),
       openSlide: null,
-      portalController: OverlayPortalController(),
-      portalAnimationController: AnimationController(
-        duration: Duration(milliseconds: 500),
-        vsync: this,
-      ),
       exports: [],
       exportsListKey: GlobalKey<AnimatedListState>(),
       visibleSlides: [],
@@ -88,13 +59,6 @@ class _SlideshowEditorState extends State<SlideshowEditor>
     );
 
     _loadReport();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    state.portalAnimationController.dispose();
-    state.scrollController.dispose();
   }
 
   List<String> _getRecentFiles() {
@@ -133,8 +97,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
   }
 
   Future<void> _loadReport() async {
-    return widget
-        .slideshowCallback()
+    return waitAtLeast(Duration(seconds: 1), widget.slideshowCallback())
         .then((report) {
           setState(() {
             state = state.copyWith(
@@ -148,6 +111,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
                     }
                     return slide is PivotTable;
                   }).toList(),
+              openSlide: state.openSlide,
             );
           });
           context.read<ScaffoldController>()
@@ -156,7 +120,11 @@ class _SlideshowEditorState extends State<SlideshowEditor>
         })
         .catchError((_) {
           setState(() {
-            state = state.copyWith(status: FutureStatus.error);
+            state = state.copyWith(
+              status: FutureStatus.error,
+              slideshow: state.slideshow,
+              openSlide: state.openSlide,
+            );
           });
         });
   }
@@ -208,25 +176,6 @@ class _SlideshowEditorState extends State<SlideshowEditor>
           status: FutureStatus.pending,
         ),
       );
-    });
-  }
-
-  void _openSlideMenu(Slide slide) {
-    print("Opening the slide menu");
-    // if (state.openSlide == null) {
-    state.portalController.show();
-    state.portalAnimationController.forward();
-    // }
-    setState(() {
-      state = state.copyWith(openSlide: slide);
-    });
-  }
-
-  void _closeSlideMenu() {
-    state.portalAnimationController.reverse();
-    state.portalController.hide();
-    setState(() {
-      state = state.copyWith(openSlide: null);
     });
   }
 
@@ -287,66 +236,84 @@ class _SlideshowEditorState extends State<SlideshowEditor>
 
   @override
   Widget build(BuildContext context) {
-    if (state.status == FutureStatus.error) {
-      return _errorState();
-    }
-
-    if (state.status == FutureStatus.pending) {
-      return _loadingState();
-    }
-
-    if (state.status == FutureStatus.success && state.slideshow != null) {
-      return _successState();
-    }
-
-    return Placeholder(child: Text("Invalid future state"));
+    return Stack(
+      children: [
+        AnimatedOpacity(
+          opacity: state.status == FutureStatus.pending ? 1 : 0,
+          duration: Duration(milliseconds: 250),
+          child: _loadingState(),
+        ),
+        AnimatedOpacity(
+          opacity:
+              state.status == FutureStatus.success ||
+                      state.status == FutureStatus.error
+                  ? 1
+                  : 0,
+          duration: Duration(milliseconds: 250),
+          child:
+              state.status == FutureStatus.pending
+                  ? SizedBox.shrink()
+                  : (state.status == FutureStatus.success
+                      ? _successState()
+                      : _errorState()),
+        ),
+      ],
+    );
   }
 
   Widget _errorState() {
-    return Text("Algo salió mal");
+    return Text(key: ValueKey('error'), "Algo salió mal");
   }
 
   Widget _loadingState() {
-    return ShimmerSlide();
+    return ShimmerSlide(key: ValueKey('loading'));
   }
 
   Widget _successState() {
-    final reportBloc = SlideshowEditorBloc(
+    final slideshowBloc = SlideshowEditorBloc(
       initialState: state,
-      setState: (callback) {
+      setInitialState: (callback) {
         setState(() {
           state = callback(state);
-          // state = state.copyWith(slideshow: callback(state.slideshow!));
         });
       },
     );
 
-    outterSetSlide<T extends Slide>(T slide, T Function(T) callback) {
-      setState(() {
-        state = state.copyWith(
-          slideshow: state.slideshow!.copyWith(
-            slides:
-                state.slideshow!.slides.map((innerSlide) {
-                  if (innerSlide.identifier == slide.identifier) {
-                    return callback(slide);
-                  }
-                  return innerSlide;
-                }).toList(),
-          ),
-        );
-      });
-    }
+    return AppSubscaffold(
+      key: ValueKey('success'),
+      isMenuOpen: state.openSlide != null,
+      bloc: slideshowBloc,
+      menu: _buildEditorMenu(slideshowBloc),
+      child: _buildEditorContent(slideshowBloc),
+    );
+  }
 
+  void _setSlide<T extends Slide>(String identifier, T Function(T) callback) {
+    setState(() {
+      state = state.copyWith(
+        openSlide: state.openSlide,
+        slideshow: state.slideshow!.copyWith(
+          slides:
+              state.slideshow!.slides.map((innerSlide) {
+                if (innerSlide.identifier == identifier) {
+                  return callback(innerSlide as T);
+                }
+                return innerSlide;
+              }).toList(),
+        ),
+      );
+    });
+  }
+
+  Widget _buildEditorMenu(SlideshowEditorBloc reportBloc) {
     return SlideshowEditorMenu(
       slide: state.openSlide,
-      portalController: state.portalController,
-      animationController: state.portalAnimationController,
       imageSlideBlocBuilder:
           (imageSlide) => ImageSlideBloc(
             slideshow: state.slideshow!.identifier,
             initialSlide: imageSlide,
             setSlide: (callback) {
-              outterSetSlide(imageSlide, callback);
+              _setSlide(imageSlide.identifier, callback);
             },
           ),
       pivotTableBlocBuilder:
@@ -354,15 +321,38 @@ class _SlideshowEditorState extends State<SlideshowEditor>
             slideshow: state.slideshow!.identifier,
             initialSlide: pivotTable,
             setSlide: (callback) {
-              outterSetSlide(pivotTable, callback);
+              _setSlide(pivotTable.identifier, callback);
             },
           ),
-      closeSlideMenu: _closeSlideMenu,
-      child: _buildReportContent(reportBloc),
     );
   }
 
-  Widget _buildReportContent(SlideshowEditorBloc bloc) {
+  void _removeExport(ExportBoxEntry entry) {
+    setState(() {
+      final innerIndex = state.exports.indexWhere(
+        (innerEntry) => innerEntry.identifier == entry.identifier,
+      );
+      state.exportsListKey.currentState!.removeItem(innerIndex, (
+        context,
+        animation,
+      ) {
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            return Opacity(opacity: animation.value, child: child);
+          },
+          child: ExportBox(entry: entry),
+        );
+      });
+      state.exports.removeAt(innerIndex);
+    });
+  }
+
+  void _retryExport(ExportBoxEntry entry) {
+    //
+  }
+
+  Widget _buildEditorContent(SlideshowEditorBloc bloc) {
     return Stack(
       children: [
         SingleChildScrollView(
@@ -381,25 +371,13 @@ class _SlideshowEditorState extends State<SlideshowEditor>
                   key: state.visibleSlidesListKey,
                   shrinkWrap: true,
                   itemBuilder: (context, index, animation) {
-                    final slide = state.visibleSlides[index];
-                    if (slide is PivotTable) {
-                      return SlideFrame(
-                        isMenuOpen: state.openSlide != null,
-                        openMenu: () => _openSlideMenu(slide),
-                        child: PivotTableSection(
-                          data: slide.data,
-                          chartName: slide.title,
-                        ),
-                      );
-                    }
-                    if (slide is ImageSlide) {
-                      return SlideFrame(
-                        isMenuOpen: state.openSlide != null,
-                        openMenu: () => _openSlideMenu(slide),
-                        child: ImageSlideSection(initialSlide: slide),
-                      );
-                    }
-                    return Placeholder(child: Text("Tipo de slide inválido"));
+                    return AnimatedBuilder(
+                      animation: animation,
+                      builder: (context, widget) {
+                        return Opacity(opacity: animation.value, child: widget);
+                      },
+                      child: bloc.buildSlideFrame(index),
+                    );
                   },
                   initialItemCount: state.visibleSlides.length,
                 ),
@@ -411,42 +389,11 @@ class _SlideshowEditorState extends State<SlideshowEditor>
           bottom: 16,
           width: EXPORT_BOX_WIDTH,
           left: 16,
-          child: AnimatedList(
-            key: state.exportsListKey,
-            itemBuilder: (context, index, animation) {
-              final entry = state.exports[index];
-              return ExportBox(
-                timeout: Duration(seconds: 3),
-                interactionTimeout: Duration(seconds: 1),
-                key: ValueKey(entry.identifier),
-                entry: entry,
-                retry: () {},
-                remove: () {
-                  setState(() {
-                    final innerIndex = state.exports.indexWhere(
-                      (innerEntry) => innerEntry.identifier == entry.identifier,
-                    );
-                    state.exportsListKey.currentState!.removeItem(innerIndex, (
-                      context,
-                      animation,
-                    ) {
-                      return AnimatedBuilder(
-                        animation: animation,
-                        builder: (context, child) {
-                          return Opacity(
-                            opacity: animation.value,
-                            child: child,
-                          );
-                        },
-                        child: ExportBox(entry: entry),
-                      );
-                    });
-                    state.exports.removeAt(innerIndex);
-                  });
-                },
-              );
-            },
-            initialItemCount: state.exports.length,
+          child: ExportBoxList(
+            exportsListKey: state.exportsListKey,
+            exports: state.exports,
+            removeExport: _removeExport,
+            retryExport: _retryExport,
           ),
         ),
       ],

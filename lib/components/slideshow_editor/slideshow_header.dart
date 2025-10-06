@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:ut_report_generator/blocs/slideshow_editor_bloc.dart';
-import 'package:ut_report_generator/components/invisible_text_field.dart';
+import 'package:ut_report_generator/components/util/invisible_text_field.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/models/report/visualization_mode.dart';
 

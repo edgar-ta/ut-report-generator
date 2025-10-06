@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
-import 'package:ut_report_generator/components/export_box/entry.dart';
+import 'package:ut_report_generator/components/slideshow_editor/export_box/entry.dart';
 import 'package:ut_report_generator/models/response/file_response.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 import 'package:ut_report_generator/utils/future_status.dart';

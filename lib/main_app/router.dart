@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/models/profile.dart';
 import 'package:ut_report_generator/models/report/self.dart';
-import 'package:ut_report_generator/components/app_scaffold.dart';
+import 'package:ut_report_generator/components/util/app_scaffold.dart';
 import 'package:ut_report_generator/models/slideshow_editor_request.dart';
 import 'package:ut_report_generator/pages/bug_report/_main.dart';
 import 'package:ut_report_generator/pages/home/_main.dart';

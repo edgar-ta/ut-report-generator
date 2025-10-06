@@ -2,18 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:ut_report_generator/api/pivot_table/create_pivot_table.dart'
     as pivot_table_api;
 import 'package:ut_report_generator/blocs/bloc.dart';
+import 'package:ut_report_generator/models/image_slide/self.dart';
+import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/api/report/self.dart' as report_api;
 import 'package:ut_report_generator/models/report/visualization_mode.dart';
+import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
+import 'package:ut_report_generator/pages/home/slideshow_editor/image_slide_section/widget.dart';
+import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/widget.dart';
+import 'package:ut_report_generator/pages/home/slideshow_editor/slide/slide_frame.dart';
 import 'package:ut_report_generator/pages/home/slideshow_editor/state.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
 
 class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
-  SlideshowEditorBloc({required super.initialState, required super.setState});
+  SlideshowEditorBloc({
+    required super.initialState,
+    required super.setInitialState,
+  });
 
   void _setSlideshow(Slideshow Function(Slideshow) callback) {
-    setState((state) => state.copyWith(slideshow: callback(state.slideshow!)));
+    setInitialState(
+      (state) => state.copyWith(
+        slideshow: callback(state.slideshow!),
+        openSlide: state.openSlide,
+      ),
+    );
   }
 
   Slideshow get _initialSlideshow => initialState.slideshow!;
@@ -26,26 +40,62 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
     );
   }
 
+  void openSlideMenu(Slide slide) {
+    setInitialState((state) {
+      return state.copyWith(openSlide: slide, slideshow: state.slideshow);
+    });
+  }
+
+  void closeSlideMenu() {
+    setInitialState((state) {
+      return state.copyWith(openSlide: null, slideshow: state.slideshow);
+    });
+  }
+
+  Widget buildSlideFrame(int index) {
+    final slide = initialState.visibleSlides[index];
+    if (slide is PivotTable) {
+      return SlideFrame(
+        isMenuOpen: initialState.openSlide != null,
+        openMenu: () => openSlideMenu(slide),
+        child: PivotTableSection(data: slide.data, chartName: slide.title),
+      );
+    }
+    if (slide is ImageSlide) {
+      return SlideFrame(
+        isMenuOpen: initialState.openSlide != null,
+        openMenu: () => openSlideMenu(slide),
+        child: ImageSlideSection(initialSlide: slide),
+      );
+    }
+    return Placeholder(child: Text("Tipo de slide inválido"));
+  }
+
   Future<void> toggleSlideshowMode() async {
-    print("Hello world!");
     if (initialState.slideshow!.visualizationMode ==
         VisualizationMode.asReport) {
-      setState((state) {
+      setInitialState((state) {
         for (var i = 0; i < state.slideshow!.slides.length; i++) {
           if (state.slideshow!.slides[i].category == SlideCategory.imageSlide) {
             state.visibleSlidesListKey.currentState!.removeItem(i, (
               context,
               animation,
             ) {
-              return Text("fsfs");
+              return AnimatedBuilder(
+                animation: animation,
+                builder: (context, widget) {
+                  return Opacity(opacity: animation.value, child: widget);
+                },
+                child: buildSlideFrame(i),
+              );
             });
           }
         }
-        print("fjsdklfsd");
         return state.copyWith(
           slideshow: state.slideshow!.copyWith(
             visualizationMode: VisualizationMode.chartsOnly,
           ),
+          openSlide: state.openSlide,
           visibleSlides:
               state.visibleSlides
                   .where((slide) => slide.category == SlideCategory.pivotTable)
@@ -53,7 +103,7 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
         );
       });
     } else {
-      setState((state) {
+      setInitialState((state) {
         for (var i = 0; i < state.slideshow!.slides.length; i++) {
           final slide = state.slideshow!.slides[i];
           if (slide.category == SlideCategory.imageSlide) {
@@ -65,6 +115,7 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
             visualizationMode: VisualizationMode.asReport,
           ),
           visibleSlides: state.slideshow!.slides,
+          openSlide: state.openSlide,
         );
       });
     }

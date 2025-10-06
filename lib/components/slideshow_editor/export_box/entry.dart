@@ -1,4 +1,4 @@
-import 'package:ut_report_generator/components/export_box/widget.dart';
+import 'package:ut_report_generator/components/slideshow_editor/export_box/widget.dart';
 import 'package:ut_report_generator/models/response/file_response.dart';
 import 'package:ut_report_generator/utils/future_status.dart';
 
