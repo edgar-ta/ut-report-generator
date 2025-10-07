@@ -25,7 +25,7 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
     setInitialState(
       (state) => state.copyWith(
         slideshow: callback(state.slideshow!),
-        openSlide: state.openSlide,
+        openSlideIdentifier: state.openSlideIdentifier,
       ),
     );
   }
@@ -42,28 +42,44 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
 
   void openSlideMenu(Slide slide) {
     setInitialState((state) {
-      return state.copyWith(openSlide: slide, slideshow: state.slideshow);
+      return state.copyWith(
+        openSlideIdentifier: slide.identifier,
+        slideshow: state.slideshow,
+      );
     });
   }
 
   void closeSlideMenu() {
     setInitialState((state) {
-      return state.copyWith(openSlide: null, slideshow: state.slideshow);
+      return state.copyWith(
+        openSlideIdentifier: null,
+        slideshow: state.slideshow,
+      );
     });
   }
 
+  List<Slide> get visibleSlides =>
+      _initialSlideshow.slides.where((slide) {
+        if (_initialSlideshow.visualizationMode == VisualizationMode.asReport) {
+          return true;
+        }
+        return slide is PivotTable;
+      }).toList();
+
   Widget buildSlideFrame(int index) {
-    final slide = initialState.visibleSlides[index];
+    final slide = visibleSlides[index];
     if (slide is PivotTable) {
       return SlideFrame(
-        isMenuOpen: initialState.openSlide != null,
+        key: ValueKey(slide.identifier),
+        isMenuOpen: initialState.openSlideIdentifier != null,
         openMenu: () => openSlideMenu(slide),
         child: PivotTableSection(data: slide.data, chartName: slide.title),
       );
     }
     if (slide is ImageSlide) {
       return SlideFrame(
-        isMenuOpen: initialState.openSlide != null,
+        key: ValueKey(slide.identifier),
+        isMenuOpen: initialState.openSlideIdentifier != null,
         openMenu: () => openSlideMenu(slide),
         child: ImageSlideSection(initialSlide: slide),
       );
@@ -95,11 +111,7 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
           slideshow: state.slideshow!.copyWith(
             visualizationMode: VisualizationMode.chartsOnly,
           ),
-          openSlide: state.openSlide,
-          visibleSlides:
-              state.visibleSlides
-                  .where((slide) => slide.category == SlideCategory.pivotTable)
-                  .toList(),
+          openSlideIdentifier: state.openSlideIdentifier,
         );
       });
     } else {
@@ -114,8 +126,7 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
           slideshow: state.slideshow!.copyWith(
             visualizationMode: VisualizationMode.asReport,
           ),
-          visibleSlides: state.slideshow!.slides,
-          openSlide: state.openSlide,
+          openSlideIdentifier: state.openSlideIdentifier,
         );
       });
     }

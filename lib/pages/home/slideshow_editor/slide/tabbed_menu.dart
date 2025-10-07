@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 
 class TabbedMenu extends StatefulWidget {
-  final WidgetBuilder editTabBuilder;
-  final WidgetBuilder metadataTabBuilder;
+  final Widget editPane;
+  final Widget metadataPane;
 
   const TabbedMenu({
     Key? key,
-    required this.editTabBuilder,
-    required this.metadataTabBuilder,
+    required this.editPane,
+    required this.metadataPane,
   }) : super(key: key);
 
   @override
@@ -53,17 +53,7 @@ class _TabbedMenuState extends State<TabbedMenu>
           Expanded(
             child: TabBarView(
               controller: _controller,
-              children: [
-                Builder(builder: widget.editTabBuilder),
-                Builder(
-                  builder: (context) {
-                    return Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: widget.metadataTabBuilder(context),
-                    );
-                  },
-                ),
-              ],
+              children: [widget.editPane, widget.metadataPane],
             ),
           ),
         ],

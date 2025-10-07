@@ -21,6 +21,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
   });
 
   void _updateAfterEdition(EditPivotTable_Response response) {
+    print("Callback after edition");
     this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         data: response.data,
@@ -208,6 +209,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
   }
 
   Future<void> toggleSelectionMode(int filterIndex) async {
+    print("Toggling the selection mode");
     this.setSlide(
       (pivotTable) => pivotTable.copyWith(
         filters: copyWithReplacement(

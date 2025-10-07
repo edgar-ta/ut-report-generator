@@ -32,50 +32,44 @@ class _SlideshowEditorMenuState extends State<SlideshowEditorMenu> {
   Widget build(BuildContext context) {
     return Material(
       elevation: 8,
-      child: Builder(
-        builder: (context) {
-          if (widget.slide is PivotTable) {
-            return _pivotTableMenu(widget.slide as PivotTable);
-          }
-          if (widget.slide is ImageSlide) {
-            return _imageSlideMenu(widget.slide as ImageSlide);
-          }
-          return const Text("Tipo de slide inválido");
-        },
-      ),
+      child:
+          widget.slide == null
+              ? SizedBox.shrink()
+              : (widget.slide is PivotTable
+                  ? _pivotTableMenu(widget.slide as PivotTable)
+                  : _imageSlideMenu(widget.slide as ImageSlide)),
     );
   }
 
   Widget _pivotTableMenu(PivotTable pivotTable) {
     final bloc = widget.pivotTableBlocBuilder(pivotTable);
     return TabbedMenu(
-      editTabBuilder:
-          (_) => PivotTableEditPane(
-            title: pivotTable.title,
-            bloc: bloc,
-            filters: pivotTable.filters,
-          ),
-      metadataTabBuilder:
-          (_) => PivotMetadataPane(files: pivotTable.source.files, bloc: bloc),
+      editPane: PivotTableEditPane(
+        title: pivotTable.title,
+        bloc: bloc,
+        filters: pivotTable.filters,
+      ),
+      metadataPane: PivotMetadataPane(
+        files: pivotTable.source.files,
+        bloc: bloc,
+      ),
     );
   }
 
   Widget _imageSlideMenu(ImageSlide imageSlide) {
     final bloc = widget.imageSlideBlocBuilder(imageSlide);
     return TabbedMenu(
-      editTabBuilder:
-          (_) => ImageSlideEditPane(
-            title: imageSlide.title,
-            parameters: imageSlide.parameters,
-            bloc: bloc,
-          ),
-      metadataTabBuilder:
-          (_) => SlideMetadataPane(
-            identifier: imageSlide.identifier,
-            creationDate: imageSlide.creationDate,
-            preview: imageSlide.preview,
-            category: imageSlide.category,
-          ),
+      editPane: ImageSlideEditPane(
+        title: imageSlide.title,
+        parameters: imageSlide.parameters,
+        bloc: bloc,
+      ),
+      metadataPane: SlideMetadataPane(
+        identifier: imageSlide.identifier,
+        creationDate: imageSlide.creationDate,
+        preview: imageSlide.preview,
+        category: imageSlide.category,
+      ),
     );
   }
 }

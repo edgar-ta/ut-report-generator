@@ -7,28 +7,19 @@ import 'package:ut_report_generator/utils/future_status.dart';
 
 class SlideshowEditorState {
   final ScrollController scrollController;
-  /* this has to be lifted */
-  final Slide? openSlide;
+  final String? openSlideIdentifier;
 
-  // this has to be lifted
-  /* this has to be lifted */
   final List<ExportBoxEntry> exports;
-  /* this has to be lifted */
   final GlobalKey<AnimatedListState> exportsListKey;
-  /* this has to be lifted */
-  final List<Slide> visibleSlides;
-  /* this has to be lifted */
   final GlobalKey<AnimatedListState> visibleSlidesListKey;
-  /* this has to be lifted */
   final Slideshow? slideshow;
   final FutureStatus status;
 
   SlideshowEditorState({
     required this.scrollController,
-    required this.openSlide,
+    required this.openSlideIdentifier,
     required this.exports,
     required this.exportsListKey,
-    required this.visibleSlides,
     required this.visibleSlidesListKey,
     required this.slideshow,
     required this.status,
@@ -37,20 +28,18 @@ class SlideshowEditorState {
   SlideshowEditorState copyWith({
     ScrollController? scrollController,
     GlobalKey<ExpandableFabState>? fabKey,
-    required Slide? openSlide,
+    required String? openSlideIdentifier,
     List<ExportBoxEntry>? exports,
-    List<Slide>? visibleSlides,
     required Slideshow? slideshow,
     FutureStatus? status,
   }) {
     return SlideshowEditorState(
       scrollController: scrollController ?? this.scrollController,
-      openSlide: openSlide,
+      openSlideIdentifier: openSlideIdentifier,
       exports: exports ?? this.exports,
       exportsListKey: exportsListKey,
-      visibleSlides: visibleSlides ?? this.visibleSlides,
       visibleSlidesListKey: visibleSlidesListKey,
-      slideshow: slideshow ?? this.slideshow,
+      slideshow: slideshow,
       status: status ?? this.status,
     );
   }
