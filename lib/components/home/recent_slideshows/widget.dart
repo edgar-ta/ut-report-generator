@@ -34,48 +34,44 @@ class _RecentSlideshowsState extends State<RecentSlideshows> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: SLIDESHOW_PREVIEW_HEIGHT + 64,
+      width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       color: Theme.of(context).colorScheme.surfaceContainerLow,
-      child: SizedBox(
-        height: SLIDESHOW_PREVIEW_HEIGHT + 50,
-        child:
-            widget.state.status == FutureStatus.error
-                ? _errorState(widget.retry)
-                : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  spacing: 8,
-                  children: [
-                    Text(
-                      "Reportes recientes".toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
+      child:
+          widget.state.status == FutureStatus.error
+              ? _errorState(widget.retry)
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                spacing: 8,
+                children: [
+                  Text(
+                    "Reportes recientes".toUpperCase(),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                  SizedBox(
+                    height: SLIDESHOW_PREVIEW_HEIGHT,
+                    child: Stack(
+                      children: [
+                        _loadingState(
+                          widget.state.status == FutureStatus.pending ? 1 : 0,
+                        ),
+                        if (widget.state.response != null)
+                          widget.state.response!.reports.isNotEmpty
+                              ? _successState(
+                                widget.state.status == FutureStatus.success
+                                    ? 1
+                                    : 0,
+                                widget.state.response!,
+                                widget.openPreview,
+                              )
+                              : EmptyReportsPlaceholder(),
+                      ],
                     ),
-                    SizedBox(
-                      height: SLIDESHOW_PREVIEW_HEIGHT,
-                      child: Stack(
-                        children: [
-                          _loadingState(
-                            widget.state.status == FutureStatus.pending ? 1 : 0,
-                          ),
-                          if (widget.state.response != null)
-                            widget.state.response!.reports.isNotEmpty
-                                ? _successState(
-                                  widget.state.status == FutureStatus.success
-                                      ? 1
-                                      : 0,
-                                  widget.state.response!,
-                                  widget.openPreview,
-                                )
-                                : EmptyReportsPlaceholder(),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-      ),
+                  ),
+                ],
+              ),
     );
   }
 

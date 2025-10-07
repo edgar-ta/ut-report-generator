@@ -49,10 +49,9 @@ class _SlideshowEditorState extends State<SlideshowEditor>
     super.initState();
     state = SlideshowEditorState(
       scrollController: ScrollController(),
-      openSlide: null,
+      openSlideIdentifier: null,
       exports: [],
       exportsListKey: GlobalKey<AnimatedListState>(),
-      visibleSlides: [],
       visibleSlidesListKey: GlobalKey<AnimatedListState>(),
       slideshow: null,
       status: FutureStatus.pending,
@@ -103,15 +102,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
             state = state.copyWith(
               status: FutureStatus.success,
               slideshow: report,
-              visibleSlides:
-                  report.slides.where((slide) {
-                    if (report.visualizationMode ==
-                        VisualizationMode.asReport) {
-                      return true;
-                    }
-                    return slide is PivotTable;
-                  }).toList(),
-              openSlide: state.openSlide,
+              openSlideIdentifier: state.openSlideIdentifier,
             );
           });
           context.read<ScaffoldController>()
@@ -123,7 +114,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
             state = state.copyWith(
               status: FutureStatus.error,
               slideshow: state.slideshow,
-              openSlide: state.openSlide,
+              openSlideIdentifier: state.openSlideIdentifier,
             );
           });
         });
@@ -281,38 +272,30 @@ class _SlideshowEditorState extends State<SlideshowEditor>
 
     return AppSubscaffold(
       key: ValueKey('success'),
-      isMenuOpen: state.openSlide != null,
+      isMenuOpen: state.openSlideIdentifier != null,
       bloc: slideshowBloc,
-      menu: _buildEditorMenu(slideshowBloc),
+      menu: _buildEditorMenu(),
       child: _buildEditorContent(slideshowBloc),
     );
   }
 
-  void _setSlide<T extends Slide>(String identifier, T Function(T) callback) {
-    setState(() {
-      state = state.copyWith(
-        openSlide: state.openSlide,
-        slideshow: state.slideshow!.copyWith(
-          slides:
-              state.slideshow!.slides.map((innerSlide) {
-                if (innerSlide.identifier == identifier) {
-                  return callback(innerSlide as T);
-                }
-                return innerSlide;
-              }).toList(),
-        ),
-      );
-    });
-  }
+  Widget _buildEditorMenu() {
+    Slide? openSlide;
+    for (final slide in state.slideshow!.slides) {
+      if (slide.identifier == state.openSlideIdentifier) {
+        openSlide = slide;
+        break;
+      }
+    }
 
-  Widget _buildEditorMenu(SlideshowEditorBloc reportBloc) {
     return SlideshowEditorMenu(
-      slide: state.openSlide,
+      slide: openSlide,
       imageSlideBlocBuilder:
           (imageSlide) => ImageSlideBloc(
             slideshow: state.slideshow!.identifier,
             initialSlide: imageSlide,
             setSlide: (callback) {
+              print("Calling the image slide");
               _setSlide(imageSlide.identifier, callback);
             },
           ),
@@ -321,10 +304,28 @@ class _SlideshowEditorState extends State<SlideshowEditor>
             slideshow: state.slideshow!.identifier,
             initialSlide: pivotTable,
             setSlide: (callback) {
+              print("Calling the pivot table");
               _setSlide(pivotTable.identifier, callback);
             },
           ),
     );
+  }
+
+  void _setSlide<T extends Slide>(String identifier, T Function(T) callback) {
+    setState(() {
+      final List<Slide> slides = [];
+      for (final slide in state.slideshow!.slides) {
+        if (slide.identifier == identifier) {
+          slides.add(callback(slide as T));
+        } else {
+          slides.add(slide);
+        }
+      }
+      state = state.copyWith(
+        slideshow: state.slideshow!.copyWith(slides: slides),
+        openSlideIdentifier: state.openSlideIdentifier,
+      );
+    });
   }
 
   void _removeExport(ExportBoxEntry entry) {
@@ -360,13 +361,13 @@ class _SlideshowEditorState extends State<SlideshowEditor>
           child: Column(
             children: [
               SlideshowHeader(slideshow: state.slideshow!, bloc: bloc),
-              if (state.visibleSlides.isEmpty)
+              if (bloc.visibleSlides.isEmpty)
                 EmptySlideshowPlaceholder(
                   onCreatePressed: () {
                     _addPivotTableDialog(bloc);
                   },
                 ),
-              if (state.visibleSlides.isNotEmpty)
+              if (bloc.visibleSlides.isNotEmpty)
                 AnimatedList(
                   key: state.visibleSlidesListKey,
                   shrinkWrap: true,
@@ -379,7 +380,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
                       child: bloc.buildSlideFrame(index),
                     );
                   },
-                  initialItemCount: state.visibleSlides.length,
+                  initialItemCount: bloc.visibleSlides.length,
                 ),
             ],
           ),
