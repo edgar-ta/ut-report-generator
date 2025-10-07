@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
@@ -31,6 +33,29 @@ class PivotTableEditPane extends StatefulWidget {
 }
 
 class _PivotTableEditPaneState extends State<PivotTableEditPane> {
+  Timer? _debounce;
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.title);
+  }
+
+  void _rename(String text) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      widget.bloc.rename(text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -39,10 +64,7 @@ class _PivotTableEditPaneState extends State<PivotTableEditPane> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            InvisibleTextField(
-              controller: TextEditingController(text: widget.title),
-              onChanged: widget.bloc.rename,
-            ),
+            InvisibleTextField(controller: _controller, onChanged: _rename),
             FilterSelector(
               title: "Filtros",
               availableFilters:

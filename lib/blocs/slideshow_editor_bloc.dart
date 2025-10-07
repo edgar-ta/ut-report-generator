@@ -5,7 +5,7 @@ import 'package:ut_report_generator/blocs/bloc.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report/self.dart';
-import 'package:ut_report_generator/api/report/self.dart' as report_api;
+import 'package:ut_report_generator/api/slideshow/self.dart' as report_api;
 import 'package:ut_report_generator/models/report/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
@@ -131,7 +131,9 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
       });
     }
 
-    await report_api.toggleModeOfReport(report: _initialSlideshow.identifier);
+    await report_api.toggleModeOfSlideshow(
+      report: _initialSlideshow.identifier,
+    );
   }
 
   Future<void> addPivotTable({

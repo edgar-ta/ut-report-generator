@@ -24,7 +24,7 @@ import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 import 'package:ut_report_generator/utils/future_status.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
-import 'package:ut_report_generator/api/report/self.dart' as report_api;
+import 'package:ut_report_generator/api/slideshow/self.dart' as report_api;
 
 class SlideshowEditor extends StatefulWidget {
   final Future<Slideshow> Function() slideshowCallback;
@@ -128,7 +128,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
         ExportBoxEntry(
           identifier: identifier,
           process: Future.delayed(Duration(seconds: 2), () {
-            return report_api.compileReport(
+            return report_api.compileSlideshow(
               report: state.slideshow!.identifier,
             );
           }),
@@ -154,7 +154,9 @@ class _SlideshowEditorState extends State<SlideshowEditor>
         ExportBoxEntry(
           identifier: identifier,
           process: Future.delayed(Duration(seconds: 2), () {
-            return report_api.exportReport(report: state.slideshow!.identifier);
+            return report_api.exportSlideshow(
+              report: state.slideshow!.identifier,
+            );
           }),
           setState: (callback) {
             setState(() {

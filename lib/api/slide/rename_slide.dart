@@ -1,7 +1,7 @@
 import 'package:ut_report_generator/api/send_request.dart';
-import 'package:ut_report_generator/models/response/success_response.dart';
+import 'package:ut_report_generator/models/response/file_response.dart';
 
-Future<SuccessResponse> renameSlide({
+Future<FileResponse> renameSlide({
   required String report,
   required String slide,
   required String title,
@@ -9,6 +9,6 @@ Future<SuccessResponse> renameSlide({
   return sendRequest(
     route: "slide/rename",
     body: {'report': report, 'slide': slide, 'title': title},
-    callback: SuccessResponse.fromJson,
+    callback: FileResponse.fromJson,
   );
 }

@@ -9,6 +9,9 @@ from spire.presentation import Presentation as SpirePresentation
 import os
 
 def render_preview(root_directory: str, slides: ProjectSlide | list[ProjectSlide]):
+    '''
+    Adds a preview for the array of slides given. It modifies the objects in place
+    '''
     if not isinstance(slides, list):
         slides = [slides]
 

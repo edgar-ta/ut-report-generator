@@ -1,10 +1,10 @@
 import 'package:ut_report_generator/api/send_request.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 
-// ignore: non_constant_identifier_names
-Future<Slideshow> startReport_withImageSlide() {
+Future<Slideshow> importSlideshow({required String rootDirectory}) async {
   return sendRequest(
-    route: "report/start_with_image_slide",
+    route: "report/import",
     callback: Slideshow.fromJson,
+    body: {"root_directory": rootDirectory},
   );
 }

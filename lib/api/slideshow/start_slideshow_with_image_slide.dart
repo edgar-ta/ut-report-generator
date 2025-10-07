@@ -1,10 +1,9 @@
 import 'package:ut_report_generator/api/send_request.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 
-Future<Slideshow> importReport({required String rootDirectory}) async {
+Future<Slideshow> startSlideshowWithImageSlide() {
   return sendRequest(
-    route: "report/import",
+    route: "report/start_with_image_slide",
     callback: Slideshow.fromJson,
-    body: {"root_directory": rootDirectory},
   );
 }

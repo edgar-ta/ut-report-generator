@@ -22,6 +22,29 @@ class ImageSlideEditPane extends StatefulWidget {
 }
 
 class _ImageSlideEditPaneState extends State<ImageSlideEditPane> {
+  Timer? _debounce;
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.title);
+  }
+
+  void _rename(String text) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      widget.bloc.rename(text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -29,7 +52,7 @@ class _ImageSlideEditPaneState extends State<ImageSlideEditPane> {
       child: Column(
         spacing: 16,
         children: [
-          TextField(onChanged: widget.bloc.rename),
+          TextField(onChanged: _rename),
           ...widget.parameters.entries.map((data) {
             final (key, value) = (data.key, data.value);
             return ParameterWidget(

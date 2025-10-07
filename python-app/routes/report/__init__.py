@@ -7,6 +7,7 @@ from routes.report.start_report_with_pivot_table import start_report_with_pivot_
 from routes.report.start_report_with_image_slide import start_report_with_image_slide
 from routes.report.rename_report import rename_report
 from routes.report.toggle_mode_of_report import toggle_mode_of_report
+from routes.report.delete_report import delete_report
 
 from flask import Blueprint
 
@@ -21,3 +22,4 @@ start_report_with_pivot_table(blueprint)
 start_report_with_image_slide(blueprint)
 rename_report(blueprint)
 toggle_mode_of_report(blueprint)
+delete_report(blueprint)

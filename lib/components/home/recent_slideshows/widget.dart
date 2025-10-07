@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:relative_time/relative_time.dart';
-import 'package:ut_report_generator/api/report/get_slideshow.dart';
-import 'package:ut_report_generator/api/report/get_recent_slideshows.dart';
+import 'package:ut_report_generator/api/slideshow/get_slideshow.dart';
+import 'package:ut_report_generator/api/slideshow/get_recent_slideshows.dart';
 import 'package:ut_report_generator/components/home/recent_slideshows/state.dart';
 import 'package:ut_report_generator/models/response/recent_slideshows_response.dart';
 import 'package:ut_report_generator/models/response/report_preview.dart';
@@ -17,13 +17,15 @@ import 'package:ut_report_generator/utils/wait_at_least.dart';
 class RecentSlideshows extends StatefulWidget {
   RecentSlideshowsState state;
   void Function(SlideshowPreview) openPreview;
-  Future<void> Function() retry;
+  Future<void> Function(SlideshowPreview)? deletePreview;
+  Future<void> Function()? retry;
 
   RecentSlideshows({
     super.key,
     required this.state,
     required this.openPreview,
-    required this.retry,
+    this.retry,
+    this.deletePreview,
   });
 
   @override
@@ -65,6 +67,7 @@ class _RecentSlideshowsState extends State<RecentSlideshows> {
                                     : 0,
                                 widget.state.response!,
                                 widget.openPreview,
+                                widget.deletePreview,
                               )
                               : EmptyReportsPlaceholder(),
                       ],
@@ -97,6 +100,7 @@ class _RecentSlideshowsState extends State<RecentSlideshows> {
     double opacity,
     RecentSlideshowsResponse response,
     void Function(SlideshowPreview) openPreview,
+    Future<void> Function(SlideshowPreview)? deletePreview,
   ) {
     return AnimatedOpacity(
       opacity: opacity,
@@ -104,32 +108,53 @@ class _RecentSlideshowsState extends State<RecentSlideshows> {
       curve: Curves.easeOut,
       child: ScrollConfiguration(
         behavior: ScrollBehavior().copyWith(
-          dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch},
+          dragDevices: {
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.touch,
+            PointerDeviceKind.trackpad,
+          },
         ),
-        child: ListView.separated(
+        child: AnimatedList.separated(
+          key: widget.state.listKey,
           scrollDirection: Axis.horizontal,
-          itemCount: response.reports.length,
+          initialItemCount: widget.state.response!.reports.length,
+          removedSeparatorBuilder: (context, index, animation) {
+            return const SizedBox(width: 16);
+          },
+          separatorBuilder: (context, index, animation) {
+            return const SizedBox(width: 16);
+          },
           shrinkWrap: true,
           clipBehavior: Clip.none,
-          itemBuilder: (context, index) {
+          itemBuilder: (context, index, animation) {
             final report = response.reports[index];
-            return SlideshowPreviewCard(
-              key: ValueKey(report.identifier),
-              name: report.name,
-              preview: report.preview,
-              lastOpen: report.lastOpen.relativeTimeLocale(Locale('es', 'MX')),
-              onTap: () {
-                openPreview(report);
+            return AnimatedBuilder(
+              animation: animation,
+              builder: (context, child) {
+                return Opacity(opacity: animation.value, child: child);
               },
+              child: SlideshowPreviewCard(
+                key: ValueKey(report.identifier),
+                name: report.name,
+                preview: report.preview,
+                lastOpen: report.lastOpen.relativeTimeLocale(
+                  Locale('es', 'MX'),
+                ),
+                openPreview: () {
+                  openPreview(report);
+                },
+                deletePreview: () async {
+                  await deletePreview?.call(report);
+                },
+              ),
             );
           },
-          separatorBuilder: (_, __) => const SizedBox(width: 16),
         ),
       ),
     );
   }
 
-  _errorState(Future<void> Function() retry) {
+  _errorState(Future<void> Function()? retry) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

@@ -1,7 +1,7 @@
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/api/slide/self.dart' as slide_api;
 
-class SlideBloc<T extends Slide> {
+abstract class SlideBloc<T extends Slide> {
   String slideshow;
   T initialSlide;
   void Function(T Function(T)) setSlide;
@@ -15,10 +15,14 @@ class SlideBloc<T extends Slide> {
   Future<void> rename(String title) async {
     setSlide((slide) => slide..title = title);
 
-    slide_api.renameSlide(
-      report: slideshow,
-      slide: initialSlide.identifier,
-      title: title,
-    );
+    slide_api
+        .renameSlide(
+          report: slideshow,
+          slide: initialSlide.identifier,
+          title: title,
+        )
+        .then((response) {
+          setSlide((slide) => slide..preview = response.filepath!);
+        });
   }
 }

@@ -1,9 +1,13 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ut_report_generator/api/hello_request.dart';
 import 'package:ut_report_generator/components/home/home_page_header/widget.dart';
 import 'package:ut_report_generator/components/home/home_page_header/state.dart';
+import 'package:ut_report_generator/components/home/recent_slideshows/slideshow_preview_card.dart';
 import 'package:ut_report_generator/components/home/recent_slideshows/state.dart';
 import 'package:ut_report_generator/components/home/startup_button/state.dart';
 import 'package:ut_report_generator/models/report/self.dart';
@@ -13,7 +17,7 @@ import 'package:ut_report_generator/models/response/recent_slideshows_response.d
 import 'package:ut_report_generator/models/response/report_preview.dart';
 import 'package:ut_report_generator/models/slideshow_editor_request.dart';
 import 'package:ut_report_generator/utils/future_status.dart';
-import 'package:ut_report_generator/api/report/self.dart' as slideshow_api;
+import 'package:ut_report_generator/api/slideshow/self.dart' as slideshow_api;
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 
 enum StartupOption { importZip, createVisualization, createReport }
@@ -29,6 +33,7 @@ class _HomePageState extends State<HomePage> {
   final RecentSlideshowsState _recentSlideshowsState = RecentSlideshowsState(
     status: FutureStatus.pending,
     response: null,
+    listKey: GlobalKey<AnimatedListState>(),
   );
 
   HomePageHeaderState _homePageHeaderState = HomePageHeaderState(
@@ -53,7 +58,24 @@ class _HomePageState extends State<HomePage> {
               values[0] as RecentSlideshowsResponse;
           final helloRequestResponse = values[1] as HelloRequestResponse;
           setState(() {
+            final previousReports = _recentSlideshowsState.response?.reports;
             _recentSlideshowsState.response = recentSlideshowsResponse;
+
+            if (previousReports != null) {
+              for (
+                var i = 0;
+                i < recentSlideshowsResponse.reports.length;
+                i++
+              ) {
+                final newPreview = recentSlideshowsResponse.reports[i];
+                if (!previousReports.any(
+                  (preview) => preview.identifier == newPreview.identifier,
+                )) {
+                  _recentSlideshowsState.listKey.currentState!.insertItem(i);
+                }
+              }
+            }
+
             _recentSlideshowsState.status = FutureStatus.success;
             _homePageHeaderState = _homePageHeaderState.copyWith(
               response: helloRequestResponse,
@@ -101,6 +123,37 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _deleteSlideshowPreview(SlideshowPreview preview) async {
+    if (!mounted) return;
+    setState(() {
+      final index = _recentSlideshowsState.response!.reports.indexWhere(
+        (innerPreview) => innerPreview.identifier == preview.identifier,
+      );
+
+      _recentSlideshowsState.response!.reports.removeAt(index);
+      _recentSlideshowsState.listKey.currentState!.removeItem(index, (
+        context,
+        animation,
+      ) {
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            return Opacity(
+              opacity: animation.value,
+              child: Transform.scale(scale: animation.value, child: child),
+            );
+          },
+          child: SlideshowPreviewCard(
+            preview: preview.preview,
+            name: preview.name,
+            lastOpen: "Ahora",
+          ),
+        );
+      });
+    });
+    await slideshow_api.deleteSlideshow(slideshow: preview.identifier);
+  }
+
   void _selectFiles(
     bool allowMultiple,
     List<String> allowedExtensions,
@@ -128,19 +181,19 @@ class _HomePageState extends State<HomePage> {
         if (!mounted) return;
         _openSlideshowEditor(
           SlideshowEditorRequest(
-            startCallback: () => slideshow_api.startReport_withImageSlide(),
+            startCallback: () => slideshow_api.startSlideshowWithImageSlide(),
             callbackWhenReturning: _loadStates,
           ),
         );
         return;
       case StartupOption.importZip:
         _selectFiles(false, [".zip"], (files) async {
-          return slideshow_api.importReport(rootDirectory: files[0]);
+          return slideshow_api.importSlideshow(rootDirectory: files[0]);
         });
         break;
       case StartupOption.createVisualization:
         _selectFiles(true, [".xls"], (files) async {
-          return slideshow_api.startReport_withPivotTable(files);
+          return slideshow_api.startSlideshowWithPivotTable(files);
         });
         break;
     }
@@ -182,6 +235,7 @@ class _HomePageState extends State<HomePage> {
             state: _recentSlideshowsState,
             retry: _retryToLoadRecentSlideshows,
             openPreview: _openSlideshowPreview,
+            deletePreview: _deleteSlideshowPreview,
           ),
         ],
       ),
