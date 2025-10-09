@@ -22,6 +22,7 @@ class _StartupButtonItemState extends State<StartupButtonItem> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) {
         setState(() {
           _isHovered = true;

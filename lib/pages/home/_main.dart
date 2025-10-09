@@ -45,6 +45,66 @@ class _HomePageState extends State<HomePage> {
     ),
   );
 
+  void _setRecentSlideshows(
+    RecentSlideshowsResponse? recentSlideshowsResponse,
+  ) {
+    if (recentSlideshowsResponse != null) {
+      setState(() {
+        final previousSlideshows = _recentSlideshowsState.response?.reports;
+        _recentSlideshowsState.response = recentSlideshowsResponse;
+
+        if (previousSlideshows != null) {
+          for (final (index, preview) in previousSlideshows.indexed) {
+            final isDeletion =
+                !recentSlideshowsResponse.reports
+                    .map((slideshow) => slideshow.identifier)
+                    .contains(preview.identifier);
+            if (isDeletion) {
+              _removeSlideshowPreviewFromList(preview, index);
+            }
+          }
+
+          for (final (index, preview)
+              in recentSlideshowsResponse.reports.indexed) {
+            final isAddition =
+                !previousSlideshows
+                    .map((slideshow) => slideshow.identifier)
+                    .contains(preview.identifier);
+
+            if (isAddition) {
+              _recentSlideshowsState.listKey.currentState!.insertItem(index);
+            }
+          }
+        }
+
+        _recentSlideshowsState.status = FutureStatus.success;
+      });
+    } else {
+      setState(() {
+        _recentSlideshowsState.response = null;
+        _recentSlideshowsState.status = FutureStatus.error;
+      });
+    }
+  }
+
+  void _setHomePageHeader(HelloRequestResponse? helloRequestResponse) {
+    if (helloRequestResponse != null) {
+      setState(() {
+        _homePageHeaderState = _homePageHeaderState.copyWith(
+          response: helloRequestResponse,
+          status: FutureStatus.success,
+        );
+      });
+    } else {
+      setState(() {
+        _homePageHeaderState = _homePageHeaderState.copyWith(
+          response: null,
+          status: FutureStatus.error,
+        );
+      });
+    }
+  }
+
   Future<void> _loadStates() async {
     await Future.wait([
           waitAtLeast(
@@ -57,41 +117,12 @@ class _HomePageState extends State<HomePage> {
           final recentSlideshowsResponse =
               values[0] as RecentSlideshowsResponse;
           final helloRequestResponse = values[1] as HelloRequestResponse;
-          setState(() {
-            final previousReports = _recentSlideshowsState.response?.reports;
-            _recentSlideshowsState.response = recentSlideshowsResponse;
-
-            if (previousReports != null) {
-              for (
-                var i = 0;
-                i < recentSlideshowsResponse.reports.length;
-                i++
-              ) {
-                final newPreview = recentSlideshowsResponse.reports[i];
-                if (!previousReports.any(
-                  (preview) => preview.identifier == newPreview.identifier,
-                )) {
-                  _recentSlideshowsState.listKey.currentState!.insertItem(i);
-                }
-              }
-            }
-
-            _recentSlideshowsState.status = FutureStatus.success;
-            _homePageHeaderState = _homePageHeaderState.copyWith(
-              response: helloRequestResponse,
-              status: FutureStatus.success,
-            );
-          });
+          _setRecentSlideshows(recentSlideshowsResponse);
+          _setHomePageHeader(helloRequestResponse);
         })
         .catchError((_) {
-          setState(() {
-            _recentSlideshowsState.response = null;
-            _recentSlideshowsState.status = FutureStatus.error;
-            _homePageHeaderState = _homePageHeaderState.copyWith(
-              response: null,
-              status: FutureStatus.error,
-            );
-          });
+          _setRecentSlideshows(null);
+          _setHomePageHeader(null);
         });
   }
 
@@ -123,6 +154,35 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _openDeleteSlideshowDialog(SlideshowPreview preview) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Eliminar presentación"),
+          content: Text(
+            "¿Estás seguro de querer eliminar esta presentación? Esta acción no es reversible; todos tus datos se perderán",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteSlideshowPreview(preview);
+              },
+              child: Text("Sí"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _deleteSlideshowPreview(SlideshowPreview preview) async {
     if (!mounted) return;
     setState(() {
@@ -131,27 +191,31 @@ class _HomePageState extends State<HomePage> {
       );
 
       _recentSlideshowsState.response!.reports.removeAt(index);
-      _recentSlideshowsState.listKey.currentState!.removeItem(index, (
-        context,
-        animation,
-      ) {
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (context, child) {
-            return Opacity(
-              opacity: animation.value,
-              child: Transform.scale(scale: animation.value, child: child),
-            );
-          },
-          child: SlideshowPreviewCard(
-            preview: preview.preview,
-            name: preview.name,
-            lastOpen: "Ahora",
-          ),
-        );
-      });
+      _removeSlideshowPreviewFromList(preview, index);
     });
     await slideshow_api.deleteSlideshow(slideshow: preview.identifier);
+  }
+
+  void _removeSlideshowPreviewFromList(SlideshowPreview preview, int index) {
+    _recentSlideshowsState.listKey.currentState!.removeItem(index, (
+      context,
+      animation,
+    ) {
+      return AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) {
+          return Opacity(
+            opacity: animation.value,
+            child: Transform.scale(scale: animation.value, child: child),
+          );
+        },
+        child: SlideshowPreviewCard(
+          preview: preview.preview,
+          name: preview.name,
+          lastOpen: "Ahora",
+        ),
+      );
+    });
   }
 
   void _selectFiles(
@@ -200,7 +264,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _openSlideshowEditor(SlideshowEditorRequest request) async {
-    await context.push("/home/report-editor", extra: request);
+    await context.push("/home/slideshow_editor", extra: request);
   }
 
   @override
@@ -235,7 +299,7 @@ class _HomePageState extends State<HomePage> {
             state: _recentSlideshowsState,
             retry: _retryToLoadRecentSlideshows,
             openPreview: _openSlideshowPreview,
-            deletePreview: _deleteSlideshowPreview,
+            deletePreview: _openDeleteSlideshowDialog,
           ),
         ],
       ),

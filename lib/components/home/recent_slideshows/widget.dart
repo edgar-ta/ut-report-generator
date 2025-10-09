@@ -157,9 +157,10 @@ class _RecentSlideshowsState extends State<RecentSlideshows> {
   _errorState(Future<void> Function()? retry) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text("No se pudieron obtener los reportes recientes"),
-        Text("(×_×)"),
+        Text("(×_×)", style: TextStyle(fontSize: 48)),
         TextButton(onPressed: retry, child: Text("Reintentar")),
       ],
     );

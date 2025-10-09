@@ -24,7 +24,7 @@ import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 import 'package:ut_report_generator/utils/future_status.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
-import 'package:ut_report_generator/api/slideshow/self.dart' as report_api;
+import 'package:ut_report_generator/api/slideshow/self.dart' as slideshow_api;
 
 class SlideshowEditor extends StatefulWidget {
   final Future<Slideshow> Function() slideshowCallback;
@@ -128,7 +128,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
         ExportBoxEntry(
           identifier: identifier,
           process: Future.delayed(Duration(seconds: 2), () {
-            return report_api.compileSlideshow(
+            return slideshow_api.compileSlideshow(
               report: state.slideshow!.identifier,
             );
           }),
@@ -154,7 +154,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
         ExportBoxEntry(
           identifier: identifier,
           process: Future.delayed(Duration(seconds: 2), () {
-            return report_api.exportSlideshow(
+            return slideshow_api.exportSlideshow(
               report: state.slideshow!.identifier,
             );
           }),
@@ -172,6 +172,39 @@ class _SlideshowEditorState extends State<SlideshowEditor>
     });
   }
 
+  void _deleteSlideshow() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Eliminar presentación"),
+          content: Text(
+            "¿Estás seguro de querer eliminar esta presentación? Esta acción no es reversible; todos tus datos se perderán",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await slideshow_api
+                    .deleteSlideshow(slideshow: state.slideshow!.identifier)
+                    .then((_) {
+                      _returnToHome();
+                    });
+              },
+              child: Text("Sí"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _slideshowEditorFab(BuildContext context) {
     return SlideshowEditorFab(
       addPivotTable: () async {
@@ -185,23 +218,26 @@ class _SlideshowEditorState extends State<SlideshowEditor>
     return CommonAppbar(
       actions: [
         PopupMenuButton(
-          icon: const Icon(Icons.import_export_outlined, color: Colors.white),
-          tooltip: "Exportar reporte",
+          icon: const Icon(Icons.more_vert, color: Colors.white),
+          tooltip: "Más opciones",
           onSelected: (value) {
-            if (value == "pdf") {
+            if (value == "pptx") {
               _compileReport();
             }
             if (value == "zip") {
               _exportSlideshow();
             }
+            if (value == "delete") {
+              _deleteSlideshow();
+            }
           },
           itemBuilder:
               (BuildContext context) => <PopupMenuEntry<String>>[
                 const PopupMenuItem<String>(
-                  value: "pdf",
+                  value: "pptx",
                   child: ListTile(
-                    leading: Icon(Icons.picture_as_pdf),
-                    title: Text('Exportar PDF'),
+                    leading: Icon(Icons.slideshow),
+                    title: Text('Exportar PPTX'),
                   ),
                 ),
                 const PopupMenuItem<String>(
@@ -211,20 +247,29 @@ class _SlideshowEditorState extends State<SlideshowEditor>
                     title: Text('Exportar ZIP'),
                   ),
                 ),
+                const PopupMenuItem<String>(
+                  value: "delete",
+                  child: ListTile(
+                    leading: Icon(Icons.delete),
+                    title: Text("Eliminar presentación"),
+                  ),
+                ),
               ],
         ),
       ],
       leading: IconButton(
-        onPressed: () async {
-          context.read<ScaffoldController>()
-            ..setAppBarBuilder(null)
-            ..setFabBuilder(null);
-          context.pop();
-          await widget.callbackWhenReturning();
-        },
+        onPressed: _returnToHome,
         icon: Icon(Icons.arrow_back, color: Colors.white),
       ),
     );
+  }
+
+  Future<void> _returnToHome() async {
+    context.read<ScaffoldController>()
+      ..setAppBarBuilder(null)
+      ..setFabBuilder(null);
+    context.pop();
+    await widget.callbackWhenReturning();
   }
 
   @override

@@ -38,7 +38,7 @@ final router = GoRouter(
               builder: (context, state) => HomePage(),
               routes: [
                 GoRoute(
-                  path: 'report-editor',
+                  path: 'slideshow_editor',
                   builder: (context, state) {
                     final extra = state.extra as SlideshowEditorRequest;
                     return SlideshowEditor(
