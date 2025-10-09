@@ -3,7 +3,6 @@ from lib.get_entities_from_request import entities_for_editing_filter
 from lib.descriptive_error import DescriptiveError
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.bring_filter_up import bring_filter_up
-from lib.pivot_table.plot_pivot_table import plot_from_entities
 
 from models.response.edit_pivot_table_response import EditPivotTable_Response
 from models.pivot_table.data_filter.selection_mode import SelectionMode

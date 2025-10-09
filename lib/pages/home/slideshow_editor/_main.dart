@@ -343,7 +343,6 @@ class _SlideshowEditorState extends State<SlideshowEditor>
             slideshow: state.slideshow!.identifier,
             initialSlide: imageSlide,
             setSlide: (callback) {
-              print("Calling the image slide");
               _setSlide(imageSlide.identifier, callback);
             },
           ),
@@ -352,7 +351,6 @@ class _SlideshowEditorState extends State<SlideshowEditor>
             slideshow: state.slideshow!.identifier,
             initialSlide: pivotTable,
             setSlide: (callback) {
-              print("Calling the pivot table");
               _setSlide(pivotTable.identifier, callback);
             },
           ),

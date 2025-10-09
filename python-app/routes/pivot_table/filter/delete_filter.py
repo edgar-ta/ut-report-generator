@@ -2,7 +2,6 @@ from lib.with_flask import with_flask
 from lib.descriptive_error import DescriptiveError
 from lib.get_entities_from_request import entities_for_editing_filter
 from lib.pivot_table.recalculate import recalculate
-from lib.pivot_table.plot_pivot_table import plot_from_entities
 
 from models.response.edit_pivot_table_response import EditPivotTable_Response
 

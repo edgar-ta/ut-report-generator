@@ -8,7 +8,6 @@ from lib.data_frame.data_frame_io import import_data_frame, export_data_frame
 from lib.pivot_table.read_excel import read_excel
 from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
 from lib.pivot_table.recalculate import recalculate
-from lib.pivot_table.plot_pivot_table import plot_from_entities
 from lib.directory_definitions import data_file_of_slide
 
 from models.response.edit_pivot_table_response import EditPivotTable_Response

@@ -5,7 +5,6 @@ from lib.descriptive_error import DescriptiveError
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.ordered_filters import find_filter
 from lib.pivot_table.get_combinable_filters import get_combinable_filters
-from lib.pivot_table.plot_pivot_table import plot_from_entities
 from lib.pivot_table.recalculate import recalculate
 from lib.data_frame.data_frame_io import import_data_frame
 

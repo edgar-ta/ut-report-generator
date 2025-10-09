@@ -1,6 +1,7 @@
 from lib.directory_definitions import temporary_compiled_file_of_report, preview_image_of_slide
 from lib.descriptive_error import DescriptiveError
 from lib.report.compile_slides import compile_slides
+from lib.slide.get_slide_state import get_slide_state, SlideState
 
 from models.slide.self import Slide as ProjectSlide
 
@@ -10,12 +11,18 @@ import os
 
 def render_preview(root_directory: str, slides: ProjectSlide | list[ProjectSlide]):
     '''
-    Adds a preview for the array of slides given. It modifies the objects in place
+    Takes a list or a single slide whose state is HAS_DIRECTORY_BUT_NO_PREVIEW and 
+    renders their preview (that is, it makes their state HAS_PREVIEW).
+
+    It modifies the slide objects in place
     '''
     if not isinstance(slides, list):
         slides = [slides]
 
-    if not all(slide.preview is None for slide in slides):
+    if not all(
+        get_slide_state(root_directory=root_directory, slide=slide) == SlideState.HAS_DIRECTORY_BUT_NO_PREVIEW 
+        for slide in slides
+        ):
         raise DescriptiveError(http_error_code=500, message='Se intentó renderizar la vista previa de una diapositiva que ya tenía vista previa')
 
     temporary_path = temporary_compiled_file_of_report(root_directory=root_directory)

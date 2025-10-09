@@ -5,6 +5,7 @@ from lib.report.get_id_of_report import get_id_of_report
 from lib.report.get_preview_of_report import get_preview_of_report
 
 from models.report.self import Report
+from models.response.recent_reports_response import RecentReportsResponse, ReportPreview
 
 from control_variables import REPORTS_CHUNK_SIZE
 
@@ -49,16 +50,16 @@ def get_recent_reports():
     has_more = len(reports) > REPORTS_CHUNK_SIZE
     last_report = reports[-1] if len(reports) > 0 else None
 
-    return {
-        "reports": [
-            {
-                "preview": get_preview_of_report(report=report),
-                "name": report.report_name,
-                "identifier": report.identifier,
-                'last_open': Timestamp.fromtimestamp(os.path.getmtime(report.root_directory)).isoformat(),
-            }
+    return RecentReportsResponse(
+        reports=[
+            ReportPreview(
+                preview=get_preview_of_report(report=report),
+                name=report.report_name,
+                identifier=report.identifier,
+                last_open=Timestamp.fromtimestamp(os.path.getmtime(report.root_directory)),
+            )
             for report in reports
         ],
-        "has_more": has_more,
-        "last_report": last_report.root_directory if last_report is not None else None
-    }, 200
+        has_more=has_more,
+        last_report=last_report.identifier if last_report is not None else None
+    ).to_dict(), 200
