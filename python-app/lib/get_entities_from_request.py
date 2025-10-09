@@ -5,6 +5,7 @@ from models.report.self import Report
 from models.pivot_table.self import PivotTable
 from models.pivot_table.data_filter.self import DataFilter
 from models.image_slide.self import ImageSlide
+from models.slide.self import Slide
 
 import flask
 
@@ -12,6 +13,15 @@ def entities_for_editing_report(request: flask.Request) -> Report:
     report: Report = get_or_panic(request.json, 'report', 'El identificador del reporte no está presente en la solicitud')
     report = Report.from_identifier(identifier=report)
     return report
+
+def entities_for_editing_slide(request: flask.Request) -> tuple[str, Report, Slide]:
+    report = entities_for_editing_report(request=request)
+    root_directory = report.root_directory
+
+    slide = get_or_panic(request.json, 'slide', 'El identificador de la diapositiva no está presente en la solicitud')
+    slide = report[slide]
+    
+    return (root_directory, report, slide)
 
 def entities_for_editing_pivot_table(request: flask.Request) -> tuple[Report, PivotTable]:
     report: Report = get_or_panic(request.json, 'report', 'El identificador del reporte no está presente en la solicitud')

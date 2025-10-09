@@ -94,8 +94,13 @@ class Report:
         self.slides.append(slide)
     
     def save(self):
-        last_edits = [ slide.last_edit for slide in self.slides ]
+        last_edits = [] 
+
+        if len(self.slides) > 0:
+            last_edits.extend([ slide.last_edit for slide in self.slides ])
+
         last_edits.append(self.last_edit)
+        
         self.last_edit = max(last_edits)
         metadata_file = metadata_file_of_report(root_directory=self.root_directory)
 

@@ -22,7 +22,7 @@ abstract class SlideBloc<T extends Slide> {
           title: title,
         )
         .then((response) {
-          setSlide((slide) => slide..preview = response.filepath!);
+          setSlide((slide) => slide..preview = response.filepath);
         });
   }
 }

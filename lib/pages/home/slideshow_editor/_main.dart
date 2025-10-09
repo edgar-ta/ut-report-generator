@@ -15,7 +15,6 @@ import 'package:ut_report_generator/components/slideshow_editor/file_selector/wi
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/components/util/common_appbar.dart';
-import 'package:ut_report_generator/models/report/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/components/slideshow_editor/export_box/widget.dart';
 import 'package:ut_report_generator/pages/home/slideshow_editor/slide/shimmer_slide.dart';
@@ -25,6 +24,7 @@ import 'package:ut_report_generator/utils/design_constants.dart';
 import 'package:ut_report_generator/utils/future_status.dart';
 import 'package:ut_report_generator/utils/wait_at_least.dart';
 import 'package:ut_report_generator/api/slideshow/self.dart' as slideshow_api;
+import 'package:ut_report_generator/api/slide/self.dart' as slide_api;
 
 class SlideshowEditor extends StatefulWidget {
   final Future<Slideshow> Function() slideshowCallback;
@@ -337,6 +337,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
 
     return SlideshowEditorMenu(
       slide: openSlide,
+      deleteSlide: () async => _openDeleteSlideDialog(openSlide!),
       imageSlideBlocBuilder:
           (imageSlide) => ImageSlideBloc(
             slideshow: state.slideshow!.identifier,
@@ -355,6 +356,62 @@ class _SlideshowEditorState extends State<SlideshowEditor>
               _setSlide(pivotTable.identifier, callback);
             },
           ),
+    );
+  }
+
+  void _openDeleteSlideDialog(Slide slide) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Eliminar diapositiva"),
+          content: Text(
+            "¿Estás seguro de querer borrar esta diapositiva? Esta acción no se puede revertir; tus cambios se perderán",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                _deleteSlide(slide);
+              },
+              child: Text("Yes"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteSlide(Slide slide) async {
+    setState(() {
+      final index = state.slideshow!.slides.indexWhere(
+        (innerSlide) => innerSlide.identifier == slide.identifier,
+      );
+
+      final newSlides = [...state.slideshow!.slides];
+      state.visibleSlidesListKey.currentState!.removeItem(index, (
+        context,
+        animation,
+      ) {
+        return Text("This slide is being removed");
+      });
+      newSlides.removeAt(index);
+
+      state = state.copyWith(
+        openSlideIdentifier: null,
+        slideshow: state.slideshow!.copyWith(slides: newSlides),
+      );
+    });
+
+    await slide_api.deleteSlide(
+      slideshow: state.slideshow!.identifier,
+      slide: slide.identifier,
     );
   }
 

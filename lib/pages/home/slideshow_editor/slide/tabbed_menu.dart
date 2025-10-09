@@ -53,7 +53,16 @@ class _TabbedMenuState extends State<TabbedMenu>
           Expanded(
             child: TabBarView(
               controller: _controller,
-              children: [widget.editPane, widget.metadataPane],
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: widget.editPane,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: widget.metadataPane,
+                ),
+              ],
             ),
           ),
         ],

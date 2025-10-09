@@ -119,7 +119,7 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
         for (var i = 0; i < state.slideshow!.slides.length; i++) {
           final slide = state.slideshow!.slides[i];
           if (slide.category == SlideCategory.imageSlide) {
-            state.visibleSlidesListKey.currentState!.insertItem(i);
+            state.visibleSlidesListKey.currentState?.insertItem(i);
           }
         }
         return state.copyWith(

@@ -12,11 +12,14 @@ import 'package:ut_report_generator/pages/home/slideshow_editor/slide/tabbed_men
 import 'package:ut_report_generator/utils/design_constants.dart';
 
 class SlideshowEditorMenu extends StatefulWidget {
+  Future<void> Function()? deleteSlide;
+
   SlideshowEditorMenu({
     super.key,
     this.slide,
     required this.imageSlideBlocBuilder,
     required this.pivotTableBlocBuilder,
+    this.deleteSlide,
   });
 
   Slide? slide;
@@ -48,6 +51,7 @@ class _SlideshowEditorMenuState extends State<SlideshowEditorMenu> {
         title: pivotTable.title,
         bloc: bloc,
         filters: pivotTable.filters,
+        deleteSlide: widget.deleteSlide,
       ),
       metadataPane: PivotMetadataPane(
         files: pivotTable.source.files,
@@ -63,6 +67,7 @@ class _SlideshowEditorMenuState extends State<SlideshowEditorMenu> {
         title: imageSlide.title,
         parameters: imageSlide.parameters,
         bloc: bloc,
+        deleteSlide: widget.deleteSlide,
       ),
       metadataPane: SlideMetadataPane(
         identifier: imageSlide.identifier,
