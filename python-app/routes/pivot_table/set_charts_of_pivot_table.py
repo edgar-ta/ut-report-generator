@@ -13,6 +13,7 @@ import pandas
 @with_flask("/set_charts", methods=["POST"])
 def set_charts_of_pivot_table():
     report, pivot_table = entities_for_editing_pivot_table(request=request)
+    root_directory = report.root_directory
     chart_index = request.json['chart']
     super_chart_index = request.json['super_chart']
 
@@ -47,7 +48,7 @@ def set_charts_of_pivot_table():
 
             _filter.charting_mode = ChartingMode.NONE
 
-    recalculate(report=report, pivot_table=pivot_table)
+    recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()

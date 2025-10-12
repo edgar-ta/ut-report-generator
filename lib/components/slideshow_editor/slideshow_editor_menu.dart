@@ -48,9 +48,8 @@ class _SlideshowEditorMenuState extends State<SlideshowEditorMenu> {
     final bloc = widget.pivotTableBlocBuilder(pivotTable);
     return TabbedMenu(
       editPane: PivotTableEditPane(
-        title: pivotTable.title,
+        pivotTable: pivotTable,
         bloc: bloc,
-        filters: pivotTable.filters,
         deleteSlide: widget.deleteSlide,
       ),
       metadataPane: PivotMetadataPane(

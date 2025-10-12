@@ -14,6 +14,7 @@ import pandas
 @with_flask("/add", methods=["POST"])
 def add_option_to_filter():
     report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
+    root_directory = report.root_directory
 
     if _filter.selection_mode != SelectionMode.MANY:
         raise DescriptiveError(http_error_code=400, message="Se intentó añadir una opción a un filtro de tipo 'ONE'")
@@ -28,7 +29,7 @@ def add_option_to_filter():
     
     pivot_table.filters_order = bring_filter_up(filters=pivot_table.filters_order, edited_filter=_filter.level)
 
-    recalculate(report=report, pivot_table=pivot_table)
+    recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()

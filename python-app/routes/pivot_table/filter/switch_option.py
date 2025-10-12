@@ -14,6 +14,7 @@ import pandas
 @with_flask("/switch", methods=["POST"])
 def switch_option_in_filter():
     report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
+    root_directory = report.root_directory
 
     if not option in _filter.possible_values:
         raise DescriptiveError(http_error_code=400, message="La opción seleccionada no es válida para el filtro")
@@ -32,7 +33,7 @@ def switch_option_in_filter():
     _filter.selected_values = [option]
     pivot_table.filters_order = bring_filter_up(filters=pivot_table.filters_order, edited_filter=_filter.level)
 
-    recalculate(report=report, pivot_table=pivot_table)
+    recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()

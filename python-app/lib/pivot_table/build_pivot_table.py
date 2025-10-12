@@ -8,6 +8,7 @@ from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
 from lib.pivot_table.read_excel import read_excel
 from lib.pivot_table.create_default_filters import create_default_filters
 from lib.pivot_table.render_bare_preview_of_pivot_table import render_bare_preview_of_pivot_table
+from lib.pivot_table.recalculate import recalculate
 
 from models.pivot_table.self import PivotTable
 from models.pivot_table.aggregate_function_type import AggregateFunctionType
@@ -58,13 +59,6 @@ def build_pivot_table(root_directory: str, local_request: flask.Request) -> Pivo
     default_filters = create_default_filters(data_frame=main_frame)
     default_title = "Mi tabla dinámica"
 
-    data = get_data_of_frame(
-        data_frame=main_frame, 
-        filters=default_filters, 
-        filter_function=default_filter_function, 
-        aggregate_function=default_aggregate_function, 
-        )
-
     pivot_table = PivotTable(
         title=default_title,
         identifier=slide_identifier,
@@ -75,11 +69,11 @@ def build_pivot_table(root_directory: str, local_request: flask.Request) -> Pivo
         filters=default_filters,
         filters_order=[ _filter.level for _filter in default_filters ],
         source=data_source,
-        data=data,
+        data=None,
         aggregate_function=default_aggregate_function,
         filter_function=default_filter_function,
     )
 
-    render_bare_preview_of_pivot_table(root_directory=root_directory, pivot_table=pivot_table)
+    recalculate(root_directory=root_directory, pivot_table=pivot_table, preloaded_data_frame=main_frame)
     
     return pivot_table

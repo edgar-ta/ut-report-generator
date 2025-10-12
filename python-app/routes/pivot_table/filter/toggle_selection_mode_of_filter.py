@@ -14,6 +14,7 @@ import pandas
 @with_flask("/toggle_selection_mode", methods=["POST"])
 def toggle_selection_mode_of_filter():
     report, pivot_table, _filter, _ = entities_for_editing_filter(request=request, get_option=False)
+    root_directory = report.root_directory
 
     if not is_valid_filter(_filter=_filter):
         raise DescriptiveError(http_error_code=400, message="El filtro seleccionado es de tipo inválido (no tiene valores posibles)")
@@ -28,7 +29,7 @@ def toggle_selection_mode_of_filter():
     
     if do_recalculation:
         pivot_table.filters_order = bring_filter_up(filters=pivot_table.filters_order, edited_filter=_filter.level)
-        recalculate(report=report, pivot_table=pivot_table)
+        recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()

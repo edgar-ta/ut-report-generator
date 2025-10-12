@@ -1,10 +1,10 @@
 // ignore: camel_case_types
-class EditImageSlide_Response {
+class EditImageSlideResponse {
   String preview;
 
-  EditImageSlide_Response({required this.preview});
+  EditImageSlideResponse({required this.preview});
 
-  factory EditImageSlide_Response.fromJson(Map<String, dynamic> json) {
-    return EditImageSlide_Response(preview: json['preview'] as String);
+  factory EditImageSlideResponse.fromJson(Map<String, dynamic> json) {
+    return EditImageSlideResponse(preview: json['preview'] as String);
   }
 }
