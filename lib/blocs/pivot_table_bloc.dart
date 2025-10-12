@@ -1,5 +1,6 @@
 import 'package:ut_report_generator/blocs/slide_bloc.dart';
 import 'package:ut_report_generator/models/pivot_table/aggregate_function_type.dart';
+import 'package:ut_report_generator/models/pivot_table/filter_function_type.dart';
 import 'package:ut_report_generator/models/response/edit_pivot_table_response.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
@@ -418,6 +419,20 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
           slideshow: slideshow,
           pivotTable: initialSlide.identifier,
           aggregateFunction: aggregateFunction,
+        )
+        .then(_updateAfterEdition);
+  }
+
+  Future<void> setFilterFunction(FilterFunctionType filterFunction) async {
+    setSlide(
+      (pivotTable) => pivotTable.copyWith(filterFunction: filterFunction),
+    );
+
+    await pivot_table
+        .setFilterFunction(
+          slideshow: slideshow,
+          pivotTable: initialSlide.identifier,
+          filterFunction: filterFunction,
         )
         .then(_updateAfterEdition);
   }

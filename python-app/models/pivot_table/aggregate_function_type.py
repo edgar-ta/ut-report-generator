@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from numpy import average
+from numpy import isnan
 
 from typing import Callable
 
@@ -17,7 +17,7 @@ class AggregateFunctionType(Enum):
             case AggregateFunctionType.COUNT:
                 return lambda values: values.size
             case AggregateFunctionType.AVERAGE:
-                return lambda values: values.mean()
+                return lambda values: mean if not isnan(mean := values.mean()) else 0
             case AggregateFunctionType.MIN:
                 return lambda values: values.min()
             case AggregateFunctionType.MAX:
