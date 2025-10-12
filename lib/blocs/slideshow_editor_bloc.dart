@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ut_report_generator/api/pivot_table/create_pivot_table.dart'
     as pivot_table_api;
 import 'package:ut_report_generator/blocs/bloc.dart';
+import 'package:ut_report_generator/components/slideshow_editor/add_slide_dialog/entry.dart';
+import 'package:ut_report_generator/components/slideshow_editor/add_slide_dialog/widget.dart';
+import 'package:ut_report_generator/components/slideshow_editor/file_selector/widget.dart';
+import 'package:ut_report_generator/components/slideshow_editor/image_slide_previews/cover_page_preview.dart';
+import 'package:ut_report_generator/components/slideshow_editor/image_slide_previews/image_left_preview.dart';
+import 'package:ut_report_generator/components/slideshow_editor/image_slide_previews/title_and_content_preview.dart';
+import 'package:ut_report_generator/models/image_slide/image_slide_kind.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report/self.dart';
@@ -160,5 +167,74 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
             }
           });
         });
+  }
+
+  List<String> _getRecentFiles() {
+    var pivotTables =
+        initialState.slideshow!.slides.whereType<PivotTable>().toList();
+    pivotTables.sort(
+      (first, second) => first.creationDate.compareTo(second.creationDate),
+    );
+    var uniqueFiles =
+        pivotTables
+            .map((pivotTable) => pivotTable.source.files)
+            .expand((files) => files)
+            .toSet()
+            .toList();
+    return uniqueFiles;
+  }
+
+  void openAddPivotTableDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        var recentFiles = _getRecentFiles();
+
+        return FileSelector(
+          initialFiles: recentFiles,
+          defaultSelection: [],
+          legend: null,
+          onFilesSelected: (List<String> files) async {
+            await addPivotTable(
+              files: files,
+              controller: initialState.scrollController,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> openAddSlideDialog(BuildContext context) async {
+    if (initialState.slideshow!.visualizationMode ==
+        VisualizationMode.chartsOnly) {
+      openAddPivotTableDialog(context);
+      return;
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AddSlideDialog(
+            entries: [
+              AddSlideEntry(
+                kind: ImageSlideKind.coverPage,
+                title: "Portada",
+                preview: const CoverPagePreview(),
+              ),
+              AddSlideEntry(
+                kind: ImageSlideKind.titleAndContent,
+                title: "Título y texto",
+                preview: const TitleAndContentPreview(),
+              ),
+              AddSlideEntry(
+                kind: ImageSlideKind.imageLeft,
+                title: "Imagen izquierda",
+                preview: const ImageLeftPreview(),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }

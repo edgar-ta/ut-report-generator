@@ -60,41 +60,6 @@ class _SlideshowEditorState extends State<SlideshowEditor>
     _loadReport();
   }
 
-  List<String> _getRecentFiles() {
-    var pivotTables = state.slideshow!.slides.whereType<PivotTable>().toList();
-    pivotTables.sort(
-      (first, second) => first.creationDate.compareTo(second.creationDate),
-    );
-    var uniqueFiles =
-        pivotTables
-            .map((pivotTable) => pivotTable.source.files)
-            .expand((files) => files)
-            .toSet()
-            .toList();
-    return uniqueFiles;
-  }
-
-  void _addPivotTableDialog(SlideshowEditorBloc bloc) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        var recentFiles = _getRecentFiles();
-
-        return FileSelector(
-          initialFiles: recentFiles,
-          defaultSelection: [],
-          legend: null,
-          onFilesSelected: (List<String> files) async {
-            await bloc.addPivotTable(
-              files: files,
-              controller: state.scrollController,
-            );
-          },
-        );
-      },
-    );
-  }
-
   Future<void> _loadReport() async {
     return waitAtLeast(Duration(seconds: 1), widget.slideshowCallback())
         .then((report) {
@@ -105,9 +70,9 @@ class _SlideshowEditorState extends State<SlideshowEditor>
               openSlideIdentifier: state.openSlideIdentifier,
             );
           });
-          context.read<ScaffoldController>()
-            ..setFabBuilder(_slideshowEditorFab)
-            ..setAppBarBuilder(_slideshowEditorAppBar);
+          context.read<ScaffoldController>().setAppBarBuilder(
+            _slideshowEditorAppBar,
+          );
         })
         .catchError((_) {
           setState(() {
@@ -202,15 +167,6 @@ class _SlideshowEditorState extends State<SlideshowEditor>
           ],
         );
       },
-    );
-  }
-
-  Widget _slideshowEditorFab(BuildContext context) {
-    return SlideshowEditorFab(
-      addPivotTable: () async {
-        // _addPivotTableDialog(bloc);
-      },
-      addImageSlide: () async {},
     );
   }
 
@@ -466,7 +422,7 @@ class _SlideshowEditorState extends State<SlideshowEditor>
               if (bloc.visibleSlides.isEmpty)
                 EmptySlideshowPlaceholder(
                   onCreatePressed: () {
-                    _addPivotTableDialog(bloc);
+                    bloc.openAddPivotTableDialog(context);
                   },
                 ),
               if (bloc.visibleSlides.isNotEmpty)

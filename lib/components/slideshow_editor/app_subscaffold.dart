@@ -43,6 +43,16 @@ class _AppSubscaffoldState extends State<AppSubscaffold> {
             ),
           ),
         ),
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: FloatingActionButton(
+            onPressed: () {
+              widget.bloc.openAddSlideDialog(context);
+            },
+            child: Icon(Icons.add),
+          ),
+        ),
         AnimatedPositioned(
           duration: const Duration(milliseconds: 250),
           top: 0,
