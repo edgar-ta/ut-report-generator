@@ -113,6 +113,11 @@ class _PivotTableEditPaneState extends State<PivotTableEditPane> {
                   inputDecorationTheme: InputDecorationTheme(
                     border: UnderlineInputBorder(),
                   ),
+                  onSelected: (filterFunction) async {
+                    if (filterFunction != null) {
+                      await widget.bloc.setFilterFunction(filterFunction);
+                    }
+                  },
                   dropdownMenuEntries: [
                     DropdownMenuEntry(
                       value: FilterFunctionType.allStudents,
