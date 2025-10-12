@@ -1,7 +1,7 @@
 import 'package:ut_report_generator/api/send_request.dart';
 import 'package:ut_report_generator/models/response/edit_pivot_table_response.dart';
 
-Future<EditPivotTable_Response> toggleSelectionMode({
+Future<EditPivotTableResponse> toggleSelectionMode({
   required String report,
   required String pivotTable,
   required int filter,
@@ -9,6 +9,6 @@ Future<EditPivotTable_Response> toggleSelectionMode({
   return sendRequest(
     route: "pivot_table/filter/toggle_selection_mode",
     body: {"report": report, "pivot_table": pivotTable, "filter": filter},
-    callback: EditPivotTable_Response.fromJson,
+    callback: EditPivotTableResponse.fromJson,
   );
 }

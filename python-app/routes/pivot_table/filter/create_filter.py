@@ -5,7 +5,6 @@ from lib.descriptive_error import DescriptiveError
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.ordered_filters import find_filter
 from lib.pivot_table.get_combinable_filters import get_combinable_filters
-from lib.pivot_table.plot_pivot_table import plot_from_entities
 from lib.pivot_table.recalculate import recalculate
 from lib.data_frame.data_frame_io import import_data_frame
 
@@ -21,6 +20,7 @@ import pandas
 @with_flask("/create", methods=["POST"])
 def create_filter():
     report, pivot_table = entities_for_editing_pivot_table(request=request)
+    root_directory = report.root_directory
 
     level: PivotTableLevel = get_or_panic(request.json, 'level', 'No se incluyó el nivel del nuevo filtro en la request')
     try:
@@ -49,7 +49,7 @@ def create_filter():
     refined_filter = find_filter(level=level, filters=refined_filters)
 
     pivot_table.filters = refined_filters
-    recalculate(report=report, pivot_table=pivot_table)
+    recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()

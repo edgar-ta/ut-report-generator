@@ -1,15 +1,13 @@
-from lib.descriptive_error import DescriptiveError
-
 from models.slide.self import Slide
 
 import os
 
 def delete_preview(slide: Slide):
+    '''
+    Takes a slide of any state and makes it a non-HAS_PREVIEW slide
+    '''
     if slide.preview is None:
         return
-    
-    if os.path.exists(slide.preview) and not os.path.isfile(slide.preview):
-        raise DescriptiveError(http_error_code=500, message='La vista previa del reporte apunta hacia un archivo inválido')
 
     if os.path.exists(slide.preview):
         os.remove(slide.preview)

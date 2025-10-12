@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/blocs/image_slide_bloc.dart';
+import 'package:ut_report_generator/components/slideshow_editor/delete_slide_button.dart';
+import 'package:ut_report_generator/components/util/invisible_text_field.dart';
 import 'package:ut_report_generator/models/image_slide/image_slide_parameter.dart';
 import 'dart:async';
 
@@ -9,12 +11,14 @@ class ImageSlideEditPane extends StatefulWidget {
   final String title;
   final Map<String, ImageSlideParameter> parameters;
   final ImageSlideBloc bloc;
+  final Future<void> Function()? deleteSlide;
 
   const ImageSlideEditPane({
     super.key,
     required this.title,
     required this.parameters,
     required this.bloc,
+    required this.deleteSlide,
   });
 
   @override
@@ -47,21 +51,24 @@ class _ImageSlideEditPaneState extends State<ImageSlideEditPane> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        spacing: 16,
-        children: [
-          TextField(onChanged: _rename),
-          ...widget.parameters.entries.map((data) {
-            final (key, value) = (data.key, data.value);
-            return ParameterWidget(
-              parameter: value,
-              editParameter: (value) => widget.bloc.editParameter(key, value),
-            );
-          }),
-        ],
-      ),
+    return Column(
+      spacing: 16,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InvisibleTextField(
+          onChanged: _rename,
+          controller: _controller,
+          label: Text("Título"),
+        ),
+        ...widget.parameters.entries.map((data) {
+          final (key, value) = (data.key, data.value);
+          return ParameterWidget(
+            parameter: value,
+            editParameter: (value) => widget.bloc.editParameter(key, value),
+          );
+        }),
+        DeleteSlideButton(deleteSlide: widget.deleteSlide),
+      ],
     );
   }
 }

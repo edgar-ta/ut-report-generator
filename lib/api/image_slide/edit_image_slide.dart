@@ -1,7 +1,7 @@
 import 'package:ut_report_generator/api/send_request.dart';
 import 'package:ut_report_generator/models/response/edit_image_slide_response.dart';
 
-Future<EditImageSlide_Response> editSlide({
+Future<EditImageSlideResponse> editSlide({
   required String slideshow,
   required String imageSlide,
   required String parameterName,
@@ -15,6 +15,6 @@ Future<EditImageSlide_Response> editSlide({
       "parameter_name": parameterName,
       "parameter_value": parameterValue,
     },
-    callback: EditImageSlide_Response.fromJson,
+    callback: EditImageSlideResponse.fromJson,
   );
 }

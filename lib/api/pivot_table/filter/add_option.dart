@@ -1,7 +1,7 @@
 import 'package:ut_report_generator/api/send_request.dart';
 import 'package:ut_report_generator/models/response/edit_pivot_table_response.dart';
 
-Future<EditPivotTable_Response> addOptionToFilter({
+Future<EditPivotTableResponse> addOptionToFilter({
   required String report,
   required String pivotTable,
   required int filter,
@@ -15,6 +15,6 @@ Future<EditPivotTable_Response> addOptionToFilter({
       "filter": filter,
       "option": option,
     },
-    callback: EditPivotTable_Response.fromJson,
+    callback: EditPivotTableResponse.fromJson,
   );
 }

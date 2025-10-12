@@ -10,7 +10,7 @@ class ImageSlideBloc extends SlideBloc<ImageSlide> {
     required super.setSlide,
   });
 
-  void _updateAfterEdition(EditImageSlide_Response response) {
+  void _updateAfterEdition(EditImageSlideResponse response) {
     setSlide((imageSlide) => imageSlide.copyWith(preview: response.preview));
   }
 

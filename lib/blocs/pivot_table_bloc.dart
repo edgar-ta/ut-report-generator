@@ -1,4 +1,5 @@
 import 'package:ut_report_generator/blocs/slide_bloc.dart';
+import 'package:ut_report_generator/models/pivot_table/aggregate_function_type.dart';
 import 'package:ut_report_generator/models/response/edit_pivot_table_response.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/data_filter/selection_mode.dart';
@@ -20,7 +21,7 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
     required super.setSlide,
   });
 
-  void _updateAfterEdition(EditPivotTable_Response response) {
+  void _updateAfterEdition(EditPivotTableResponse response) {
     print("Callback after edition");
     this.setSlide(
       (pivotTable) => pivotTable.copyWith(
@@ -403,5 +404,21 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
             ),
           );
         });
+  }
+
+  Future<void> setAggregateFunction(
+    AggregateFunctionType aggregateFunction,
+  ) async {
+    setSlide(
+      (pivotTable) => pivotTable.copyWith(aggregateFunction: aggregateFunction),
+    );
+
+    await pivot_table
+        .setAggregateFunction(
+          slideshow: slideshow,
+          pivotTable: initialSlide.identifier,
+          aggregateFunction: aggregateFunction,
+        )
+        .then(_updateAfterEdition);
   }
 }

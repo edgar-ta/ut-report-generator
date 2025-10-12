@@ -5,6 +5,7 @@ class InvisibleTextField extends StatefulWidget {
   final TextStyle? style;
   final TextAlign? textAlign;
   final void Function(String)? onChanged;
+  final Widget? label;
 
   const InvisibleTextField({
     super.key,
@@ -12,6 +13,7 @@ class InvisibleTextField extends StatefulWidget {
     this.style,
     this.textAlign,
     this.onChanged,
+    this.label,
   });
 
   @override
@@ -63,11 +65,13 @@ class _InvisibleTextFieldState extends State<InvisibleTextField> {
             bottom: BorderSide(color: _borderColor(context), width: 2),
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 8),
         child: TextField(
           controller: widget.controller,
           focusNode: _focusNode,
-          decoration: const InputDecoration(border: InputBorder.none),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            label: widget.label,
+          ),
           style: widget.style,
           textAlign: widget.textAlign ?? TextAlign.start,
           onChanged: widget.onChanged,

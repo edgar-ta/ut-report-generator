@@ -19,6 +19,7 @@ import pandas
 @with_flask("/add_file", methods=["POST"])
 def add_file_to_pivot_table():
     report, pivot_table = entities_for_editing_pivot_table(request=request)
+    root_directory = report.root_directory
     _file = get_or_panic(request.json, 'file', 'El archivo de datos no se incluyó en la solicitud')
 
     validate_file(data_file=_file)
@@ -43,7 +44,7 @@ def add_file_to_pivot_table():
         )
     pivot_table.source.merged_file = new_merged_file
 
-    recalculate(report=report, pivot_table=pivot_table, preloaded_data_frame=new_data_frame)    
+    recalculate(root_directory=root_directory, pivot_table=pivot_table, preloaded_data_frame=new_data_frame)    
 
     pivot_table.last_edit = pandas.Timestamp.now()
     report.save()

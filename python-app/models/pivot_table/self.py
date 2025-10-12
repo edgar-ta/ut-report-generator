@@ -71,25 +71,6 @@ class PivotTable(Slide):
             "filter_function": self.filter_function.value,
         }
     
-    def render_bare_preview(self, filepath: str):
-        outer_filter: DataFilter = next((_filter for _filter in self.filters if _filter.charting_mode == ChartingMode.SUPER_CHART), None)
-        if outer_filter is None:
-            outer_filter = next((_filter for _filter in self.filters if _filter.charting_mode == ChartingMode.CHART), None)
-
-        plot_data(
-            data=self.data, 
-            title=self.title, 
-            kind="bar", 
-            x_label=level_to_spanish(outer_filter.level), 
-            y_label=
-                aggregate_function_to_spanish(self.aggregate_function) + 
-                " de calificaciones de " + 
-                filter_function_to_spanish(outer_filter),
-            filepath=filepath
-            )
-        
-        self.bare_preview = filepath
-    
     def render(self, slide, drawable_area):
         grid_layout(
             slide=slide,
