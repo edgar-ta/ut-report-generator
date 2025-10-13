@@ -102,7 +102,7 @@ class _FileSelectorState extends State<FileSelector> {
               },
               regularText:
                   widget.legend ??
-                  "Escoja los archivos de base para generar su tabla dinámica",
+                  "Escoja los archivos de base para generar su gráfica",
               errorText: "Se debe seleccionar al menos un archivo",
             ),
             const SizedBox(height: 16),

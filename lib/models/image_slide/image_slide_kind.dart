@@ -1,1 +1,1 @@
-enum ImageSlideKind { coverPage, finalPage }
+enum ImageSlideKind { coverPage, imageLeft, titleAndContent, finalPage }
