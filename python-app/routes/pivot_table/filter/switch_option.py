@@ -8,11 +8,13 @@ from models.error.descriptive_error import DescriptiveError
 from models.response.edit_pivot_table_response import EditPivotTable_Response
 from models.pivot_table.data_filter.selection_mode import SelectionMode
 
+from routes.route_map import DATA_FILTER
+
 from flask import request
 
 import pandas
 
-@with_flask("/switch", methods=["POST"])
+@with_flask(DATA_FILTER.SWITCH_OPTION.value, methods=["POST"])
 def switch_option_in_filter():
     report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
     root_directory = report.root_directory

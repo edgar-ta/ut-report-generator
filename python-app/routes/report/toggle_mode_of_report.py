@@ -5,9 +5,11 @@ from lib.report.save_slideshow import save_slideshow
 from models.report.visualization_mode import VisualizationMode
 from models.response.success_response import SuccessResponse
 
+from routes.route_map import SLIDESHOW
+
 from flask import request
 
-@with_flask("toggle_mode", methods=["POST"])
+@with_flask(SLIDESHOW.TOGGLE_MODE.value, methods=["POST"])
 def toggle_mode_of_report():
     root_directory, report = entities_for_editing_report(request=request)
     if report.visualization_mode == VisualizationMode.AS_REPORT:

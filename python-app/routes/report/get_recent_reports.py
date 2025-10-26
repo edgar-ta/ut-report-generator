@@ -10,13 +10,15 @@ from models.response.recent_reports_response import RecentReportsResponse, Repor
 
 from constants.control_variables import REPORTS_CHUNK_SIZE
 
+from routes.route_map import SLIDESHOW
+
 from flask import request
 from itertools import dropwhile
 from pandas import Timestamp
 
 import os
 
-@with_flask("/get_recent", methods=["POST"])
+@with_flask(SLIDESHOW.GET_RECENT.value, methods=["POST"])
 def get_recent_reports():
     reference_report: str | None = getattr(request.json, 'report', None)
     

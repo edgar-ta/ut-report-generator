@@ -5,11 +5,13 @@ from lib.report.save_slideshow import save_slideshow
 
 from models.response.success_response import SuccessResponse
 
+from routes.route_map import SLIDE
+
 from flask import request
 from shutil import rmtree
 from pandas import Timestamp
 
-@with_flask("/delete", methods=["POST"])
+@with_flask(SLIDE.DELETE.value, methods=["POST"])
 def delete_slide():
     root_directory, report, slide = entities_for_editing_slide(request=request)
     report.slides = [ _slide for _slide in report.slides if _slide.identifier != slide.identifier ]

@@ -11,7 +11,7 @@ from routes.report.delete_report import delete_report
 
 from flask import Blueprint
 
-blueprint = Blueprint("report", __name__, url_prefix="/report")
+blueprint = Blueprint("slideshow", __name__, url_prefix="")
 
 export_report(blueprint)
 get_recent_reports(blueprint)

@@ -7,7 +7,7 @@ from routes.pivot_table.filter.toggle_selection_mode_of_filter import toggle_sel
 
 from flask import Blueprint
 
-blueprint = Blueprint("filter", __name__, url_prefix="/filter")
+blueprint = Blueprint("filter", __name__, url_prefix="")
 
 add_option_to_filter(blueprint)
 create_filter(blueprint)

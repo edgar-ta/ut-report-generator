@@ -8,11 +8,13 @@ from lib.report.save_slideshow import save_slideshow
 from models.error.descriptive_error import DescriptiveError
 from models.pivot_table.data_filter.selection_mode import SelectionMode
 
+from routes.route_map import DATA_FILTER
+
 from flask import request
 
 import pandas
 
-@with_flask("/toggle_selection_mode", methods=["POST"])
+@with_flask(DATA_FILTER.TOGGLE_MODE.value, methods=["POST"])
 def toggle_selection_mode_of_filter():
     report, pivot_table, _filter, _ = entities_for_editing_filter(request=request, get_option=False)
     root_directory = report.root_directory

@@ -8,6 +8,8 @@ from models.image_slide.self import ImageSlide
 from models.image_slide.cover_page_slide import CoverPageSlide
 from models.image_slide.title_and_content_slide import TitleAndContentSlide
 
+from routes.route_map import IMAGE_SLIDE
+
 from flask import request
 from uuid import uuid4
 from pandas import Timestamp
@@ -42,7 +44,7 @@ def image_slide_from_kind(kind: ImageSlideKind):
             pass
     pass
 
-@with_flask("/create", methods=["POST"])
+@with_flask(IMAGE_SLIDE.CREATE.value, methods=["POST"])
 def create_image_slide():
     report = entities_for_editing_report(request=request)
     root_directory = report.root_directory

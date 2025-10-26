@@ -12,15 +12,23 @@ from lib.report.save_slideshow import save_slideshow
 
 from models.response.edit_pivot_table_response import EditPivotTable_Response
 
+from routes.route_map import PIVOT_TABLE
+
 from flask import request
 
 import os
 import pandas
 
-@with_flask("/add_file", methods=["POST"])
+@with_flask(PIVOT_TABLE.ADD_FILE.value, methods=["POST"])
 def add_file_to_pivot_table():
     root_directory, report, pivot_table = entities_for_editing_pivot_table(request=request)
     _file = get_or_panic(request.json, 'file', 'El archivo de datos no se incluyó en la solicitud')
+    if _file in pivot_table.source.files:
+        return EditPivotTable_Response(
+            data=pivot_table.data,
+            filters=pivot_table.filters,
+            preview=pivot_table.preview
+        ).to_dict(), 200
 
     validate_file(data_file=_file)
     new_data_frame = read_excel(filename=_file)

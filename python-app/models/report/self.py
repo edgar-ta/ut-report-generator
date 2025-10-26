@@ -47,3 +47,16 @@ class Report:
         if slide is None:
             raise DescriptiveError(400, f"La diapositiva con id {key} no existe. Tal vez sea un error de dedo")
         return slide
+
+    def __repr__(self) -> str:
+        return (
+            f"Report("
+            f"  identifier={self.identifier!r}, "
+            f"  report_name={self.report_name!r}, "
+            f"  creation_date={self.creation_date!r}, "
+            f"  last_edit={self.last_edit!r}, "
+            f"  slides={len(self.slides)} slides, "
+            f"  visualization_mode={self.visualization_mode!r}, "
+            f"  version={self.version!r}"
+            f")"
+        )

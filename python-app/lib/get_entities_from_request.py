@@ -27,6 +27,8 @@ def entities_for_editing_pivot_table(request: flask.Request) -> tuple[str, Repor
 
     pivot_table = get_or_panic(request.json, 'pivot_table', 'El identificador de la tabla dinámica no está presente en la solicitud')
     pivot_table = report[pivot_table]
+    if not isinstance(pivot_table, PivotTable):
+        raise DescriptiveError(http_error_code=400, message="La id solicitada no pertenece a una diapositiva de tipo tabla dinámica")
 
     return (root_directory, report, pivot_table)
 
@@ -50,5 +52,7 @@ def entities_for_editing_image_slide(request: flask.Request) -> tuple[str, Repor
 
     image_slide = get_or_panic(request.json, 'image_slide', 'El identificador de la diapositiva de imagen no está presente en la solicitud')
     image_slide: ImageSlide = report[image_slide]
+    if not isinstance(image_slide, ImageSlide):
+        raise DescriptiveError(http_error_code=400, message="La id solicitada no pertenece a una diapositiva de tipo imagen")
 
     return (root_directory, report, image_slide)

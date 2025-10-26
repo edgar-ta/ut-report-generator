@@ -3,11 +3,13 @@ from lib.get_entities_from_request import entities_for_editing_pivot_table
 from lib.get_or_panic import get_or_panic
 from lib.report.save_slideshow import save_slideshow
 
+from routes.route_map import PIVOT_TABLE
+
 from flask import request
 
 import pandas
 
-@with_flask("/reorder_filter", methods=["POST"])
+@with_flask(PIVOT_TABLE.REORDER_FILTER.value, methods=["POST"])
 def reorder_filter_of_pivot_table():
     root_directory, report, pivot_table = entities_for_editing_pivot_table(request=request)
     old_index = get_or_panic(request.json, 'old_index', 'No se incluyó el antiguo índice del filtro a reordenar')

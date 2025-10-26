@@ -12,6 +12,8 @@ from models.report.self import Report
 from models.pivot_table.self import PivotTable
 from models.response.file_response import FileResponse
 
+from routes.route_map import SLIDESHOW
+
 from flask import request
 
 import os
@@ -42,7 +44,7 @@ def export_pivot_table_files(temporary_export_directory: str, pivot_tables: list
 
     save_slideshow(root_directory=temporary_export_directory, slideshow=exported_report)
 
-@with_flask("/export", methods=["POST"])
+@with_flask(SLIDESHOW.EXPORT.value, methods=["POST"])
 def export_report():
     root_directory, report = entities_for_editing_report(request=request)
 

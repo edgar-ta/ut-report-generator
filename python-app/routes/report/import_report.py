@@ -7,13 +7,15 @@ from lib.report.save_slideshow import save_slideshow
 
 from constants.control_variables import ZIP_COMPRESSION_LEVEL
 
+from routes.route_map import SLIDESHOW
+
 from flask import request
 from uuid import uuid4
 
 import os
 import zipfile
 
-@with_flask("/import", methods=["POST"])
+@with_flask(SLIDESHOW.IMPORT.value, methods=["POST"])
 def import_report():
     report_file = get_or_panic(object=request.json, key='report_file', error_message='Se esperaba el archivo .zip para importar')
     check_file_extension(filename=report_file, valid_extensions=["zip"])

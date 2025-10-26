@@ -11,7 +11,7 @@ from routes.pivot_table.filter import blueprint as filter_blueprint
 
 from flask import Blueprint
 
-blueprint = Blueprint("pivot_table", __name__, url_prefix="/pivot_table")
+blueprint = Blueprint("pivot_table", __name__, url_prefix="")
 
 create_pivot_table(blueprint)
 add_file_to_pivot_table(blueprint)

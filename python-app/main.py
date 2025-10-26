@@ -2,7 +2,7 @@ from constants.asset_variables import validate_assets
 from constants.dynamic_variables import DynamicVariables
 from logs.setup import setup_logging
 from routes.hello_world import hello_world
-from testing.playground import playground
+from playground import playground
 
 import routes.slide as slide
 import routes.pivot_table as pivot_table

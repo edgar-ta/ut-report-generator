@@ -7,12 +7,14 @@ from lib.report.save_slideshow import save_slideshow
 from models.report.visualization_mode import VisualizationMode
 from models.image_slide.cover_page_slide import CoverPageSlide
 
+from routes.route_map import SLIDESHOW
+
 from pandas import Timestamp
 from uuid import uuid4
 
 import os
 
-@with_flask("/start_with_image_slide", methods=["POST"])
+@with_flask(SLIDESHOW.START_AS_REPORT.value, methods=["POST"])
 def start_report_with_image_slide():
     root_directory, report = create_report(visualization_mode=VisualizationMode.AS_REPORT)
 

@@ -6,15 +6,16 @@ from lib.report.save_slideshow import save_slideshow
 from models.pivot_table.data_filter.charting_mode import ChartingMode
 from models.error.descriptive_error import DescriptiveError
 
+from routes.route_map import PIVOT_TABLE
+
 from flask import request
 
 import os
 import pandas
 
-@with_flask("/set_charts", methods=["POST"])
+@with_flask(PIVOT_TABLE.SET_CHARTS.value, methods=["POST"])
 def set_charts_of_pivot_table():
-    report, pivot_table = entities_for_editing_pivot_table(request=request)
-    root_directory = report.root_directory
+    root_directory, report, pivot_table = entities_for_editing_pivot_table(request=request)
     chart_index = request.json['chart']
     super_chart_index = request.json['super_chart']
 

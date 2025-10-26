@@ -8,11 +8,13 @@ from lib.report.save_slideshow import save_slideshow
 from models.error.descriptive_error import DescriptiveError
 from models.response.edit_image_slide_response import EditImageSlide_Response
 
+from routes.route_map import IMAGE_SLIDE
+
 from flask import request
 
 import pandas
 
-@with_flask("/edit", methods=["POST"])
+@with_flask(IMAGE_SLIDE.EDIT.value, methods=["POST"])
 def edit_image_slide():
     root_directory, report, image_slide = entities_for_editing_image_slide(request=request)
     parameter_name = get_or_panic(request.json, 'parameter_name', 'El nombre del parámetro a editar no está presente en la solicitud')
@@ -32,4 +34,4 @@ def edit_image_slide():
 
     save_slideshow(slideshow=report, root_directory=root_directory)
 
-    return EditImageSlide_Response(image_slide=image_slide).to_dict(), 200
+    return EditImageSlide_Response(preview=image_slide.preview).to_dict(), 200

@@ -37,7 +37,7 @@ def get_data_frame_from_files(data_files: list[str]) -> pd.DataFrame:
 
 def build_pivot_table(root_directory: str, local_request: flask.Request) -> PivotTable:
     '''
-    Adds a pivot table to a report. The state of the pivot table is HAS_DIRECTORY_BUT_NO_PREVIEW
+    Adds a pivot table to a report. The state of the pivot table is HAS_PREVIEW
     '''
 
     data_files = get_or_panic(local_request.json, "data_files", "Se necesitan archivos de datos para empezar una tabla dinámica")

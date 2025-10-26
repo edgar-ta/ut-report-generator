@@ -7,9 +7,11 @@ from lib.report.save_slideshow import save_slideshow
 
 from models.response.file_response import FileResponse
 
+from routes.route_map import SLIDESHOW
+
 from flask import request
 
-@with_flask("/compile", methods=["POST"])
+@with_flask(SLIDESHOW.COMPILE.value, methods=["POST"])
 def compile_report():
     root_directory, report = entities_for_editing_report(request=request)
 

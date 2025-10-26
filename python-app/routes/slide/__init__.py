@@ -3,7 +3,7 @@ from routes.slide.delete_slide import delete_slide
 
 from flask import Blueprint
 
-blueprint = Blueprint("slide", __name__, url_prefix="/slide")
+blueprint = Blueprint("slide", __name__, url_prefix="")
 
 rename_slide(blueprint)
 delete_slide(blueprint)

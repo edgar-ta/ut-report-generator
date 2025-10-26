@@ -14,11 +14,13 @@ from models.pivot_table.data_filter.self import DataFilter
 from models.pivot_table.data_filter.selection_mode import SelectionMode
 from models.pivot_table.data_filter.charting_mode import ChartingMode
 
+from routes.route_map import DATA_FILTER
+
 from flask import request
 
 import pandas
 
-@with_flask("/create", methods=["POST"])
+@with_flask(DATA_FILTER.CREATE.value, methods=["POST"])
 def create_filter():
     report, pivot_table = entities_for_editing_pivot_table(request=request)
     root_directory = report.root_directory

@@ -7,11 +7,13 @@ from lib.report.save_slideshow import save_slideshow
 from models.error.descriptive_error import DescriptiveError
 from models.response.edit_pivot_table_response import EditPivotTable_Response
 
+from routes.route_map import DATA_FILTER
+
 from flask import request
 
 import pandas
 
-@with_flask("/remove", methods=["POST"])
+@with_flask(DATA_FILTER.REMOVE_OPTION.value, methods=["POST"])
 def remove_option_from_filter():
     root_directory, report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
     

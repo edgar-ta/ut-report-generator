@@ -6,6 +6,8 @@ from lib.report.save_slideshow import save_slideshow
 
 from models.response.success_response import SuccessResponse
 
+from routes.route_map import SLIDESHOW
+
 from flask import request
 from pandas import Timestamp
 from threading import Lock
@@ -14,7 +16,7 @@ import os
 
 LOCK = Lock()
 
-@with_flask("/rename", methods=["POST"])
+@with_flask(SLIDESHOW.RENAME.value, methods=["POST"])
 def rename_report():
     with LOCK:
         root_directory, report = entities_for_editing_report(request=request)
