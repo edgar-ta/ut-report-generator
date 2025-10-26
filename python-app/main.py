@@ -1,4 +1,8 @@
+from constants.asset_variables import validate_assets
+from constants.dynamic_variables import DynamicVariables
+from logs.setup import setup_logging
 from routes.hello_world import hello_world
+from testing.playground import playground
 
 import routes.slide as slide
 import routes.pivot_table as pivot_table
@@ -8,12 +12,12 @@ import routes.report as report
 from flask import Flask, request, jsonify
 from typing import TypeVar
 from dotenv import load_dotenv
+from enum import Enum
 
-import logging
 import sys
+import os
 
 app = Flask(__name__)
-logger = logging.getLogger(__name__)
 
 hello_world(app)
 
@@ -24,53 +28,41 @@ app.register_blueprint(slide.blueprint)
 
 T = TypeVar("T")
 def item_or(_list: list[T], index: int, default: T) -> T:
-    try:
-        return _list[index]
-    except IndexError:
-        return default
+    if index >= len(_list): return default
+    return _list[index]
 
-if __name__ == '__main__':
-    mode = item_or(_list=sys.argv, index=1, default="dev")
-    port = int(item_or(_list=sys.argv, index=2, default="5000"))
-    load_dotenv()
+class RunningMode(Enum):
+    DEVELOPMENT_MODE = "dev"
+    RELEASE_MODE = "release"
+    PLAYGROUND_MODE = "playground"
+    NONE = "none"
 
-    if mode == "dev":
-        logging.basicConfig(filename='logs.log')
-        app.run(port=port)
-    elif mode == "release":
+DynamicVariables.initialize(
+    application_root_directory=item_or(_list=sys.argv, index=3, default=os.path.dirname(__file__)),
+    executable_directory=os.path.dirname(__file__))
+setup_logging()
+validate_assets()
+load_dotenv()
+
+def _get_running_mode() -> RunningMode:
+    if __name__ != '__main__': return RunningMode.NONE
+    running_mode = item_or(_list=sys.argv, index=1, default="dev")
+    running_mode = RunningMode(running_mode)
+    return running_mode
+
+running_mode = _get_running_mode()
+
+match running_mode:
+    case RunningMode.RELEASE_MODE:
         from waitress import serve
+
+        port = int(sys.argv[2])
         serve(app=app, port=port)
-    elif mode == "playground":
-        from models.image_slide.cover_page_slide import CoverPageSlide
-        from pptx import Presentation
-        from pptx.util import Cm
-        from pandas import Timestamp
 
-        from render.drawable_area import DrawableArea
+    case RunningMode.DEVELOPMENT_MODE:
+        print("Running in dev mode")
+        app.run(debug=True)
 
-        path = r'D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\.logistics-assets\example-presentation-copy.pptx'
-
-        presentation = Presentation(path)
-        slide = presentation.slides.add_slide(presentation.slides[0].slide_layout)
-        base_area = DrawableArea(
-            x=0, y=0, 
-            width=presentation.slide_width.emu, 
-            height=presentation.slide_height.emu
-            ).with_padding(horizontal=Cm(2).emu, vertical=Cm(4).emu)
-        
-        for placeholder in slide.placeholders:
-            slide.placeholders.element.remove(placeholder.element)
-
-        cover_page = CoverPageSlide(
-            title="1ER. INFORME GRUPO DS01SM-24-2°",
-            identifier="fsfs",
-            creation_date=Timestamp.now(),
-            last_edit=Timestamp.now(),
-            preview=None,
-            professor_name="BRENDA JUÁREZ SANTIAGO",
-            period="ENERO - ABRIL 2025",
-            date="16/09/25"
-        )
-        cover_page.render(slide=slide, drawable_area=base_area)
-        
-        presentation.save(path)
+    case RunningMode.PLAYGROUND_MODE:
+        print("Running the playground")
+        playground()

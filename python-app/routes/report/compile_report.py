@@ -3,6 +3,7 @@ from lib.get_entities_from_request import entities_for_editing_report
 from lib.report.compile_slides import compile_slides
 from lib.report.get_preview_of_report import get_preview_of_report
 from lib.directory_definitions import compiled_file_of_report
+from lib.report.save_slideshow import save_slideshow
 
 from models.response.file_response import FileResponse
 
@@ -10,15 +11,15 @@ from flask import request
 
 @with_flask("/compile", methods=["POST"])
 def compile_report():
-    report = entities_for_editing_report(request=request)
+    root_directory, report = entities_for_editing_report(request=request)
 
-    filepath = compiled_file_of_report(root_directory=report.root_directory, report_name=report.report_name)
+    filepath = compiled_file_of_report(root_directory=root_directory, report_name=report.report_name)
     compile_slides(
         slides=report.slides, 
         filepath=filepath
         )
     
-    report.save()
+    save_slideshow(root_directory=root_directory, slideshow=report)
     return FileResponse(
         message='El reporte fue compilado de forma correcta',
         filepath=filepath,

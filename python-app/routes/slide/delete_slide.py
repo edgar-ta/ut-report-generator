@@ -1,6 +1,7 @@
 from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_slide
-from lib.directory_definitions import base_directory_of_slide, data_directory_of_report
+from lib.directory_definitions import base_directory_of_slide
+from lib.report.save_slideshow import save_slideshow
 
 from models.response.success_response import SuccessResponse
 
@@ -19,7 +20,7 @@ def delete_slide():
     # slide (in case it is a pivot table) which are present in the data_directory_of_report
 
     report.last_edit = Timestamp.now()
-    report.save()
+    save_slideshow(root_directory=root_directory, slideshow=report)
 
     return SuccessResponse(
         message='La diapositiva se eliminó correctamente'

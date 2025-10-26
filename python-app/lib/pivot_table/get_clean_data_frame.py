@@ -1,4 +1,4 @@
-from lib.descriptive_error import DescriptiveError
+from models.error.descriptive_error import DescriptiveError
 from lib.group_name import inscription_year_of_group
 
 from models.pivot_table.pivot_table_level import PivotTableLevel

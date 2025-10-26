@@ -1,5 +1,5 @@
 from lib.file_extension import get_file_extension, without_extension
-from lib.descriptive_error import DescriptiveError
+from models.error.descriptive_error import DescriptiveError
 from lib.group_name import is_valid_group_name
 
 import os

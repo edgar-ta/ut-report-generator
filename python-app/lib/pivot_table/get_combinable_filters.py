@@ -1,5 +1,3 @@
-from control_variables import INVALID_FILTER_CREATES_VOID
-
 from lib.data_filter.is_valid_filter import is_valid_filter
 from lib.data_filter.get_valid_values import get_valid_values
 from lib.data_frame.cross_section import cross_section
@@ -59,7 +57,5 @@ def get_combinable_filters(data_frame: pandas.DataFrame, filters: list[DataFilte
                 for _data_frame in data_frames 
                 for value in get_valid_values(_filter=combinable_filter)
                 ]
-        elif INVALID_FILTER_CREATES_VOID:
-            data_frames = []
     
     return combinable_filters

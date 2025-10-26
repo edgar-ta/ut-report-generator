@@ -1,6 +1,6 @@
 import re
 
-from lib.descriptive_error import DescriptiveError
+from models.error.descriptive_error import DescriptiveError
 
 from typing import Callable
 

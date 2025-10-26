@@ -8,6 +8,7 @@ from lib.pivot_table.read_excel import read_excel
 from lib.pivot_table.get_clean_data_frame import get_clean_data_frame
 from lib.pivot_table.recalculate import recalculate
 from lib.directory_definitions import data_file_of_slide
+from lib.report.save_slideshow import save_slideshow
 
 from models.response.edit_pivot_table_response import EditPivotTable_Response
 
@@ -18,8 +19,7 @@ import pandas
 
 @with_flask("/add_file", methods=["POST"])
 def add_file_to_pivot_table():
-    report, pivot_table = entities_for_editing_pivot_table(request=request)
-    root_directory = report.root_directory
+    root_directory, report, pivot_table = entities_for_editing_pivot_table(request=request)
     _file = get_or_panic(request.json, 'file', 'El archivo de datos no se incluyó en la solicitud')
 
     validate_file(data_file=_file)
@@ -33,7 +33,7 @@ def add_file_to_pivot_table():
 
     os.remove(pivot_table.source.merged_file)
     new_merged_file = data_file_of_slide(
-        root_directory=report.root_directory, 
+        root_directory=root_directory, 
         slide_id=pivot_table.identifier
         )
 
@@ -47,7 +47,7 @@ def add_file_to_pivot_table():
     recalculate(root_directory=root_directory, pivot_table=pivot_table, preloaded_data_frame=new_data_frame)    
 
     pivot_table.last_edit = pandas.Timestamp.now()
-    report.save()
+    save_slideshow(slideshow=report, root_directory=root_directory)
 
     return EditPivotTable_Response(
         data=pivot_table.data, 

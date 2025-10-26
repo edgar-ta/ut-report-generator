@@ -2,8 +2,8 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "UT Report Generator"
-#define MyAppVersion "0.7.0"
-#define MyAppPublisher "Better Software"
+#define MyAppVersion "0.10.0"
+#define MyAppPublisher "Happier Software"
 #define MyAppURL "https://www.better-software.com/"
 #define MyAppExeName "flutter_application_1.exe"
 

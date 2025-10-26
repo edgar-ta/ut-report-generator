@@ -2,6 +2,7 @@ from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_report
 from lib.get_or_panic import get_or_panic
 from lib.directory_definitions import compiled_file_of_report, exported_file_of_report
+from lib.report.save_slideshow import save_slideshow
 
 from models.response.success_response import SuccessResponse
 
@@ -16,8 +17,7 @@ LOCK = Lock()
 @with_flask("/rename", methods=["POST"])
 def rename_report():
     with LOCK:
-        report = entities_for_editing_report(request=request)
-        root_directory = report.root_directory
+        root_directory, report = entities_for_editing_report(request=request)
         name = get_or_panic(request.json, 'name', 'El nuevo nombre del reporte no está presente en la solicitud')
 
         current_compiled_file = compiled_file_of_report(root_directory=root_directory, report_name=report.report_name)
@@ -32,7 +32,7 @@ def rename_report():
         
         report.report_name = name
         report.last_edit = Timestamp.now()
-        report.save()
+        save_slideshow(root_directory=root_directory, slideshow=report)
 
         return SuccessResponse(
             message="Reporte renombrado exitosamente"

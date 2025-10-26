@@ -9,8 +9,7 @@ import shutil
 
 @with_flask("/delete", methods=["POST"])
 def delete_report():
-    report = entities_for_editing_report(request=request)
-    root_directory = report.root_directory
-
+    root_directory, _ = entities_for_editing_report(request=request)
     shutil.rmtree(root_directory)
+
     return SuccessResponse(message="El reporte fue eliminado correctamente").to_dict(), 200

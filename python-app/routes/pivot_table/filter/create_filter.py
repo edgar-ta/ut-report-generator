@@ -1,13 +1,14 @@
 from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_pivot_table
 from lib.get_or_panic import get_or_panic
-from lib.descriptive_error import DescriptiveError
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.ordered_filters import find_filter
 from lib.pivot_table.get_combinable_filters import get_combinable_filters
 from lib.pivot_table.recalculate import recalculate
 from lib.data_frame.data_frame_io import import_data_frame
+from lib.report.save_slideshow import save_slideshow
 
+from models.error.descriptive_error import DescriptiveError
 from models.pivot_table.pivot_table_level import PivotTableLevel
 from models.pivot_table.data_filter.self import DataFilter
 from models.pivot_table.data_filter.selection_mode import SelectionMode
@@ -52,6 +53,6 @@ def create_filter():
     recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
-    report.save()
+    save_slideshow(slideshow=report, root_directory=root_directory)
     
     return refined_filter.to_dict(), 200

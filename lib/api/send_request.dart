@@ -6,13 +6,13 @@ Future<K> sendRequest<K>({
   required String route,
   required K Function(Map<String, dynamic>) callback,
   Object? body,
-  int retries = 3, // número de reintentos si NO hay respuesta
+  int retries = 3,
 }) async {
   int attempt = 0;
   http.Response? response = null;
 
   print("@send_request.dart");
-  print("Sending data to route: $route");
+  print("Sending data to route '$route' on port ${serverPort()}");
   print(jsonEncode(body));
 
   while (true) {

@@ -1,7 +1,7 @@
 from lib.data_frame.cross_section import cross_section
 from lib.data_frame.flatten_to_series import flatten_to_series
 from lib.data_filter.get_valid_values import get_valid_values
-from lib.descriptive_error import DescriptiveError
+from models.error.descriptive_error import DescriptiveError
 
 from models.pivot_table.data_filter.self import DataFilter
 from models.pivot_table.data_filter.charting_mode import ChartingMode

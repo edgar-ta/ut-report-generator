@@ -1,9 +1,10 @@
 from lib.with_flask import with_flask
-from lib.descriptive_error import DescriptiveError
 from lib.get_entities_from_request import entities_for_editing_filter
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.bring_filter_up import bring_filter_up
+from lib.report.save_slideshow import save_slideshow
 
+from models.error.descriptive_error import DescriptiveError
 from models.response.edit_pivot_table_response import EditPivotTable_Response
 
 from flask import request
@@ -12,8 +13,7 @@ import pandas
 
 @with_flask("/remove", methods=["POST"])
 def remove_option_from_filter():
-    report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
-    root_directory = report.root_directory
+    root_directory, report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
     
     if not option in _filter.selected_values:
         raise DescriptiveError(http_error_code=400, message=f"La opción a eliminar no está presente en el filtro.\n{option = }.\n{_filter.selected_values = }")
@@ -24,7 +24,7 @@ def remove_option_from_filter():
     recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
-    report.save()
+    save_slideshow(root_directory=root_directory, slideshow=report)
 
     return EditPivotTable_Response(
         data=pivot_table.data,

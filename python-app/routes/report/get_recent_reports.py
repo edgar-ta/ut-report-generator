@@ -3,11 +3,12 @@ from lib.directory_definitions import get_reports_directory
 
 from lib.report.get_id_of_report import get_id_of_report
 from lib.report.get_preview_of_report import get_preview_of_report
+from lib.report.construct import from_root_directory, find_root_directory
 
 from models.report.self import Report
 from models.response.recent_reports_response import RecentReportsResponse, ReportPreview
 
-from control_variables import REPORTS_CHUNK_SIZE
+from constants.control_variables import REPORTS_CHUNK_SIZE
 
 from flask import request
 from itertools import dropwhile
@@ -20,7 +21,7 @@ def get_recent_reports():
     reference_report: str | None = getattr(request.json, 'report', None)
     
     os.makedirs(get_reports_directory(), exist_ok=True)
-    reports_directories = sorted(
+    all_report_directories = sorted(
         (
             full_directory_name 
             for directory_name in os.listdir(get_reports_directory()) 
@@ -31,35 +32,40 @@ def get_recent_reports():
     )
 
     if reference_report is not None:
-        reports_directories = list(dropwhile(
+        all_report_directories = list(dropwhile(
             lambda report: get_id_of_report(report) != reference_report, 
-            reports_directories
+            all_report_directories
             ))[1:]
 
-    reports: list[Report] = []
-    for directory in reports_directories:
+    reports: list[tuple[str, Report]] = []
+
+    reports_count = 0
+    for directory in all_report_directories:
         try:
             if len(reports) >= REPORTS_CHUNK_SIZE:
                 break
-            report = Report.from_root_directory(root_directory=directory)
-            reports.append(report)
+            report = from_root_directory(root_directory=directory)
+            reports.append((directory, report))
+            reports_count += 1
         except Exception as e:
             print(f"Couldn't generate report")
             print(e)
     
-    has_more = len(reports) > REPORTS_CHUNK_SIZE
-    last_report = reports[-1] if len(reports) > 0 else None
+    has_more = len(all_report_directories) > reports_count
+    last_report = reports[-1][1] if len(reports) > 0 else None
 
-    return RecentReportsResponse(
+    response = RecentReportsResponse(
         reports=[
             ReportPreview(
                 preview=get_preview_of_report(report=report),
                 name=report.report_name,
                 identifier=report.identifier,
-                last_open=Timestamp.fromtimestamp(os.path.getmtime(report.root_directory)),
+                last_open=Timestamp.fromtimestamp(os.path.getmtime(root_directory)),
             )
-            for report in reports
+            for root_directory, report in reports
         ],
         has_more=has_more,
         last_report=last_report.identifier if last_report is not None else None
-    ).to_dict(), 200
+    )
+    
+    return response.to_dict(), 200

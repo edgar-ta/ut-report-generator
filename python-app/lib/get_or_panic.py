@@ -1,4 +1,4 @@
-from lib.descriptive_error import DescriptiveError
+from models.error.descriptive_error import DescriptiveError
 
 def get_or_panic(object: dict[str, any], key: str, error_message: str, error_code: int = 400) -> any:
     '''

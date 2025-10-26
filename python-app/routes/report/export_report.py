@@ -3,8 +3,10 @@ from lib.file_extension import get_extension_or_panic, get_file_extension
 from lib.random_message import random_message, RandomMessageType
 from lib.get_entities_from_request import entities_for_editing_report
 from lib.directory_definitions import temporary_export_directory_of_report, data_directory_of_report, exported_file_of_report
+from lib.report.construct import from_root_directory
+from lib.report.save_slideshow import save_slideshow
 
-from control_variables import ZIP_COMPRESSION_LEVEL
+from constants.control_variables import ZIP_COMPRESSION_LEVEL
 
 from models.report.self import Report
 from models.pivot_table.self import PivotTable
@@ -20,7 +22,7 @@ import zipfile
 def export_pivot_table_files(temporary_export_directory: str, pivot_tables: list[PivotTable]):
     unique_data_files = { data_file for pivot_table in pivot_tables for data_file in pivot_table.source.files }
 
-    exported_report = Report.from_root_directory(root_directory=temporary_export_directory)
+    exported_report = from_root_directory(root_directory=temporary_export_directory)
     data_directory = data_directory_of_report(root_directory=temporary_export_directory)
 
     files_equivalence = {
@@ -38,12 +40,11 @@ def export_pivot_table_files(temporary_export_directory: str, pivot_tables: list
             for data_file in exported_pivot_table.source.files
         ]
 
-    exported_report.save()
+    save_slideshow(root_directory=temporary_export_directory, slideshow=exported_report)
 
 @with_flask("/export", methods=["POST"])
 def export_report():
-    report = entities_for_editing_report(request=request)
-    root_directory = report.root_directory
+    root_directory, report = entities_for_editing_report(request=request)
 
     temporary_export_directory = temporary_export_directory_of_report(root_directory=root_directory)
     if os.path.exists(temporary_export_directory) and os.path.isdir(temporary_export_directory):

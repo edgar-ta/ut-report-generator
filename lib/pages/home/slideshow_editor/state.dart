@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:ut_report_generator/components/slideshow_editor/export_box/entry.dart';
 import 'package:ut_report_generator/models/report/self.dart';
-import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/utils/future_status.dart';
 
 class SlideshowEditorState {

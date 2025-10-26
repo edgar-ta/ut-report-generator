@@ -1,5 +1,5 @@
 import re
-from lib.descriptive_error import DescriptiveError
+from models.error.descriptive_error import DescriptiveError
 
 def get_file_extension(filename: str) -> str | None:
     extension = re.search(r"\.([^\.]+)$", filename)

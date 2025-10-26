@@ -1,6 +1,6 @@
 from lib.with_flask import with_flask
 from lib.get_or_panic import get_or_panic
-from lib.descriptive_error import DescriptiveError
+from models.error.descriptive_error import DescriptiveError
 
 from flask import request
 

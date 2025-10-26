@@ -1,4 +1,4 @@
-from lib.descriptive_error import DescriptiveError
+from models.error.descriptive_error import DescriptiveError
 from lib.file_extension import get_file_extension
 
 import pandas

@@ -2,7 +2,7 @@ from models.report.self import Report
 from models.report.visualization_mode import VisualizationMode
 from models.slide.slide_category import SlideCategory
 
-from control_variables import EMPTY_REPORT_PREVIEW, EMPTY_VISUALIZATION_PREVIEW
+from constants.asset_variables import Assets
 
 def get_preview_of_report(report: Report) -> str:
     visible_slides = report.slides
@@ -13,8 +13,8 @@ def get_preview_of_report(report: Report) -> str:
     if len(visible_slides) == 0:
         match report.visualization_mode:
             case VisualizationMode.CHARTS_ONLY:
-                return EMPTY_VISUALIZATION_PREVIEW()
+                return Assets.EMPTY_VISUALIZATION_PREVIEW.value.path
             case VisualizationMode.AS_REPORT:
-                return EMPTY_REPORT_PREVIEW()
+                return Assets.EMPTY_REPORT_PREVIEW.value.path
     
     return visible_slides[0].preview

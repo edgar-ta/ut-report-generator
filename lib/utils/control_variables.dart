@@ -1,4 +1,6 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:io';
+
+import 'package:path/path.dart' as path;
 import 'package:ut_report_generator/utils/get_environment_variable.dart';
 
 extension BoolParsing on bool {
@@ -8,10 +10,11 @@ extension BoolParsing on bool {
 }
 
 String Function() serverExecutable =
-    () => getEnvironmentVariable("SERVER_EXECUTABLE", "main.exe");
+    () =>
+        "${File(Platform.resolvedExecutable).parent.path}${path.separator}main.exe";
+int Function() serverPort = () => isDevelopmentMode() ? 5000 : 55_001;
+
 bool Function() isDevelopmentMode =
     () => bool.parse(getEnvironmentVariable("IS_DEVELOPMENT_MODE", "false"));
 bool Function() isTestingMode =
     () => bool.parse(getEnvironmentVariable("IS_TESTING_MODE", "false"));
-int Function() serverPort =
-    () => int.parse(getEnvironmentVariable("SERVER_PORT", "55001"));

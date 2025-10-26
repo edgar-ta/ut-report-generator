@@ -4,9 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
-  image_clipboard
   open_dir_windows
-  pasteboard
   url_launcher_windows
 )
 

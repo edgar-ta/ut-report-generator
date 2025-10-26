@@ -1,9 +1,10 @@
 from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_pivot_table
-from lib.descriptive_error import DescriptiveError
 from lib.pivot_table.recalculate import recalculate
+from lib.report.save_slideshow import save_slideshow
 
 from models.pivot_table.data_filter.charting_mode import ChartingMode
+from models.error.descriptive_error import DescriptiveError
 
 from flask import request
 
@@ -51,6 +52,6 @@ def set_charts_of_pivot_table():
     recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
-    report.save()
+    save_slideshow(slideshow=report, root_directory=root_directory)
 
     return pivot_table.data, 200

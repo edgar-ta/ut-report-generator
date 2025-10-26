@@ -1,4 +1,4 @@
-from control_variables import CURRENT_DIRECTORY_PATH
+from constants.dynamic_variables import DynamicVariables
 
 from lib.kebab_case import kebab_case
 from lib.remove_invalid_characters import remove_invalid_characters
@@ -8,7 +8,7 @@ from uuid import uuid4
 import os
 
 def get_reports_directory() -> str:
-    return os.path.join(CURRENT_DIRECTORY_PATH, "reports")
+    return os.path.join(DynamicVariables.instance.application_root_directory, "reports")
 
 def root_directory_of_report(report_id: str) -> str:
     return os.path.join(get_reports_directory(), report_id)

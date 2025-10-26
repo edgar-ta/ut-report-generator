@@ -1,9 +1,9 @@
 from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_report
 from lib.get_or_panic import get_or_panic
-
 from lib.slide.render_preview import render_preview
 from lib.slide.delete_preview import delete_preview
+from lib.report.save_slideshow import save_slideshow
 
 from models.response.file_response import FileResponse
 
@@ -16,8 +16,7 @@ LOCK = Lock()
 @with_flask("/rename", methods=["POST"])
 def rename_slide():
     with LOCK:
-        report = entities_for_editing_report(request=request) 
-        root_directory = report.root_directory
+        root_directory, report = entities_for_editing_report(request=request) 
 
         slide = get_or_panic(request.json, 'slide', 'El identificador de la diapositiva no está presente en la solicitud')
         title = get_or_panic(request.json, 'title', 'El nuevo título de la diapositiva no está presente en la solicitud')
@@ -30,7 +29,7 @@ def rename_slide():
         delete_preview(slide=slide)
         render_preview(root_directory=root_directory, slides=slide)
 
-        report.save()
+        save_slideshow(root_directory=root_directory, slideshow=report)
 
         return FileResponse(
             message='Se renderizó correctamente la diapositiva', 

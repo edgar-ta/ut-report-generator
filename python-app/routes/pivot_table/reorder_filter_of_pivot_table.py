@@ -1,6 +1,7 @@
 from lib.with_flask import with_flask
 from lib.get_entities_from_request import entities_for_editing_pivot_table
 from lib.get_or_panic import get_or_panic
+from lib.report.save_slideshow import save_slideshow
 
 from flask import request
 
@@ -8,7 +9,7 @@ import pandas
 
 @with_flask("/reorder_filter", methods=["POST"])
 def reorder_filter_of_pivot_table():
-    report, pivot_table = entities_for_editing_pivot_table(request=request)
+    root_directory, report, pivot_table = entities_for_editing_pivot_table(request=request)
     old_index = get_or_panic(request.json, 'old_index', 'No se incluyó el antiguo índice del filtro a reordenar')
     new_index = get_or_panic(request.json, 'new_index', 'No se incluyó el nuevo índice del filtro a reordenar')
 
@@ -20,7 +21,7 @@ def reorder_filter_of_pivot_table():
     pivot_table.filters.insert(new_index, _filter)
 
     pivot_table.last_edit = pandas.Timestamp.now()
-    report.save()
+    save_slideshow(slideshow=report, root_directory=root_directory)
 
     return {
         "message": "Se reordenó el filtro correctamente",

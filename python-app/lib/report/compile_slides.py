@@ -1,4 +1,4 @@
-from control_variables import PATH_OF_PPTX_TEMPLATE
+from constants.asset_variables import Assets
 
 from models.slide.self import Slide as ProjectSlide
 
@@ -9,7 +9,7 @@ from pptx.slide import Slide
 from pptx.util import Cm
 
 def compile_slides(slides: list[ProjectSlide], filepath: str):
-    template_path = PATH_OF_PPTX_TEMPLATE()
+    template_path = Assets.PRESENTATION_TEMPLATE.value.path
     presentation = Presentation(template_path)
     
     base_area = DrawableArea(

@@ -1,10 +1,11 @@
 from lib.data_filter.is_valid_filter import is_valid_filter
-from lib.descriptive_error import DescriptiveError
 from lib.get_entities_from_request import entities_for_editing_filter
 from lib.pivot_table.recalculate import recalculate
 from lib.pivot_table.bring_filter_up import bring_filter_up
 from lib.with_flask import with_flask
+from lib.report.save_slideshow import save_slideshow
 
+from models.error.descriptive_error import DescriptiveError
 from models.pivot_table.data_filter.selection_mode import SelectionMode
 
 from flask import request
@@ -32,7 +33,7 @@ def toggle_selection_mode_of_filter():
         recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()
-    report.save()
+    save_slideshow(root_directory=root_directory, slideshow=report)
 
     if do_recalculation:
         return {
