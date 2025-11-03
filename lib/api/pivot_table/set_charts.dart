@@ -1,7 +1,8 @@
 import 'package:ut_report_generator/api/send_request.dart';
-import 'package:ut_report_generator/models/pivot_table/pivot_data.dart';
+import 'package:ut_report_generator/models/pivot_table/pivot_table_data.dart';
+import 'package:ut_report_generator/models/response/edit_pivot_table_response.dart';
 
-Future<PivotData> setCharts({
+Future<EditPivotTableResponse> setCharts({
   required String report,
   required String pivotTable,
   int? chart,
@@ -15,6 +16,6 @@ Future<PivotData> setCharts({
       "chart": chart,
       "super_chart": superChart,
     },
-    callback: PivotData.fromJson,
+    callback: EditPivotTableResponse.fromJson,
   );
 }

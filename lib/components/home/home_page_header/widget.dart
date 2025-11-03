@@ -4,7 +4,7 @@ import 'package:ut_report_generator/components/home/welcome_text.dart';
 import 'package:ut_report_generator/components/home/startup_button/entry.dart';
 import 'package:ut_report_generator/components/home/startup_button/state.dart';
 import 'package:ut_report_generator/components/home/startup_button/widget.dart';
-import 'package:ut_report_generator/pages/home/_main.dart';
+import 'package:ut_report_generator/pages/home/page.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 import 'package:ut_report_generator/utils/future_status.dart';
 

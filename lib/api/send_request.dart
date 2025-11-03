@@ -9,17 +9,24 @@ Future<K> sendRequest<K>({
   int retries = 3,
 }) async {
   int attempt = 0;
-  http.Response? response = null;
+  http.Response? response;
 
   print("@send_request.dart");
-  print("Sending data to route '$route' on port ${serverPort()}");
+  print(
+    "Sending data to route '$route' on port ${ControlVariables.instance.serverPort}",
+  );
   print(jsonEncode(body));
 
   while (true) {
     try {
       response = await http
           .post(
-            Uri.parse("http://localhost:${serverPort()}/$route"),
+            Uri(
+              port: ControlVariables.instance.serverPort,
+              scheme: "http",
+              host: "localhost",
+              path: "/$route",
+            ),
             body: jsonEncode(body),
             headers: {'Content-Type': 'application/json'},
           )

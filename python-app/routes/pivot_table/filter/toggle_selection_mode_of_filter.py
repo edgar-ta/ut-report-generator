@@ -16,8 +16,7 @@ import pandas
 
 @with_flask(DATA_FILTER.TOGGLE_MODE.value, methods=["POST"])
 def toggle_selection_mode_of_filter():
-    report, pivot_table, _filter, _ = entities_for_editing_filter(request=request, get_option=False)
-    root_directory = report.root_directory
+    root_directory, report, pivot_table, _filter, _ = entities_for_editing_filter(request=request, get_option=False)
 
     if not is_valid_filter(_filter=_filter):
         raise DescriptiveError(http_error_code=400, message="El filtro seleccionado es de tipo inválido (no tiene valores posibles)")

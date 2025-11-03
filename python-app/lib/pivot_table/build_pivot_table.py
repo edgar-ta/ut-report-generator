@@ -57,7 +57,7 @@ def build_pivot_table(root_directory: str, local_request: flask.Request) -> Pivo
     default_filter_function = FilterFunctionType.FAILED_STUDENTS
     default_aggregate_function = AggregateFunctionType.COUNT
     default_filters = create_default_filters(data_frame=main_frame)
-    default_title = "Mi tabla dinámica"
+    default_title = "Mi gráfico"
 
     pivot_table = PivotTable(
         title=default_title,

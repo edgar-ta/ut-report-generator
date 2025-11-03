@@ -16,8 +16,7 @@ import pandas
 
 @with_flask(DATA_FILTER.SWITCH_OPTION.value, methods=["POST"])
 def switch_option_in_filter():
-    report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
-    root_directory = report.root_directory
+    root_directory, report, pivot_table, _filter, option = entities_for_editing_filter(request=request, get_option=True)
 
     if not option in _filter.possible_values:
         raise DescriptiveError(http_error_code=400, message="La opción seleccionada no es válida para el filtro")

@@ -17,7 +17,7 @@ import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/components/util/common_appbar.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/components/slideshow_editor/export_box/widget.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/slide/shimmer_slide.dart';
+import 'package:ut_report_generator/components/slide/shimmer_slide.dart';
 import 'package:ut_report_generator/pages/home/slideshow_editor/state.dart';
 import 'package:ut_report_generator/scaffold_controller.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';

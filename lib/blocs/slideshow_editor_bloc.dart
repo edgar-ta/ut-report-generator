@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/api/pivot_table/create_pivot_table.dart'
     as pivot_table_api;
+import 'package:ut_report_generator/api/image_slide/create_image_slide.dart'
+    as image_slide_api;
 import 'package:ut_report_generator/blocs/bloc.dart';
 import 'package:ut_report_generator/components/slideshow_editor/add_slide_dialog/entry.dart';
 import 'package:ut_report_generator/components/slideshow_editor/add_slide_dialog/widget.dart';
@@ -16,9 +18,9 @@ import 'package:ut_report_generator/api/slideshow/self.dart' as report_api;
 import 'package:ut_report_generator/models/report/visualization_mode.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/image_slide_section/widget.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/widget.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/slide/slide_frame.dart';
+import 'package:ut_report_generator/components/image_slide/widget.dart';
+import 'package:ut_report_generator/components/pivot_table/widget.dart';
+import 'package:ut_report_generator/components/slide/slide_frame.dart';
 import 'package:ut_report_generator/pages/home/slideshow_editor/state.dart';
 import 'package:ut_report_generator/utils/copy_with_added.dart';
 
@@ -215,6 +217,20 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
         context: context,
         builder: (context) {
           return AddSlideDialog(
+            addSlide: (ImageSlideKind kind) async {
+              ImageSlide slide = await image_slide_api.createImageSlide(
+                report: initialState.slideshow!.identifier,
+                kind: kind,
+              );
+              setInitialState(
+                (state) => state.copyWith(
+                  openSlideIdentifier: state.openSlideIdentifier,
+                  slideshow: state.slideshow!.copyWith(
+                    slides: copyWithAdded(state.slideshow!.slides, slide),
+                  ),
+                ),
+              );
+            },
             entries: [
               AddSlideEntry(
                 kind: ImageSlideKind.coverPage,

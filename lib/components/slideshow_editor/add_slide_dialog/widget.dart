@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/components/slideshow_editor/add_slide_dialog/entry.dart';
 import 'package:ut_report_generator/components/slideshow_editor/add_slide_dialog/slide_kind_preview.dart';
+import 'package:ut_report_generator/models/image_slide/image_slide_kind.dart';
 
 class AddSlideDialog extends StatefulWidget {
   final List<AddSlideEntry> entries;
+  final Future<void> Function(ImageSlideKind)? addSlide;
 
-  const AddSlideDialog({super.key, required this.entries});
+  AddSlideDialog({super.key, required this.entries, this.addSlide});
 
   @override
   State<AddSlideDialog> createState() => _AddSlideDialogState();
@@ -52,7 +54,12 @@ class _AddSlideDialogState extends State<AddSlideDialog> {
       actions: [
         TextButton(
           onPressed:
-              _selectedOption != -1 ? () => Navigator.of(context).pop() : null,
+              _selectedOption != -1
+                  ? () {
+                    Navigator.of(context).pop();
+                    widget.addSlide?.call(widget.entries[_selectedOption].kind);
+                  }
+                  : null,
           child: const Text('Siguiente'),
         ),
         TextButton(

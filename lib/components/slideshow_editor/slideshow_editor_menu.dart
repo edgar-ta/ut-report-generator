@@ -4,11 +4,11 @@ import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/image_slide_section/image_slide_edit_pane.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/pivot_metadata_pane.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/pivot_table_edit_pane.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/slide/slide_metadata_pane.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/slide/tabbed_menu.dart';
+import 'package:ut_report_generator/components/image_slide/image_slide_edit_pane.dart';
+import 'package:ut_report_generator/components/pivot_table/pivot_metadata_pane.dart';
+import 'package:ut_report_generator/components/pivot_table/pivot_table_edit_pane.dart';
+import 'package:ut_report_generator/components/slide/slide_metadata_pane.dart';
+import 'package:ut_report_generator/components/slide/tabbed_menu.dart';
 import 'package:ut_report_generator/utils/design_constants.dart';
 
 class SlideshowEditorMenu extends StatefulWidget {

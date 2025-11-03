@@ -1,16 +1,14 @@
 import pandas as pd
 
-from lib.pivot_table.plot_data import plot_data
-
-from models.pivot_table.pivot_table_level import PivotTableLevel, level_to_spanish
-from models.pivot_table.aggregate_function_type import AggregateFunctionType, aggregate_function_to_spanish
-from models.pivot_table.filter_function_type import FilterFunctionType, filter_function_to_spanish
+from models.pivot_table.pivot_table_level import PivotTableLevel
+from models.pivot_table.aggregate_function_type import AggregateFunctionType
+from models.pivot_table.filter_function_type import FilterFunctionType
 from models.pivot_table.aggregate_function_type import AggregateFunctionType
 from models.pivot_table.filter_function_type import FilterFunctionType
 from models.pivot_table.pivot_table_level import PivotTableLevel
+from models.pivot_table.pivot_table_data import PivotTableData, pivot_table_data_to_dict
 from models.pivot_table.data_source import DataSource
 from models.pivot_table.data_filter.self import DataFilter
-from models.pivot_table.data_filter.charting_mode import ChartingMode
 from models.slide.slide_category import SlideCategory
 from models.slide.self import Slide
 
@@ -38,7 +36,7 @@ class PivotTable(Slide):
             filters: list[DataFilter],
             filters_order: list[PivotTableLevel],
             source: DataSource,
-            data: dict[str, dict[str, float]] | dict[str, float],
+            data: PivotTableData,
             aggregate_function: AggregateFunctionType,
             filter_function: FilterFunctionType,
             ) -> None:
@@ -66,7 +64,7 @@ class PivotTable(Slide):
             "filters": [f.to_dict() for f in self.filters],
             "filters_order": [ level.value for level in self.filters_order ],
             "source": self.source.to_dict(),
-            "data": self.data,
+            "data": pivot_table_data_to_dict(self.data),
             "aggregate_function": self.aggregate_function.value,
             "filter_function": self.filter_function.value,
         }

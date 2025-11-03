@@ -49,23 +49,41 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\build\windows\x64\runner\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\python-app\dist\main\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\college\cuatrimestre-6\2025-06-16--estadias\ut-report-generator\python-app\dist\main\_internal\assets"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{group}\{#MyAppName}"; Filename: "{app}\launch_app.bat"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\launch_app.bat"; Tasks: desktopicon
+; Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+; Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\launch_app.bat"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+; Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
 Procedure CurStepChanged(CurStep: TSetupStep);
 Var
   EnvFilePath: string;
+  BatFilePath: string;
+  BatContent: string;
 Begin
   If CurStep = ssPostInstall Then
   Begin
     EnvFilePath := ExpandConstant('{app}\.env');
     SaveStringToFile(EnvFilePath, 'SERVER_EXECUTABLE=' + ExpandConstant('{app}\main.exe'), False);
+
+    BatFilePath := ExpandConstant('{app}\launch_app.bat');
+    BatContent :=
+      '@echo off' + #13#10 +
+      'set APPDIR=' + ExpandConstant('{app}') + #13#10 +
+      'echo Iniciando servidor...' + #13#10 +
+      'start "" "%APPDIR%\main.exe" release 55001 "%APPDIR%"' + #13#10 +
+      'timeout /t 3 /nobreak >nul' + #13#10 +
+      'echo Iniciando aplicación...' + #13#10 +
+      'start "" "%APPDIR%\flutter_application_1.exe"' + #13#10 +
+      'exit' + #13#10;
+    SaveStringToFile(BatFilePath, BatContent, False);
   End;
 End;

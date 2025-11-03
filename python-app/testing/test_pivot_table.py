@@ -174,7 +174,7 @@ def test_get_pivot_table(client, created_visualization):
     assert "filters" in data, "La respuesta no contiene los filtros"
     assert "data" in data, "La respuesta no contiene los datos de la tabla dinámica"
 
-def test_set_charts_with_chart_only(client, created_visualization):
+def test_set_charts_with_chart_only(client, created_visualization: Report):
     pivot_table = created_visualization.slides[0]
     chart_index = 0
     response = client.post(PIVOT_TABLE.SET_CHARTS, json={

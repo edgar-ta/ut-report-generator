@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
+
+from models.pivot_table.pivot_table_data import PivotTableData, PivotTableRod, PivotTableRodGroup
+
 from typing import Literal
 
 def plot_data(
-        data, 
+        data: PivotTableData, 
         title: str, 
-        kind: Literal["bar"] | Literal["line"],
         x_label: str,
         y_label: str,
         filepath: str
@@ -18,14 +20,41 @@ def plot_data(
     """
     plt.figure(figsize=(8, 5))
 
-    # Caso 1: diccionario simple
-    if all(isinstance(v, (int, float)) for v in data.values()):
-        keys = list(data.keys())
-        values = list(data.values())
+    if all(isinstance(datum, PivotTableRod) for datum in data):
+        keys = [ datum.key for datum in data ]
+        values = [ datum.value for datum in data ]
 
-        if kind == "bar":
-            bars = plt.bar(keys, values)
-            # Añadir etiquetas en barras
+        bars = plt.bar(keys, values)
+        for bar, value in zip(bars, values):
+            plt.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height(),
+                f"{value:.2f}",
+                ha="center", va="bottom"
+            )
+
+    elif all(isinstance(datum, PivotTableRodGroup) for datum in data):
+        data.sort(key=lambda datum: datum.index)
+        for group in data:
+            group.rods.sort(key=lambda rod: rod.index)
+        
+        outer_keys = [ datum.key for datum in data ]
+        inner_keys = [ rod.key for rod in data[0].rods ]
+
+        x = range(len(outer_keys))
+        width = 0.8 / len(inner_keys)
+
+        for index, inner_key in enumerate(inner_keys):
+            values = [ rod.value for datum in data for rod in datum.rods if rod.key == inner_key ]
+
+            # values = [data[outer][inner_key] for outer in outer_keys]
+            bars = plt.bar(
+                [i + index * width for i in x],
+                values,
+                width=width,
+                label=inner_key
+            )
+            
             for bar, value in zip(bars, values):
                 plt.text(
                     bar.get_x() + bar.get_width() / 2,
@@ -33,50 +62,8 @@ def plot_data(
                     f"{value:.2f}",
                     ha="center", va="bottom"
                 )
-        elif kind == "line":
-            plt.plot(keys, values, marker="o")
-            # Añadir etiquetas en puntos
-            for x, y in zip(keys, values):
-                plt.text(x, y, f"{y:.2f}", ha="center", va="bottom")
-        else:
-            raise ValueError("kind debe ser 'bar' o 'line'")
 
-    # Caso 2: diccionario doble
-    elif all(isinstance(v, dict) for v in data.values()):
-        outer_keys = list(data.keys())       # ej. meses
-        inner_keys = list(next(iter(data.values())).keys())  # ej. métricas
-
-        if kind == "bar":
-            x = range(len(outer_keys))
-            width = 0.8 / len(inner_keys)
-
-            for idx, inner in enumerate(inner_keys):
-                values = [data[outer][inner] for outer in outer_keys]
-                bars = plt.bar(
-                    [i + idx * width for i in x],
-                    values,
-                    width=width,
-                    label=inner
-                )
-                # Añadir etiquetas en barras
-                for bar, value in zip(bars, values):
-                    plt.text(
-                        bar.get_x() + bar.get_width() / 2,
-                        bar.get_height(),
-                        f"{value:.2f}",
-                        ha="center", va="bottom"
-                    )
-
-            plt.xticks([i + 0.4 for i in x], outer_keys)
-
-        elif kind == "line":
-            for inner in inner_keys:
-                values = [data[outer][inner] for outer in outer_keys]
-                plt.plot(outer_keys, values, marker="o", label=inner)
-                # Añadir etiquetas en puntos
-                for x, y in zip(outer_keys, values):
-                    plt.text(x, y, f"{y:.2f}", ha="center", va="bottom")
-
+        plt.xticks([i + 0.4 for i in x], outer_keys)
         plt.legend()
 
     else:

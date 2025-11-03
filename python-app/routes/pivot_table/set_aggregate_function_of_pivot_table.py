@@ -16,7 +16,6 @@ from pandas import Timestamp
 def set_aggregate_function_of_pivot_table():
     root_directory, report, pivot_table = entities_for_editing_pivot_table(request=request)
     aggregate_function = get_or_panic(request.json, 'aggregate_function', 'La función de agregación no está presente en la solicitud')
-    root_directory = report.root_directory
 
     aggregate_function = AggregateFunctionType(aggregate_function)
 

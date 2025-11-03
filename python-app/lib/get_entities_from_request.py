@@ -42,10 +42,10 @@ def entities_for_editing_filter(request: flask.Request, get_option: bool = True)
     _filter = pivot_table.filters[_filter]
 
     if not get_option:
-        return (report, pivot_table, _filter, None)
+        return root_directory, report, pivot_table, _filter, None
 
     option: str = get_or_panic(request.json, 'option', 'La opción a añadir no está presente en la solicitud')
-    return (root_directory, report, pivot_table, _filter, option)
+    return root_directory, report, pivot_table, _filter, option
 
 def entities_for_editing_image_slide(request: flask.Request) -> tuple[str, Report, ImageSlide]:
     root_directory, report = entities_for_editing_report(request=request)

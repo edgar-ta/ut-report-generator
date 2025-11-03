@@ -22,8 +22,7 @@ import pandas
 
 @with_flask(DATA_FILTER.CREATE.value, methods=["POST"])
 def create_filter():
-    report, pivot_table = entities_for_editing_pivot_table(request=request)
-    root_directory = report.root_directory
+    root_directory, report, pivot_table = entities_for_editing_pivot_table(request=request)
 
     level: PivotTableLevel = get_or_panic(request.json, 'level', 'No se incluyó el nivel del nuevo filtro en la request')
     try:

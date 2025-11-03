@@ -5,6 +5,7 @@ from lib.report.save_slideshow import save_slideshow
 
 from models.pivot_table.data_filter.charting_mode import ChartingMode
 from models.error.descriptive_error import DescriptiveError
+from models.response.edit_pivot_table_response import EditPivotTable_Response
 
 from routes.route_map import PIVOT_TABLE
 
@@ -55,4 +56,8 @@ def set_charts_of_pivot_table():
     pivot_table.last_edit = pandas.Timestamp.now()
     save_slideshow(slideshow=report, root_directory=root_directory)
 
-    return pivot_table.data, 200
+    return EditPivotTable_Response(
+        data=pivot_table.data,
+        filters=pivot_table.filters,
+        preview=pivot_table.preview
+    ).to_dict(), 200

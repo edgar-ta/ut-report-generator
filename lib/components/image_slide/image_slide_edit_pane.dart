@@ -5,7 +5,7 @@ import 'package:ut_report_generator/components/util/invisible_text_field.dart';
 import 'package:ut_report_generator/models/image_slide/image_slide_parameter.dart';
 import 'dart:async';
 
-import 'package:ut_report_generator/pages/home/slideshow_editor/image_slide_section/parameter_widget.dart';
+import 'package:ut_report_generator/components/image_slide/parameter_widget.dart';
 
 class ImageSlideEditPane extends StatefulWidget {
   final String title;

@@ -6,6 +6,7 @@ from models.pivot_table.filter_function_type import FilterFunctionType
 from models.pivot_table.pivot_table_level import PivotTableLevel
 from models.pivot_table.data_source import DataSource
 from models.pivot_table.data_filter.self import DataFilter
+from models.pivot_table.pivot_table_data import pivot_table_data_from_json
 
 def pivot_table_from_json(json: dict[str, any]) -> PivotTable:
     slide = slide_from_json(json=json)
@@ -15,19 +16,7 @@ def pivot_table_from_json(json: dict[str, any]) -> PivotTable:
         for f in json.get("filters", [])
     ]
 
-    raw_data = json.get("data", {})
-    if not isinstance(raw_data, dict):
-        raise ValueError("Expected 'data' to be a dictionary")
-
-    if raw_data and isinstance(next(iter(raw_data.values())), dict):
-        data: dict[str, dict[str, float]] = {
-            k: {ik: float(iv) for ik, iv in v.items()}
-            for k, v in raw_data.items()
-        }
-    else:
-        data: dict[str, float] = {
-            k: float(v) for k, v in raw_data.items()
-        }
+    data = pivot_table_data_from_json(json=json['data'])
 
     return PivotTable(
         **slide,

@@ -13,8 +13,8 @@ import 'package:ut_report_generator/models/pivot_table/filter_function_type.dart
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/filter_component.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/pivot_table_section/filter_selector.dart';
+import 'package:ut_report_generator/components/pivot_table/filter_component.dart';
+import 'package:ut_report_generator/components/pivot_table/filter_selector.dart';
 import 'package:ut_report_generator/api/pivot_table/filter/self.dart'
     as filter_api;
 import 'package:ut_report_generator/utils/copy_with_added.dart';
@@ -172,7 +172,9 @@ class _PivotTableEditPaneState extends State<PivotTableEditPane> {
                           await widget.bloc.unsetSuperChart();
                           return;
                         }
+
                         if (filter.chartingMode == ChartingMode.none) {
+                          print("Setting the super chart of the chart");
                           await widget.bloc.setSuperChart(index);
                           return;
                         }

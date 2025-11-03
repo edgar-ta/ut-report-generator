@@ -3,16 +3,16 @@ import 'package:ut_report_generator/models/profile.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/components/util/app_scaffold.dart';
 import 'package:ut_report_generator/models/slideshow_editor_request.dart';
-import 'package:ut_report_generator/pages/bug_report/_main.dart';
-import 'package:ut_report_generator/pages/home/_main.dart';
-import 'package:ut_report_generator/pages/home/slideshow_editor/_main.dart';
+import 'package:ut_report_generator/pages/bug_report_page.dart';
+import 'package:ut_report_generator/pages/home/page.dart';
+import 'package:ut_report_generator/pages/home/slideshow_editor/page.dart';
 import 'package:ut_report_generator/main_app/route_observer.dart';
-import 'package:ut_report_generator/pages/profile/_main.dart';
+import 'package:ut_report_generator/pages/profile_page.dart';
 import 'package:ut_report_generator/testing_components/testing_component.dart';
 import 'package:ut_report_generator/utils/control_variables.dart';
 
 final router = GoRouter(
-  initialLocation: isDevelopmentMode() && isTestingMode() ? "/test" : "/home",
+  initialLocation: isTestingDuringDevelopment() ? "/test" : "/home",
   observers: [routeObserver],
   routes: [
     StatefulShellRoute.indexedStack(
@@ -20,7 +20,7 @@ final router = GoRouter(
         return AppScaffold(child: navigationShell);
       },
       branches: [
-        if (isDevelopmentMode() && isTestingMode())
+        if (isTestingDuringDevelopment())
           (StatefulShellBranch(
             routes: [
               GoRoute(

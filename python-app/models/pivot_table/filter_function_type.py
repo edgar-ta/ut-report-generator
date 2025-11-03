@@ -10,9 +10,9 @@ class FilterFunctionType(Enum):
     def function_from_member(cls, member: "FilterFunctionType") -> Callable[[float], bool]:
         match member:
             case FilterFunctionType.FAILED_STUDENTS:
-                return lambda x: x < 7
+                return lambda x: x < 8
             case FilterFunctionType.APPROVED_STUDENTS:
-                return lambda x: x >= 7
+                return lambda x: x >= 8
             case FilterFunctionType.ALL_STUDENTS:
                 return lambda _: True
 

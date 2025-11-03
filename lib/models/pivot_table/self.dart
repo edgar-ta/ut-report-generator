@@ -2,7 +2,7 @@ import 'package:ut_report_generator/models/pivot_table/aggregate_function_type.d
 import 'package:ut_report_generator/models/pivot_table/data_filter/self.dart';
 import 'package:ut_report_generator/models/pivot_table/data_source.dart';
 import 'package:ut_report_generator/models/pivot_table/filter_function_type.dart';
-import 'package:ut_report_generator/models/pivot_table/pivot_data.dart';
+import 'package:ut_report_generator/models/pivot_table/pivot_table_data.dart';
 import 'package:ut_report_generator/models/pivot_table/pivot_table_level.dart';
 import 'package:ut_report_generator/models/slide/self.dart';
 import 'package:ut_report_generator/models/slide_category.dart';
@@ -12,7 +12,7 @@ class PivotTable extends Slide {
   final DataSource source;
   final List<DataFilter> filters;
   final List<PivotTableLevel> filtersOrder;
-  final PivotData data;
+  final PivotTableData data;
   final AggregateFunctionType aggregateFunction;
   final FilterFunctionType filterFunction;
 
@@ -45,25 +45,40 @@ class PivotTable extends Slide {
   }
 
   factory PivotTable.fromJson(Map<String, dynamic> json) {
+    final title = json["title"];
+    final identifier = json["identifier"];
+    final creationDate = DateTime.parse(json["creation_date"]);
+    final lastEdit = DateTime.parse(json["last_edit"]);
+    final preview = json["preview"];
+    final barePreview = json["bare_preview"];
+    final source = DataSource.fromJson(json["source"]);
+    final filters =
+        (json["filters"] as List).map((e) => DataFilter.fromJson(e)).toList();
+    final filtersOrder =
+        (json["filters_order"] as List)
+            .map((e) => PivotTableLevel.values.byName(e))
+            .toList();
+    final data = PivotTableData.fromJson(json["data"]);
+    final aggregateFunction = AggregateFunctionType.values.byName(
+      json["aggregate_function"],
+    );
+    final filterFunction = FilterFunctionType.values.byName(
+      json["filter_function"],
+    );
+
     return PivotTable(
-      title: json["title"],
-      identifier: json["identifier"],
-      creationDate: DateTime.parse(json["creation_date"]),
-      lastEdit: DateTime.parse(json["last_edit"]),
-      preview: json["preview"],
-      barePreview: json["bare_preview"],
-      source: DataSource.fromJson(json["source"]),
-      filters:
-          (json["filters"] as List).map((e) => DataFilter.fromJson(e)).toList(),
-      filtersOrder:
-          (json["filters_order"] as List)
-              .map((e) => PivotTableLevel.values.byName(e))
-              .toList(),
-      data: PivotData.fromJson(json["data"]),
-      aggregateFunction: AggregateFunctionType.values.byName(
-        json["aggregate_function"],
-      ),
-      filterFunction: FilterFunctionType.values.byName(json["filter_function"]),
+      title: title,
+      identifier: identifier,
+      creationDate: creationDate,
+      lastEdit: lastEdit,
+      preview: preview,
+      barePreview: barePreview,
+      source: source,
+      filters: filters,
+      filtersOrder: filtersOrder,
+      data: data,
+      aggregateFunction: aggregateFunction,
+      filterFunction: filterFunction,
     );
   }
 
@@ -77,7 +92,7 @@ class PivotTable extends Slide {
     DataSource? source,
     List<DataFilter>? filters,
     List<PivotTableLevel>? filtersOrder,
-    PivotData? data,
+    PivotTableData? data,
     AggregateFunctionType? aggregateFunction,
     FilterFunctionType? filterFunction,
   }) {

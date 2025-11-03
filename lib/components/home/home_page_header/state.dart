@@ -1,6 +1,6 @@
 import 'package:ut_report_generator/components/home/startup_button/state.dart';
 import 'package:ut_report_generator/models/response/hello_request_response.dart';
-import 'package:ut_report_generator/pages/home/_main.dart';
+import 'package:ut_report_generator/pages/home/page.dart';
 import 'package:ut_report_generator/utils/future_status.dart';
 
 class HomePageHeaderState {

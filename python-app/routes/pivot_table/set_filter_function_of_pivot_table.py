@@ -22,7 +22,7 @@ def set_filter_function_of_pivot_table():
         pivot_table.filter_function = filter_function
         recalculate(root_directory=root_directory, pivot_table=pivot_table)
         pivot_table.last_edit = Timestamp.now()
-        save_slideshow(root_directory=root_directory, report=report)
+        save_slideshow(root_directory=root_directory, slideshow=report)
 
     return EditPivotTable_Response(
         data=pivot_table.data,
