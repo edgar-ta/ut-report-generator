@@ -50,7 +50,7 @@ def set_charts_of_pivot_table():
                 continue
 
             _filter.charting_mode = ChartingMode.NONE
-
+    
     recalculate(root_directory=root_directory, pivot_table=pivot_table)
 
     pivot_table.last_edit = pandas.Timestamp.now()

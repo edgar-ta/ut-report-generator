@@ -4,6 +4,9 @@ from models.pivot_table.pivot_table_data import PivotTableData, PivotTableRod, P
 
 from typing import Literal
 
+def _parse_color(color_string: str) -> tuple[int, int, int]:
+    return tuple(int(component) / 255 for component in color_string.split(","))
+
 def plot_data(
         data: PivotTableData, 
         title: str, 
@@ -23,8 +26,9 @@ def plot_data(
     if all(isinstance(datum, PivotTableRod) for datum in data):
         keys = [ datum.key for datum in data ]
         values = [ datum.value for datum in data ]
+        colors = [ _parse_color(datum.color) for datum in data ]
 
-        bars = plt.bar(keys, values)
+        bars = plt.bar(keys, values, color=colors)
         for bar, value in zip(bars, values):
             plt.text(
                 bar.get_x() + bar.get_width() / 2,
@@ -46,13 +50,15 @@ def plot_data(
 
         for index, inner_key in enumerate(inner_keys):
             values = [ rod.value for datum in data for rod in datum.rods if rod.key == inner_key ]
+            colors = [ _parse_color(rod.color) for datum in data for rod in datum.rods if rod.key == inner_key ]
 
             # values = [data[outer][inner_key] for outer in outer_keys]
             bars = plt.bar(
                 [i + index * width for i in x],
                 values,
                 width=width,
-                label=inner_key
+                label=inner_key,
+                color=colors
             )
             
             for bar, value in zip(bars, values):

@@ -426,4 +426,11 @@ class PivotTableBloc extends SlideBloc<PivotTable> {
         )
         .then(_updateAfterEdition);
   }
+
+  void toggleAutomaticTitle() {
+    setSlide(
+      (pivotTable) =>
+          pivotTable.copyWith(automaticTitle: !pivotTable.automaticTitle),
+    );
+  }
 }

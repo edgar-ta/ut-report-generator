@@ -26,7 +26,7 @@ def get_pivot_table_rods(
     for index, key in enumerate(valid_values):
         local_data_frame = cross_section(
             data_frame=data_frame, 
-            key=key, 
+            key=[key], 
             level=charting_filter.level.value
             )
         series = flatten_to_series(obj=local_data_frame)
@@ -51,7 +51,8 @@ def get_pivot_table_rods(
             key=key,
             value=value,
             color=color,
-            missing=False
+            missing=False,
+            index=index
         )
         results.append(result)
     return results
@@ -66,11 +67,12 @@ def get_pivot_table_rod_groups(
         ) -> list[PivotTableRodGroup]:
     results = []
     valid_values = get_valid_values(super_charting_filter)
+
     for index, key in enumerate(valid_values):
         local_data_frame = cross_section(
             data_frame=data_frame, 
-            key=key, 
-            level=charting_filter.level.value
+            key=[key], 
+            level=super_charting_filter.level.value
             )
         pivot_table_rods = get_pivot_table_rods(
             data_frame=local_data_frame,

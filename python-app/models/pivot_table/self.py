@@ -79,7 +79,7 @@ class PivotTable(Slide):
             ''',
             column_widths=[FractionalUnit(1)],
             row_heights=[
-                Cm(3.5).emu, 
+                Cm(2).emu, 
                 FractionalUnit(1) 
             ],
             gap=Cm(0.25).emu,
@@ -90,7 +90,7 @@ class PivotTable(Slide):
                         text=self.title, 
                         alignment=PP_ALIGN.CENTER,
                         font=Font(
-                            size=Pt(60),
+                            size=Pt(32),
                             bold=True,
                             font_family='Avenir'
                         ),

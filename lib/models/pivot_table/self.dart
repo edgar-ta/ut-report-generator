@@ -15,6 +15,7 @@ class PivotTable extends Slide {
   final PivotTableData data;
   final AggregateFunctionType aggregateFunction;
   final FilterFunctionType filterFunction;
+  final bool automaticTitle;
 
   PivotTable({
     required super.title,
@@ -29,6 +30,7 @@ class PivotTable extends Slide {
     required this.data,
     required this.aggregateFunction,
     required this.filterFunction,
+    required this.automaticTitle,
   }) : super(category: SlideCategory.pivotTable);
 
   Map<String, dynamic> toJson() {
@@ -79,6 +81,7 @@ class PivotTable extends Slide {
       data: data,
       aggregateFunction: aggregateFunction,
       filterFunction: filterFunction,
+      automaticTitle: true,
     );
   }
 
@@ -95,6 +98,7 @@ class PivotTable extends Slide {
     PivotTableData? data,
     AggregateFunctionType? aggregateFunction,
     FilterFunctionType? filterFunction,
+    bool? automaticTitle,
   }) {
     return PivotTable(
       title: title ?? this.title,
@@ -109,6 +113,7 @@ class PivotTable extends Slide {
       data: data ?? this.data,
       aggregateFunction: aggregateFunction ?? this.aggregateFunction,
       filterFunction: filterFunction ?? this.filterFunction,
+      automaticTitle: automaticTitle ?? this.automaticTitle,
     );
   }
 }

@@ -11,3 +11,4 @@ const double SLIDESHOW_PREVIEW_HEIGHT = 160;
 const double EXPORT_BOX_WIDTH = 256;
 const double EXPORT_BOX_HEIGHT = 48;
 const double STARTUP_BUTTON_HEIGHT = 44;
+const double HEIGHT_OF_EMPTY_BAR = 15;

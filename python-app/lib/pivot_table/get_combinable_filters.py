@@ -41,6 +41,8 @@ def get_combinable_filters(data_frame: pandas.DataFrame, filters: list[DataFilte
             selected_values=list(set(_filter.selected_values) & possible_values_set),
             selection_mode=_filter.selection_mode,
             )
+        combinable_filter.possible_values.sort()
+        combinable_filter.selected_values.sort()
         combinable_filters.append(combinable_filter)
 
         if combinable_filter.possible_values.__len__() > 0:

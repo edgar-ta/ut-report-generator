@@ -72,6 +72,17 @@ class _PivotTableEditPaneState extends State<PivotTableEditPane> {
             label: Text("Título"),
           ),
           Row(
+            children: [
+              Checkbox(
+                value: widget.pivotTable.automaticTitle,
+                onChanged: (_) {
+                  widget.bloc.toggleAutomaticTitle();
+                },
+              ),
+              Text("Mostrar título automático"),
+            ],
+          ),
+          Row(
             spacing: 4,
             children: [
               Expanded(
@@ -174,7 +185,6 @@ class _PivotTableEditPaneState extends State<PivotTableEditPane> {
                         }
 
                         if (filter.chartingMode == ChartingMode.none) {
-                          print("Setting the super chart of the chart");
                           await widget.bloc.setSuperChart(index);
                           return;
                         }

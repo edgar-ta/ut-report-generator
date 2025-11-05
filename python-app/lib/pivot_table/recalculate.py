@@ -11,7 +11,6 @@ from lib.slide.delete_preview import delete_preview
 from models.pivot_table.self import PivotTable
 from models.pivot_table.data_filter.self import DataFilter
 from models.pivot_table.data_filter.charting_mode import ChartingMode
-from models.report.self import Report
 
 import pandas
 import os
@@ -53,6 +52,7 @@ def recalculate(root_directory: str, pivot_table: PivotTable, preloaded_data_fra
     pivot_table.filters = combinable_filters
 
     _ordered_filters = ordered_filters(filters_order=pivot_table.filters_order, filters=pivot_table.filters)
+
     new_data = get_data_of_frame(
         data_frame=data_frame, 
         filters=_ordered_filters, 

@@ -12,6 +12,7 @@ import 'package:ut_report_generator/components/slideshow_editor/image_slide_prev
 import 'package:ut_report_generator/components/slideshow_editor/image_slide_previews/title_and_content_preview.dart';
 import 'package:ut_report_generator/models/image_slide/image_slide_kind.dart';
 import 'package:ut_report_generator/models/image_slide/self.dart';
+import 'package:ut_report_generator/models/pivot_table/data_filter/charting_mode.dart';
 import 'package:ut_report_generator/models/pivot_table/self.dart';
 import 'package:ut_report_generator/models/report/self.dart';
 import 'package:ut_report_generator/api/slideshow/self.dart' as report_api;
@@ -82,7 +83,10 @@ class SlideshowEditorBloc extends Bloc<SlideshowEditorState> {
         key: ValueKey(slide.identifier),
         isMenuOpen: initialState.openSlideIdentifier != null,
         openMenu: () => openSlideMenu(slide),
-        child: PivotTableSection(data: slide.data, chartName: slide.title),
+        child: PivotTableSection(
+          pivotTable: slide,
+          mode: initialState.slideshow!.visualizationMode,
+        ),
       );
     }
     if (slide is ImageSlide) {

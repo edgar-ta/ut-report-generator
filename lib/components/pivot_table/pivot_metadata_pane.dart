@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ut_report_generator/blocs/pivot_table_bloc.dart';
+import 'package:ut_report_generator/components/slide/slide_metadata_pane.dart';
+import 'package:ut_report_generator/models/slide_category.dart';
 
 class PivotMetadataPane extends StatelessWidget {
   const PivotMetadataPane({super.key, required this.files, required this.bloc});
@@ -16,6 +18,12 @@ class PivotMetadataPane extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16,
       children: [
+        SlideMetadataPane(
+          category: SlideCategory.pivotTable,
+          identifier: "fsfa",
+          creationDate: DateTime.now(),
+          preview: "fsfa",
+        ),
         Column(
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.stretch,
