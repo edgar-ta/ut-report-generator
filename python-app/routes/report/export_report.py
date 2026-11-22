@@ -28,7 +28,7 @@ def export_pivot_table_files(temporary_export_directory: str, pivot_tables: list
     data_directory = data_directory_of_report(root_directory=temporary_export_directory)
 
     files_equivalence = {
-        data_file: f"archivo-{i + 1}.{get_extension_or_panic(data_file)}"
+        data_file: f"{data_file}.{get_extension_or_panic(data_file)}"
         for i, data_file in enumerate(unique_data_files)
     }
 

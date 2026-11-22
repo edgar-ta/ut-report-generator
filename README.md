@@ -5,7 +5,7 @@
 Ésta es una aplicación interna de la UTSJR cuyo objetivo final es automatizar la generación de reportes del desempeño
 de los alumnos que solicita la Secretaría Académica a los profesores tutores de grupo.
 
-Se trata de un proyecto desarrollado en conjunto por Edgar Trejo Avila y el profesor [Gregorio Rodríguez Miranda](https://github.com/GoyoRodMir).
+Se trata de un proyecto desarrollado en conjunto por Edgar Trejo Avila y el profesor [Gregorio Rodríguez Miranda](https://github.com/GoyoRodMir), con la mentoría de la doctora Brenda Juárez Santiago.
 
 ## Tecnologías Utilizadas
 

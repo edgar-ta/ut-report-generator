@@ -250,7 +250,7 @@ class _HomePageState extends State<HomePage> {
         return;
       case StartupOption.importZip:
         _selectFiles(false, [".zip"], (files) async {
-          return slideshow_api.importSlideshow(rootDirectory: files[0]);
+          return slideshow_api.importSlideshow(reportFile: files[0]);
         });
         break;
       case StartupOption.createVisualization:

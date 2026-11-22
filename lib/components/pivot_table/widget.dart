@@ -277,7 +277,7 @@ class _PivotTableSectionState extends State<PivotTableSection> {
       children: [
         TextSpan(
           text:
-              "${_aggregateFunctionToSpanish(widget.pivotTable.aggregateFunction)} de ${_filterFunctionToSpanish(widget.pivotTable.filterFunction)} para ${currentRod.key}",
+              "${_aggregateFunctionToSpanish(widget.pivotTable.aggregateFunction)} de ${_filterFunctionToSpanish(widget.pivotTable.filterFunction)} para ${_titleCase(currentRod.key)}",
           style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
         ),
       ],
