@@ -68,6 +68,8 @@ flutter build windows --release
 iscc compilation-script.iss
 ```
 
+4. El ejecutable final está disponible en `.logistics-assets/UT Report Generator.exe`
+
 ## Cómo Contribuir al Proyecto
 
 1. Hacer un fork del repositorio y crear una rama usando el prefijo `feat/`, `fix/` o `doc/` según corresponda
