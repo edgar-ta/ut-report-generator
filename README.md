@@ -26,14 +26,16 @@ IS_TESTING_MODE=false
 ```
 
 2. Ejecutar el servidor de Python
-```sh
+```ps1
 cd python-app
+python -m venv venv
 ./venv/Scripts/Activate.ps1
+pip install -r requirements.txt
 python main.py
 ```
 
 3. Ejecutar la aplicación de Flutter en Windows
-```sh
+```ps1
 # Desde la carpeta raíz del proyecto
 flutter run -d windows
 ```
@@ -49,25 +51,32 @@ flutter run -d windows
 
 **Pasos a Seguir**
 1. Compilar el programa de Python usando PyInstaller
-```sh
+```ps1
 cd python-app
 pyinstaller --onefile main.py
 ```
 
 2. Compilar el programa de Flutter
-```sh
+```ps1
 # Desde la carpeta raíz del proyecto
 flutter build windows --release
 ```
 
 3. Compilar el script de InnoSetup
-```sh
+```ps1
 # Desde la carpeta raíz del proyecto
 iscc compilation-script.iss
 ```
 
 ## Cómo Contribuir al Proyecto
 
-
+1. Hacer un fork del repositorio y crear una rama usando el prefijo `feat/`, `fix/` o `doc/` según corresponda
+2. Realizar cambios de manera modular y con mensajes de commit semánticos
+3. Comprobar que:
+   1. La aplicación Flutter compila y se ejecuta sin errores.
+   2. El servidor Python levanta correctamente y pasa las pruebas definidas en `python-app/testing`.
+   3. No se modifican archivos de configuración global a menos que sea
+estrictamente necesario.
+4. Llenar el formato de la PR y enviarla
 
 ![Imagen de pie de página que muestra los logos de las instituciones con las que está asociada la UTSJR](readme-assets/footer.png)
