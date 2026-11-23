@@ -3,7 +3,7 @@
 ![Imagen de encabezado que muestra el logo de la UTSJR](readme-assets/header.png)
 
 Esta es una aplicación interna de la UTSJR cuyo objetivo final es automatizar la generación de reportes del desempeño
-de los grupos que Secretaría Académica a los tutores de grupo.
+de los grupos que Secretaría Académica solicita a los tutores de grupo.
 
 Se trata de un proyecto desarrollado en conjunto por Edgar Trejo Avila y el profesor [Gregorio Rodríguez Miranda](https://github.com/GoyoRodMir), con la mentoría de la doctora Brenda Juárez Santiago.
 
